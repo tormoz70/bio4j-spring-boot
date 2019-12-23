@@ -35,7 +35,7 @@ public class JdbcHelperImpl implements JdbcHelper {
             throw new IllegalArgumentException("Argument \"sql\" cannot be null!");
 
         final Map<String, Object> paramMap = mapHelper.decodeParams(prms);
-        paramMap.put("BIO_CURUSR_UID", "qwe");
+        paramMap.put("SYS_CURUSR_UID", "qwe");
 
         List<T> rslt = jdbcTemplate.query(
                 sql,
