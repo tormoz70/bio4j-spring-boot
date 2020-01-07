@@ -25,7 +25,7 @@ public class JdbcHelperImpl implements JdbcHelper {
         this.jdbcHelperConfig = jdbcHelperConfig;
     }
 
-    public <T> List<T> query(
+    private <T> List<T> _query(
             final String sql,
             final Object prms,
             final Class<T> clazz) {
@@ -77,6 +77,13 @@ public class JdbcHelperImpl implements JdbcHelper {
         );
 
         return rslt;
+    }
+
+    public <T> List<T> query(
+            final String sql,
+            final Object prms,
+            final Class<T> clazz) {
+        return _query(sql, prms, clazz);
     }
 
 }
