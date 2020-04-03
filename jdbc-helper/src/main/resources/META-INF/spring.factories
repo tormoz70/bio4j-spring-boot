@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-ru.bio4j.spring.dba.JdbcHelperAutoConfiguration

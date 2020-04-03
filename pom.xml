@@ -36,8 +36,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <com.fasterxml.jackson.core.version>2.9.7</com.fasterxml.jackson.core.version>
         <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <org.apache.poi.version>4.1.0</org.apache.poi.version>
+        <ojdbc.version>12.2.0.1</ojdbc.version>
+        <postgresql-jdbc.version>42.1.4</postgresql-jdbc.version>
+        <test.hikaricp.version>3.4.1</test.hikaricp.version>
+        <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
 	</properties>
 
     <build>
@@ -123,59 +127,159 @@
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--                <version>${spring-boot.version}</version>-->
+<!--            </dependency>-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-mail</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-json</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-logging</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-rabbit</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- HttpClient -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+
 
             <!--jackson-->
+<!--            <dependency>-->
+<!--                <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                <artifactId>jackson-core</artifactId>-->
+<!--                <version>${com.fasterxml.jackson.core.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                <artifactId>jackson-annotations</artifactId>-->
+<!--                <version>${com.fasterxml.jackson.core.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                <artifactId>jackson-databind</artifactId>-->
+<!--                <version>${com.fasterxml.jackson.core.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.fasterxml.jackson.jaxrs</groupId>-->
+<!--                <artifactId>jackson-jaxrs-json-provider</artifactId>-->
+<!--                <version>${com.fasterxml.jackson.core.version}</version>-->
+<!--            </dependency>-->
+
+<!--			<dependency>-->
+<!--				<groupId>ch.qos.logback</groupId>-->
+<!--				<artifactId>logback-core</artifactId>-->
+<!--				<version>1.2.3</version>-->
+<!--			</dependency>-->
+
+<!--			<dependency>-->
+<!--				<groupId>org.slf4j</groupId>-->
+<!--				<artifactId>slf4j-api</artifactId>-->
+<!--				<version>1.8.0-beta2</version>-->
+<!--			</dependency>-->
+
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.10</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.14</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
-                <version>${com.fasterxml.jackson.core.version}</version>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${org.apache.poi.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>5.2.1.RELEASE</version>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc8</artifactId>
+                <version>${ojdbc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql-jdbc.version}</version>
             </dependency>
 
-
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>
-			</dependency>
-
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-core</artifactId>
-				<version>1.2.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>1.8.0-beta2</version>
-			</dependency>
+            <!-- bio4j -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-commons-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-sapi-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-stypes-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-tmodel-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>bio4j-spring-common-lib</artifactId>
+                <artifactId>bio4j-spring-dbapi-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-dba-commons-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-dba-oracle-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>${project.groupId}</groupId>-->
+<!--                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>bio4j-spring-boot-jdbc-helper</artifactId>
@@ -187,56 +291,81 @@
 
     <dependencies>
 
+<!--        <dependency>-->
+<!--            <groupId>ch.qos.logback</groupId>-->
+<!--            <artifactId>logback-core</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-api</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
             <scope>provided</scope>
         </dependency>
 
 <!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-jdbc</artifactId>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-core</artifactId>-->
 <!--            <scope>provided</scope>-->
 <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-annotations</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-databind</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.jaxrs</groupId>-->
+<!--            <artifactId>jackson-jaxrs-json-provider</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
     <modules>
-		<module>common-lib</module>
-		<module>jdbc-helper</module>
+        <module>commons</module>
+        <module>dbapi</module>
+        <module>dba-commons</module>
+        <module>dba-oracle</module>
+<!--        <module>dba-pgsql</module>-->
+        <module>s-api</module>
+        <module>s-types</module>
+        <module>t-model</module>
+
+		<module>dba-helper</module>
 	</modules>
 
 </project>
