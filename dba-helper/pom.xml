@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
 		<groupId>ru.bio4j.spring</groupId>
-		<artifactId>bio4j-starters</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<artifactId>bio4j-starter</artifactId>
+        <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bio4j-spring-boot-jdbc-helper</artifactId>
+    <artifactId>bio4j-spring-boot-dba-helper</artifactId>
 
     <dependencies>
         <dependency>
@@ -31,7 +31,25 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jersey</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+        </dependency>
+
+        <!--bio4j-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-commons-lib</artifactId>
