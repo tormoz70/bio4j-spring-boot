@@ -1,5 +1,7 @@
 package ru.bio4j.spring.commons.converter;
 
+import ru.bio4j.spring.model.transport.ConvertValueException;
+
 /**
  * Created by ayrat on 21.03.14.
  */

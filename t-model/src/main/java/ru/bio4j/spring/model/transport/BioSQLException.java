@@ -1,6 +1,4 @@
-package ru.bio4j.spring.database.api;
-
-import ru.bio4j.spring.model.transport.BioError;
+package ru.bio4j.spring.model.transport;
 
 public class BioSQLException extends BioError {
     public BioSQLException(String msg, Exception parentException){

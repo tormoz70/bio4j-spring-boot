@@ -5,6 +5,7 @@ import ru.bio4j.spring.commons.utils.Lists;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;

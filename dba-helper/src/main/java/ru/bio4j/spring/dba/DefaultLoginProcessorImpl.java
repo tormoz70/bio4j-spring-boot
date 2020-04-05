@@ -5,6 +5,7 @@ package ru.bio4j.spring.dba;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.bio4j.spring.commons.types.*;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Strings;
@@ -26,81 +27,53 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginProcessorImpl.class);
 
     @Autowired
-    private SecurityService securityService;
+    @Qualifier("default")
+    private SecurityService defaultSecurityService;
+
+    @Autowired(required = false)
+    @Qualifier("override")
+    private SecurityService activeSecurityService;
+
     @Autowired
     private ErrorProcessor errorProcessor;
+
+    private SecurityService getSecurityService() {
+        return activeSecurityService != null ? activeSecurityService : defaultSecurityService;
+    }
 
     private BioQueryParams decodeQParams(final HttpServletRequest request) {
         return request instanceof WrappedRequest ? ((WrappedRequest)request).getBioQueryParams() : null;
     }
 
-    private void _doGetUser(final HttpServletRequest request, final HttpServletResponse response) {
-        User user = securityService.getUser(decodeQParams(request));
-        LoginResult result = LoginResult.Builder.success(user);
-        try {
-            response.getWriter().append(Jecksons.getInstance().encode(result));
-        } catch (IOException e) {
-            throw Utl.wrapErrorAsRuntimeException(e);
-        }
-    }
-
-    private void _doLogin(final HttpServletRequest request, final HttpServletResponse response) {
-        User user = securityService.login(decodeQParams(request));
-        LoginResult result = LoginResult.Builder.success(user);
-        try {
-            response.getWriter().append(Jecksons.getInstance().encode(result));
-        } catch (IOException e) {
-            throw Utl.wrapErrorAsRuntimeException(e);
-        }
-    }
-
-    private void _doLogoff(final HttpServletRequest request, final HttpServletResponse response) {
-        securityService.logout(decodeQParams(request));
-        LoginResult result = LoginResult.Builder.success();
-        try {
-            response.getWriter().append(Jecksons.getInstance().encode(result));
-        } catch (IOException e) {
-            throw Utl.wrapErrorAsRuntimeException(e);
-        }
+    private boolean doCheckPathIsOpened(final HttpServletRequest request) {
+        return getSecurityService().checkPathIsOpened(request);
     }
 
     private void doOthers(final HttpServletRequest request, final HttpServletResponse response) {
         final WrappedRequest req = (WrappedRequest)request;
         final BioQueryParams qprms = req.getBioQueryParams();
-        User user;
-        if (!Strings.isNullOrEmpty(qprms.login))
-            user = securityService.login(decodeQParams(request));
-        else
-            user = securityService.getUser(decodeQParams(request));
+        User user = getSecurityService().getUser(decodeQParams(request));
         req.setUser(user);
         ServletContextHolder.setCurrentUser(user);
     }
 
     public void process(final ServletRequest request, final ServletResponse response, final FilterChain chain) {
-        if(securityService != null) {
-            final HttpServletRequest reqs = (HttpServletRequest) request;
-            final HttpServletResponse resp = (HttpServletResponse) response;
+        final HttpServletRequest reqs = (HttpServletRequest) request;
+        final HttpServletResponse resp = (HttpServletResponse) response;
+        if(getSecurityService() != null) {
             resp.setCharacterEncoding("UTF-8");
-            response.setContentType("application/json");
+            resp.setContentType("application/json");
             try {
-                String pathInfo = reqs.getPathInfo();
-                if (!Strings.isNullOrEmpty(pathInfo) && Strings.compare(pathInfo, "/login", false)) {
-                    _doLogin(reqs, resp);
-                } else if (!Strings.isNullOrEmpty(pathInfo) && Strings.compare(pathInfo, "/curusr", false)) {
-                    _doGetUser(reqs, resp);
-                } else if (!Strings.isNullOrEmpty(pathInfo) && Strings.compare(pathInfo, "/logoff", false)) {
-                    _doLogoff(reqs, resp);
-                } else {
+                if(!doCheckPathIsOpened(reqs))
                     doOthers(reqs, resp);
-                    chain.doFilter(request, resp);
-                }
+                chain.doFilter(reqs, resp);
             } catch (Exception e) {
                 LOG.error(null, e);
                 errorProcessor.doResponse(e, resp);
             }
         } else {
             try {
-                chain.doFilter(request, response);
+                chain.doFilter(reqs, resp);
             } catch (ServletException | IOException e) {
                 throw BioError.wrap(e);
             }

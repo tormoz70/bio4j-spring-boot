@@ -1,7 +1,7 @@
 package ru.bio4j.spring.database.oracle.impl;
 
 import org.junit.*;
-import ru.bio4j.spring.commons.converter.ConvertValueException;
+import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import org.slf4j.Logger;

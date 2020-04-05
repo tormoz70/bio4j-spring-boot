@@ -8,7 +8,7 @@ import org.w3c.dom.NodeList;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.database.api.BioSQLException;
+import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Alignment;

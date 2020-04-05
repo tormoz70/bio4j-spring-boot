@@ -1,10 +1,14 @@
 package ru.bio4j.spring.dba;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import ru.bio4j.spring.commons.types.ApplicationContextProvider;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.LoginProcessor;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.model.transport.BioQueryParams;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -12,16 +16,24 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
+@Configuration
 public class SecurityFilterBase {
     LogWrapper LOG = LogWrapper.getLogger(SecurityFilterBase.class);
 
     private boolean bioDebug = false;
     private String errorPage;
     private LoginProcessor loginProcessor;
+    private boolean disableAnonymouse;
 
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig, ApplicationContext applicationContext, boolean disableAnonymouse) throws ServletException {
+        this.disableAnonymouse = disableAnonymouse;
         if (filterConfig != null) {
             //
+        }
+
+        if(ApplicationContextProvider.getApplicationContext() == null) {
+            ApplicationContextProvider applicationContextProvider = (ApplicationContextProvider)applicationContext.getBean("applicationContextProvider");
+            applicationContextProvider.setApplicationContext(applicationContext);
         }
         loginProcessor = (LoginProcessor) ApplicationContextProvider.getApplicationContext().getBean("loginProcessor");
     }
@@ -44,6 +56,9 @@ public class SecurityFilterBase {
             rereq = (WrappedRequest)request;
         else
             rereq = new WrappedRequest((HttpServletRequest)request);
+        if(disableAnonymouse && Strings.compare(rereq.getBioQueryParams().stoken, "anonymouse", true)) {
+            rereq.getBioQueryParams().stoken = null;
+        }
         rereq.putHeader("Access-Control-Allow-Origin", "*");
         rereq.putHeader("Access-Control-Allow-Methods", Strings.combineArray(AVAMETHODS, ","));
         return rereq;

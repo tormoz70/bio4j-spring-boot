@@ -1,5 +1,7 @@
 package ru.bio4j.spring.model.transport;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.security.Principal;
@@ -15,12 +17,12 @@ public class LoginResult {
         return success;
     }
 
-    public Exception getException() {
-        return exception;
-    }
-
     public Principal getUser() {
         return user;
+    }
+
+    public Exception getException() {
+        return exception;
     }
 
     public static class Builder {

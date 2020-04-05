@@ -1,4 +1,4 @@
-package ru.bio4j.spring.commons.utils;
+package ru.bio4j.spring.model.transport;
 
 import ru.bio4j.spring.model.transport.BioError;
 

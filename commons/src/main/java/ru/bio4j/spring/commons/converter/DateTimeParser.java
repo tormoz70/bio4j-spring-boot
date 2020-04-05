@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.converter;
 
 import ru.bio4j.spring.commons.utils.Regexs;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.model.transport.DateParseException;
 
 import java.util.ArrayList;
 import java.util.Date;

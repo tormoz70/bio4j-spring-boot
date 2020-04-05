@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
 import ru.bio4j.spring.commons.utils.SrvcUtils;

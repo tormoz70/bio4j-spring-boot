@@ -3,7 +3,7 @@ package ru.bio4j.spring.database.commons;
 import com.zaxxer.hikari.HikariConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.commons.converter.ConvertValueException;
+import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;

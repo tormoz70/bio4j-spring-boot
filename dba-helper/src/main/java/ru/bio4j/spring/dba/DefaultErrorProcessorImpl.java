@@ -3,7 +3,7 @@ package ru.bio4j.spring.dba;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.ErrorProcessor;
-import ru.bio4j.spring.database.api.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.BioSQLApplicationError;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.BioError;
 import ru.bio4j.spring.model.transport.LoginResult;
@@ -13,7 +13,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.function.Function;
 
 public class DefaultErrorProcessorImpl implements ErrorProcessor {
@@ -25,10 +24,10 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
         public String type;
     }
 
-    public static ErrorResponseEntry createEntry(int code, String entry, String type) {
+    public static ErrorResponseEntry createEntry(int code, LoginResult entry, String type) {
         ErrorResponseEntry rslt = new ErrorResponseEntry();
         rslt.code = code;
-        rslt.entry = entry;
+        rslt.entry = Jecksons.getInstance().encode(entry);
         rslt.type = type;
         return rslt;
     }
@@ -41,7 +40,7 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
             BioError.Login loginError = exception instanceof BioError.Login ? (BioError.Login) exception : null;
             if (loginError != null) {
                 LoginResult result = LoginResult.Builder.error(loginError);
-                return createEntry(Response.Status.UNAUTHORIZED.getStatusCode(), Jecksons.getInstance().encode(result), MediaType.APPLICATION_JSON);
+                return createEntry(Response.Status.UNAUTHORIZED.getStatusCode(), result, MediaType.APPLICATION_JSON);
             }
             BioError errorBean = exception instanceof BioError ? (BioError) exception : null;
             if (errorBean == null) {
@@ -52,19 +51,19 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
             if (errorBean != null) {
                 LOG.error(null, exception);
                 LoginResult result = LoginResult.Builder.error(errorBean);
-                return createEntry(errorBean.getErrorCode(), Jecksons.getInstance().encode(result), MediaType.APPLICATION_JSON);
+                return createEntry(errorBean.getErrorCode(), result, MediaType.APPLICATION_JSON);
             } else if (exception instanceof javax.ws.rs.NotAllowedException) {
                 LOG.error(null, exception);
                 LoginResult result = LoginResult.Builder.error(new BioError.MethodNotAllowed());
-                return createEntry(Response.Status.METHOD_NOT_ALLOWED.getStatusCode(), Jecksons.getInstance().encode(result), MediaType.APPLICATION_JSON);
+                return createEntry(Response.Status.METHOD_NOT_ALLOWED.getStatusCode(), result, MediaType.APPLICATION_JSON);
             } else if (exception instanceof javax.ws.rs.NotFoundException) {
                 LOG.error(null, exception);
                 LoginResult result = LoginResult.Builder.error(new BioError.MethodNotImplemented());
-                return createEntry(Response.Status.NOT_IMPLEMENTED.getStatusCode(), Jecksons.getInstance().encode(result), MediaType.APPLICATION_JSON);
+                return createEntry(Response.Status.NOT_IMPLEMENTED.getStatusCode(), result, MediaType.APPLICATION_JSON);
             }
             LOG.error(null, exception);
             LoginResult result = LoginResult.Builder.error(new BioError(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Неизвестная ошибка на сервере"));
-            return createEntry(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), Jecksons.getInstance().encode(result), MediaType.APPLICATION_JSON);
+            return createEntry(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), result, MediaType.APPLICATION_JSON);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -80,8 +79,12 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
             ErrorResponseEntry rspEntry = process(exception, null);
             ((HttpServletResponse)response).setStatus(rspEntry.code);
             response.setContentType(rspEntry.type);
-            response.getWriter().print(rspEntry.entry);
-        } catch(IOException e) {
+            response.setCharacterEncoding("UTF-8");
+//            response.getOutputStream().write(rspEntry.entry.getBytes(Charset.forName("UTF-8")));;
+            response.getWriter().write(rspEntry.entry);
+            response.flushBuffer();
+            //TODO Ошибки, которые возникают при выполнении SQL(BioSQLException) не доходят до клиента.... Надо с этим разобраться
+        } catch(Exception e) {
             throw BioError.wrap(e);
         }
     }

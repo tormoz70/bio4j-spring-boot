@@ -1,4 +1,4 @@
-package ru.bio4j.spring.database.api;
+package ru.bio4j.spring.model.transport;
 
 public class BioSQLApplicationError extends BioSQLException {
     public BioSQLApplicationError(String msg, Exception parentException){

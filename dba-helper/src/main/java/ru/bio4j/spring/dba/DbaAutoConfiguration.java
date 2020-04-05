@@ -2,6 +2,7 @@ package ru.bio4j.spring.dba;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -12,6 +13,8 @@ import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @EnableConfigurationProperties({ DataSourceProperties.class })
@@ -30,18 +33,21 @@ public class DbaAutoConfiguration {
         return result;
     }
 
-    @Bean(name="sqlContext")
+    @PostConstruct
+    public void init() {
+    }
+
+    @Bean
     public SQLContext sqlContext() {
         return DbContextFactory.createHikariCP(dataSourceProperties, OraContext.class);
     }
 
-    @Bean(name="httpParamMap")
+    @Bean
     public HttpParamMap httpParamMap() {
-        return new HttpParamMap() {};
+        return new DefaultHttpParamMapImpl();
     }
 
-    @Bean(name="dbaAdapter")
-    @ConditionalOnBean(name = "sqlContext")
+    @Bean
     public DbaAdapter dbaAdapter() {
         return new DbaAdapter();
     }
@@ -57,6 +63,7 @@ public class DbaAutoConfiguration {
     }
 
     @Bean
+    @Qualifier("default")
     public SecurityService securityService() {
         return new DefaultSecurityModuleImpl();
     }

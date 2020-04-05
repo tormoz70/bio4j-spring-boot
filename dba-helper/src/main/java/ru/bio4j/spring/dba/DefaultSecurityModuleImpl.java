@@ -2,23 +2,17 @@ package ru.bio4j.spring.dba;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.types.SecurityService;
-import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.database.api.BioSQLException;
 import ru.bio4j.spring.model.transport.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static ru.bio4j.spring.commons.utils.Strings.isNullOrEmpty;
+import javax.servlet.http.HttpServletRequest;
 
 
-@Component
 public class DefaultSecurityModuleImpl implements SecurityService {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSecurityModuleImpl.class);
+
+    @Override
+    public boolean checkPathIsOpened(HttpServletRequest request) { return true; }
 
     @Override
     public User login(final BioQueryParams qprms) {

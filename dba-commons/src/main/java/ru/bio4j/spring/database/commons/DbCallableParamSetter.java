@@ -2,12 +2,12 @@ package ru.bio4j.spring.database.commons;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.commons.converter.ConvertValueException;
+import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.database.api.BioSQLException;
+import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 import ru.bio4j.spring.database.api.SQLParamSetter;
 import ru.bio4j.spring.database.api.SqlTypeConverter;

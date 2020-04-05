@@ -209,6 +209,21 @@ public class JecksonsTest extends TestCase {
         Assert.assertNotNull(Paramus.getParam(bioParams, "p_company_id"));
     }
 
+//    public void testBadStringSerial() {
+//        LoginResult r = LoginResult.Builder.error("Error on execute command.:\n" +
+//                " - preparedSQL: {call ${bio_login.vesion}.login(:p_login,:p_deviceuuid,:p_remote_ip,:p_remote_client,:v_stoken)};\n" +
+//                " - {DbCommand.Params(before exec): {\n" +
+//                "\t   1-p_login(in)(VARCHAR)..............................[null];\n" +
+//                "\t   2-p_deviceuuid(in)(VARCHAR).........................[null];\n" +
+//                "\t   3-p_remote_ip(in)(VARCHAR)..........................\"127.0.0.1\";\n" +
+//                "\t   4-p_remote_client(in)(VARCHAR)......................\"X-Client: Unknown; User-Agent: PostmanRuntime/7.22.0\";\n" +
+//                "\t   5-v_stoken(out)(VARCHAR)............................[null];\n" +
+//                "}}");
+//        String json = Jecksons.getInstance().encode(r);
+//        System.out.println(json);
+//        LoginResult restored = Jecksons.getInstance().decode(json, LoginResult.class);
+//        System.out.println(restored.getErrorMessage());
+//    }
 
     @Test
     public void testPolymorphingErrors() throws Exception {

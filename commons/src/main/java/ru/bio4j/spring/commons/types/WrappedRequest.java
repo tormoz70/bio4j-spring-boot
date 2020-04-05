@@ -28,6 +28,10 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 
     protected HttpParamMap httpParamMap;
 
+    public HttpParamMap getHttpParamMap() {
+        return httpParamMap;
+    }
+
     public WrappedRequest(final HttpServletRequest request) {
         super(request);
         ServletContextHolder.setServletContext(request.getServletContext());

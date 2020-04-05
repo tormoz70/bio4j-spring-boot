@@ -1,7 +1,7 @@
 package ru.bio4j.spring.commons.converter.hanlers;
 
 import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.commons.converter.ConvertValueException;
+import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.converter.TypeHandler;
 import ru.bio4j.spring.commons.converter.TypeHandlerBase;
 import ru.bio4j.spring.commons.converter.Types;

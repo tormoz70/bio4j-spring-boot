@@ -1,4 +1,4 @@
-package ru.bio4j.spring.commons.converter;
+package ru.bio4j.spring.model.transport;
 
 public class DateParseException extends RuntimeException {
 

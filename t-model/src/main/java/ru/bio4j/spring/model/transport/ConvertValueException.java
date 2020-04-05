@@ -1,4 +1,4 @@
-package ru.bio4j.spring.commons.converter;
+package ru.bio4j.spring.model.transport;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

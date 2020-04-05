@@ -5,11 +5,7 @@ import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.*;
-import ru.bio4j.spring.model.transport.Prop;
-import ru.bio4j.spring.model.transport.ABean;
-import ru.bio4j.spring.model.transport.MetaType;
-import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.model.transport.User;
+import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.StoreRow;
 import ru.bio4j.spring.commons.utils.*;
 

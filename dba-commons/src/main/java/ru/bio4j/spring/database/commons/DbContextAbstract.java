@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
