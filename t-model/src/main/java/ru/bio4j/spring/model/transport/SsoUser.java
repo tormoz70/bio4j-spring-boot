@@ -2,30 +2,47 @@ package ru.bio4j.spring.model.transport;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.annotations.ApiModelProperty;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.security.Principal;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class SsoUser implements Principal {
 
+    @ApiModelProperty("Внутренний идентификатор пользователя")
     private String innerUid;
+    @ApiModelProperty("Токен безопасности. Передавать в заголовок \"X-SToken\" для всех запросов")
     private String stoken;
+    @ApiModelProperty("Логин пользователя (уникальное имя пользователя, которое используется при входе в систему)")
     private String login;
+    @ApiModelProperty("ФИО пользователя")
     private String fio;
+    @ApiModelProperty("Email пользователя")
     private String email;
+    @ApiModelProperty("Контактная информация пользователя")
     private String phone;
+    @ApiModelProperty("ID организации к которой относится пользователь")
     private String orgId;
+    @ApiModelProperty("Название организации к которой относится пользователь")
     private String orgName;
+    @ApiModelProperty("Описание организации к которой относится пользователь")
     private String orgDesc;
 
+    @ApiModelProperty("Список ролей пользователя (разделитель \",\")")
     private String roles;
+    @ApiModelProperty("Список разрешений пользователя (разделитель \",\")")
     private String grants;
 
+    @ApiModelProperty("IP адрес пользователя")
     private String remoteIP;
+    @ApiModelProperty("Описание приложения пользователя")
     private String remoteClient;
 
+    @ApiModelProperty("true - анонимный пользователь")
     private Boolean anonymouse;
 
+    @ApiModelProperty("Уникальный идентификатор устройства пользователя")
     private String deviceuuid;
 
     public String getStoken() {

@@ -18,6 +18,8 @@ public class BioQueryParams {
 
     @Prop(name = "deviceuuid")
     public String deviceuuid;
+    @Prop(name = "apptoken")
+    public String apptoken;
     @Prop(name = "stoken")
     public String stoken;
     @Prop(name = "jsonData")
@@ -34,10 +36,6 @@ public class BioQueryParams {
     public String offsetOrig;
     public Integer offset;
 
-//    @Prop(name = "limit")
-//    public String limitOrig;
-//    @Prop(name = "per-page")
-//    public String perPageOrig;
     @Prop(name = "pageSize")
     public String pageSizeOrig;
 

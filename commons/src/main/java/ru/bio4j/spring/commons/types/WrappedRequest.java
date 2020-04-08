@@ -1,16 +1,20 @@
 package ru.bio4j.spring.commons.types;
 
+import org.apache.poi.util.IOUtils;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 import ru.bio4j.spring.commons.utils.*;
 
+import java.io.*;
 import java.nio.charset.Charset;
 import java.security.Principal;
 import java.util.*;
 
+import javax.servlet.ReadListener;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -38,7 +42,8 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         httpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
         modParameters = new TreeMap<>();
         modHeaders = new HashMap();
-        bioQueryParams = decodeBioQueryParams((HttpServletRequest)this.getRequest());
+        //bioQueryParams = decodeBioQueryParams((HttpServletRequest)this.getRequest());
+        bioQueryParams = decodeBioQueryParams(this);
     }
 
     public static class SortAndFilterObj {
@@ -402,4 +407,48 @@ public class WrappedRequest extends HttpServletRequestWrapper {
     public User getUser(){
         return user;
     }
+
+    private ByteArrayOutputStream cachedBytes;
+    private void cacheInputStream() throws IOException {
+        cachedBytes = new ByteArrayOutputStream();
+        IOUtils.copy(super.getInputStream(), cachedBytes);
+    }
+
+    @Override
+    public ServletInputStream getInputStream() throws IOException {
+        if (cachedBytes == null)
+            cacheInputStream();
+        return new CachedServletInputStream();    }
+
+    @Override
+    public BufferedReader getReader() throws IOException {
+        return new BufferedReader(new InputStreamReader(getInputStream()));    }
+
+    public class CachedServletInputStream extends ServletInputStream {
+        private ByteArrayInputStream input;
+
+        public CachedServletInputStream() {
+            input = new ByteArrayInputStream(cachedBytes.toByteArray());
+        }
+
+        @Override
+        public boolean isFinished() {
+            return false;
+        }
+
+        @Override
+        public boolean isReady() {
+            return true;
+        }
+
+        @Override
+        public void setReadListener(ReadListener readListener) {
+        }
+
+        @Override
+        public int read() throws IOException {
+            return input.read();
+        }
+    }
+
 }

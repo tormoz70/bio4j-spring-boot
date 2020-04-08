@@ -11,13 +11,13 @@ public class LoginResult {
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
     private Exception exception;
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
-    private Principal user;
+    private SsoUser user;
 
     public boolean isSuccess() {
         return success;
     }
 
-    public Principal getUser() {
+    public SsoUser getUser() {
         return user;
     }
 
@@ -33,7 +33,7 @@ public class LoginResult {
             return rslt;
         }
 
-        public static LoginResult success(Principal user) {
+        public static LoginResult success(SsoUser user) {
             LoginResult rslt = new LoginResult();
             rslt.success = true;
             rslt.user = user;
