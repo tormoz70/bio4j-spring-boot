@@ -3,11 +3,13 @@ package ru.bio4j.spring.dba;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import ru.bio4j.spring.commons.types.ApplicationContextProvider;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.LoginProcessor;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.model.transport.BioError;
 import ru.bio4j.spring.model.transport.BioQueryParams;
 
 import javax.servlet.*;
@@ -20,22 +22,18 @@ import java.util.Arrays;
 public class SecurityFilterBase {
     LogWrapper LOG = LogWrapper.getLogger(SecurityFilterBase.class);
 
-    private boolean bioDebug = false;
-    private String errorPage;
     private LoginProcessor loginProcessor;
     private boolean disableAnonymouse;
 
-    public void init(FilterConfig filterConfig, ApplicationContext applicationContext, boolean disableAnonymouse) throws ServletException {
+    public void init(FilterConfig filterConfig, boolean disableAnonymouse) throws ServletException {
         this.disableAnonymouse = disableAnonymouse;
         if (filterConfig != null) {
             //
         }
 
-        if(ApplicationContextProvider.getApplicationContext() == null) {
-            ApplicationContextProvider applicationContextProvider = (ApplicationContextProvider)applicationContext.getBean("applicationContextProvider");
-            applicationContextProvider.setApplicationContext(applicationContext);
-        }
-        loginProcessor = (LoginProcessor) ApplicationContextProvider.getApplicationContext().getBean("loginProcessor");
+        ApplicationContext ctx = WebApplicationContextUtils
+                .getRequiredWebApplicationContext(filterConfig.getServletContext());
+        this.loginProcessor = ctx.getBean(LoginProcessor.class);
     }
 
     private static String[] AVAMETHODS = {"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"};
@@ -77,15 +75,12 @@ public class SecurityFilterBase {
             WrappedRequest rereq = prepareRequest(request);
             prepareResponse(response);
             doSequrityFilter(rereq, response, chain);
-        } catch (IOException ex) {
-            LOG.error(null, ex);
-            throw ex;
-        } catch (ServletException ex) {
+        } catch (IOException | ServletException ex) {
             LOG.error(null, ex);
             throw ex;
         } catch (Exception ex) {
             LOG.error(null, ex);
-            throw new ServletException(ex);
+            throw BioError.wrap(ex);
         }
     }
 

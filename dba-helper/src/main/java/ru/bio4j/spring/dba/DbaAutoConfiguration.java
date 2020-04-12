@@ -8,7 +8,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import ru.bio4j.spring.commons.types.*;
+import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.oracle.OraContext;
@@ -53,6 +55,7 @@ public class DbaAutoConfiguration {
     }
 
     @Bean
+    @Qualifier("default")
     public ErrorProcessor errorProcessor() {
         return new DefaultErrorProcessorImpl();
     }
@@ -67,4 +70,6 @@ public class DbaAutoConfiguration {
     public SecurityService securityService() {
         return new DefaultSecurityModuleImpl();
     }
+
+
 }

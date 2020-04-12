@@ -68,6 +68,10 @@ public class DbaAdapter {
         }, null);
     }
 
+    public SQLContext getSqlContext() {
+        return sqlContext;
+    }
+
     public SQLDefinitionImpl getSQLDefinition(String bioCode) {
         SQLDefinitionImpl cursor = CursorParser.pars(bioCode);
         if(cursor == null)
@@ -486,7 +490,17 @@ public class DbaAdapter {
         CrudWriterApi.execSQL(params, context, sqlDefinition, user);
     }
 
-    public SQLContext getSqlContext() {
-        return sqlContext;
+    public <T> List<T> loadBean(
+            final String bioCode,
+            final Object id,
+            final User user,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        if(id != null) {
+            return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
+        }
+        return new ArrayList<>();
     }
+
 }

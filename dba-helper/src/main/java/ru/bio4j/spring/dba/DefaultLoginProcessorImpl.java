@@ -7,12 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import ru.bio4j.spring.commons.types.*;
-import ru.bio4j.spring.commons.utils.Jecksons;
-import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.BioError;
 import ru.bio4j.spring.model.transport.BioQueryParams;
-import ru.bio4j.spring.model.transport.LoginResult;
 import ru.bio4j.spring.model.transport.User;
 
 import javax.servlet.FilterChain;
@@ -32,13 +28,22 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
 
     @Autowired(required = false)
     @Qualifier("override")
-    private SecurityService activeSecurityService;
+    private SecurityService overridenSecurityService;
 
     @Autowired
-    private ErrorProcessor errorProcessor;
+    @Qualifier("default")
+    private ErrorProcessor defaultErrorProcessor;
+
+    @Autowired(required = false)
+    @Qualifier("override")
+    private ErrorProcessor overridenErrorProcessor;
 
     private SecurityService getSecurityService() {
-        return activeSecurityService != null ? activeSecurityService : defaultSecurityService;
+        return overridenSecurityService != null ? overridenSecurityService : defaultSecurityService;
+    }
+
+    private ErrorProcessor getErrorProcessor() {
+        return overridenErrorProcessor != null ? overridenErrorProcessor : defaultErrorProcessor;
     }
 
     private BioQueryParams decodeQParams(final HttpServletRequest request) {
@@ -69,7 +74,7 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
                 chain.doFilter(reqs, resp);
             } catch (Exception e) {
                 LOG.error(null, e);
-                errorProcessor.doResponse(e, resp);
+                getErrorProcessor().doResponse(e, resp);
             }
         } else {
             try {

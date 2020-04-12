@@ -51,6 +51,12 @@ public class CrudReaderApi {
             pkParam.setValue(newValue);
         }
     }
+    private static List<Param> preparePkParamValue(final Object pkValue, final Field pkField) {
+        List<Param> params = new ArrayList<>();
+        Object newValue = Converter.toType(pkValue, MetaTypeConverter.write(pkField.getMetaType()));
+        Paramus.setParamValue(params, RestParamNames.GETROW_PARAM_PKVAL, newValue);
+        return params;
+    }
 
     private static ABeanPage readStoreData(
             final List<Param> params,
@@ -627,6 +633,22 @@ public class CrudReaderApi {
             throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
+        List<T> result = context.execBatch((ctx) -> {
+            return readStoreDataExt(params, ctx, cursor, beanType);
+        }, user);
+        return result;
+    }
+
+    public static <T> List<T> loadRecordExt(
+            final Object pkValue,
+            final SQLContext context, final SQLDefinition cursor,
+            final User user,
+            final Class<T> beanType) {
+        Field pkField = cursor.getSelectSqlDef().findPk();
+        if(pkField == null)
+            throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+        List<Param> params = preparePkParamValue(pkValue, pkField);
         List<T> result = context.execBatch((ctx) -> {
             return readStoreDataExt(params, ctx, cursor, beanType);
         }, user);

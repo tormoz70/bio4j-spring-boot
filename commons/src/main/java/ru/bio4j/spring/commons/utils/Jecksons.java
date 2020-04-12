@@ -265,7 +265,7 @@ public class Jecksons {
         return filterAndSorter;
     }
     // ******************** MixIn ***************************************************************************************************************
-    abstract class MixInException {
+    public static abstract class MixInException {
         @JsonIgnore
         abstract StackTraceElement[] getStackTrace();
         @JsonIgnore
