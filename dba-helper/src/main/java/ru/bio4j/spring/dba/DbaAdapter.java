@@ -80,67 +80,75 @@ public class DbaAdapter {
         return cursor;
     }
 
-    public ABeanPage loadPage(
+    public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
             final User user,
             final FilterAndSorter filterAndSorter,
-            final boolean forceCalcCount
+            final CrudOptions crudOptions,
+            final Class<T> beanType
             ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         int pageSize = Paramus.paramValue(prms, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         if(pageSize == 0)
-            return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user);
+            return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
         else
-            return CrudReaderApi.loadPage(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, forceCalcCount, user);
+            return CrudReaderApi.loadPage(
+                    prms,
+                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                    context, sqlDefinition, user, crudOptions, beanType);
     }
-    public ABeanPage loadAll(
+    public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
             final User user,
             final FilterAndSorter filterAndSorter,
-            final boolean forceCalcCount
+            final Class<T> beanType
     ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user);
+        return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
     }
 
-    public ABeanPage loadPage(
+    public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
-            final User user) {
-        return loadPage(bioCode, params, user, null, false);
+            final User user,
+            final Class<T> beanType) {
+        return loadPage(bioCode, params, user, null, CrudOptions.builder().build(), beanType);
     }
-    public ABeanPage loadAll(
+    public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
-            final User user) {
-        return loadAll(bioCode, params, user, null, false);
+            final User user,
+            final Class<T> beanType) {
+        return loadAll(bioCode, params, user, null, beanType);
     }
 
-    public ABeanPage loadPage(
+    public <T> BeansPage<T> loadPage(
             final String bioCode,
-            final HttpServletRequest request) {
+            final HttpServletRequest request,
+            final Class<T> beanType) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         final List<Param> params = _extractBioParams(queryParams);
         final User user = ((WrappedRequest)request).getUser();
         FilterAndSorter fs = createFilterAndSorter(queryParams);
         boolean forceCalcCount = Converter.toType(queryParams.gcount, boolean.class);
-        return loadPage(bioCode, params, user, fs, forceCalcCount);
+        return loadPage(bioCode, params, user, fs, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
     }
-    public ABeanPage loadAll(
+    public <T> BeansPage<T> loadAll(
             final String bioCode,
-            final HttpServletRequest request) {
+            final HttpServletRequest request,
+            final Class<T> beanType) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         final List<Param> params = _extractBioParams(queryParams);
         final User user = ((WrappedRequest)request).getUser();
         FilterAndSorter fs = createFilterAndSorter(queryParams);
-        boolean forceCalcCount = Converter.toType(queryParams.gcount, boolean.class);
-        return loadAll(bioCode, params, user, fs, forceCalcCount);
+        return loadAll(bioCode, params, user, fs, beanType);
     }
 
     public ABean calcTotalCount(
@@ -254,6 +262,16 @@ public class DbaAdapter {
         return CrudReaderApi.loadFirstRecordExt(params, context, cursorDef, usr, beanType);
     }
 
+    public <T> T loadFirstBean(
+            final String bioCode,
+            final Filter filter,
+            final User usr,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadFirstRecordExt(filter, context, cursorDef, usr, beanType);
+    }
+
     public HSSFWorkbook loadToExcel(
             final String bioCode,
             final HttpServletRequest request) {
@@ -352,9 +370,9 @@ public class DbaAdapter {
         final User user = ((WrappedRequest)request).getUser();
         if(id != null) {
             Paramus.setParamValue(params, RestParamNames.GETROW_PARAM_PKVAL, id, MetaTypeConverter.read(id.getClass()));
-            ABeanPage rslt = CrudReaderApi.loadRecord(params, context, sqlDefinition, user);
-            if (rslt.getRows() != null && rslt.getRows().size() > 0)
-                return rslt.getRows().get(0);
+            List<ABean> rslt = CrudReaderApi.loadRecordExt(params, context, sqlDefinition, user, ABean.class);
+            if (rslt.size() > 0)
+                return rslt.get(0);
         }
         return null;
     }

@@ -4,19 +4,20 @@ import ru.bio4j.spring.model.transport.jstore.Field;
 
 import java.util.List;
 
-public class ABeanPage {
-    private List<ABean> rows;
+public class BeansPage<T> {
+    private List<T> rows;
     private int paginationPage;
     private int paginationOffset;
     private int paginationCount;
+    private int paginationPageSize;
     private int totalCount;
     private List<Field> metadata;
 
-    public List<ABean> getRows() {
+    public List<T> getRows() {
         return rows;
     }
 
-    public void setRows(List<ABean> rows) {
+    public void setRows(List<T> rows) {
         this.rows = rows;
     }
 
@@ -58,5 +59,13 @@ public class ABeanPage {
 
     public void setTotalCount(int totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public int getPaginationPageSize() {
+        return paginationPageSize;
+    }
+
+    public void setPaginationPageSize(int paginationPageSize) {
+        this.paginationPageSize = paginationPageSize;
     }
 }

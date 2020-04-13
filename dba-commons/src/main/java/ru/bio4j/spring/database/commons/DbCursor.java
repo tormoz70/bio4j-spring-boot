@@ -95,12 +95,11 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
             List<Param> prms = params != null ? params : new ArrayList<>();
             SrvcUtils.applyCurrentUserParams(usr, prms);
             try {
-                this.resetCommand(); // Сбрасываем состояние
 
                 if (this.params == null)
                     this.params = new ArrayList<>();
 
-                applyInParamsToStatmentParams(params, false);
+                DbUtils.applyParamsToParams(params, this.params, false, true, false);
 
                 if (!doBeforeStatement(this.params)) // Обрабатываем события
                     return rslt;
@@ -205,11 +204,6 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
     @Override
     public <T> T firstBean(final User usr, final Class<T> clazz) {
         return firstBean(null, usr, clazz);
-    }
-
-    @Override
-    protected void applyInParamsToStatmentParams(List<Param> params, boolean overwriteType) {
-        DbUtils.applyParamsToParams(params, this.params, false, true, overwriteType);
     }
 
 }

@@ -30,9 +30,6 @@ public abstract class DbContextAbstract implements SQLContext {
         this.dataSourceProperties = dataSourceProperties;
     }
 
-    protected User user;
-    protected Connection connection;
-
     public User getCurrentUser() {
         return ThreadContextHolder.instance().getCurrentUser();
     }

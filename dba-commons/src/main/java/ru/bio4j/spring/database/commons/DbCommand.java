@@ -128,11 +128,6 @@ public abstract class DbCommand<T extends SQLCommand> implements SQLCommand {
         return String.format("preparedSQL: %s;\n - %s", sql, sb.toString());
     }
 
-    protected abstract void applyInParamsToStatmentParams(List<Param> params, boolean overwriteType);
-
-    protected void resetCommand() {
-    }
-
 	@Override
 	public void cancel() {
         final SQLNamedParametersStatement stmnt = this.getStatement();

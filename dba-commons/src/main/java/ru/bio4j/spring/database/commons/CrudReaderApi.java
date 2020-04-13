@@ -58,47 +58,36 @@ public class CrudReaderApi {
         return params;
     }
 
-    private static ABeanPage readStoreData(
+    private static <T> BeansPage<T> readStoreData(
             final List<Param> params,
             final SQLContext context,
             final SQLDefinition cursorDef,
-            final User usr) {
+            final CrudOptions crudOptions,
+            final Class<T> beanType) {
         if(LOG.isDebugEnabled())
             LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
-        ABeanPage result = new ABeanPage();
+        BeansPage result = new BeansPage();
         final int paginationPagesize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         result.setTotalCount(Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, int.class, 0));
         result.setPaginationOffset(Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0));
-        result.setRows(new ArrayList<>());
-
-        long startTime = System.currentTimeMillis();
-        result.setMetadata(cursorDef.getFields());
-
-        List<Param> prms = params;
-        context.createDynamicCursor()
-                .init(context.getCurrentConnection(), cursorDef.getSelectSqlDef())
-                .fetch(prms, usr, rs -> {
-                    if(rs.isFirstRow()) {
-                        long estimatedTime = System.currentTimeMillis() - startTime;
-                        if(LOG.isDebugEnabled())
-                            LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
-                    }
-                    ABean bean = DbUtils.createABeanFromReader(result.getMetadata(), rs);
-                    result.getRows().add(bean);
-                    if(result.getRows().size() >= MAX_RECORDS_FETCH_LIMIT)
-                        return false;
-                    return true;
-                });
-        if(LOG.isDebugEnabled())
-            LOG.debug("Cursor \"{}\" fetched! {} - records loaded.", cursorDef.getBioCode(), result.getRows().size());
+        if(crudOptions.isAppendMetadata()) result.setMetadata(cursorDef.getFields());
+        result.setRows(readStoreDataExt(params, context, cursorDef, crudOptions, beanType));
         result.setPaginationCount(result.getRows().size());
-        int pageSize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
-        result.setPaginationPage(pageSize > 0 ? (int)Math.floor(result.getPaginationOffset() / pageSize) + 1 : 0);
+        result.setPaginationPageSize(paginationPagesize);
+        result.setPaginationPage(paginationPagesize > 0 ? (int)Math.floor(result.getPaginationOffset() / paginationPagesize) + 1 : 0);
         if(result.getRows().size() < paginationPagesize) {
             result.setTotalCount(result.getPaginationOffset() + result.getRows().size());
             Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, result.getTotalCount());
         }
         return result;
+    }
+
+    private static <T> BeansPage<T> readStoreData(
+            final List<Param> params,
+            final SQLContext context,
+            final SQLDefinition cursorDef,
+            final Class<T> beanType) {
+        return readStoreData(params, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
     private static long calcOffset(int locatedPos, int pageSize){
@@ -126,76 +115,21 @@ public class CrudReaderApi {
      * @param sort
      * @param context
      * @param cursor
-     * @param forceCalcCount
+     * @param crudOptions
+     * @param beanType
      * @return возвращает страницу
      *
      */
-    public static ABeanPage loadPage0(
+    public static <T> BeansPage<T> loadPage0(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
             final SQLContext context,
             final SQLDefinition cursor,
-            final boolean forceCalcCount) {
-
-        Connection connTest = context.getCurrentConnection();
-        if (connTest == null)
-            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
-
-        final Object location = Paramus.paramValue(params, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
-        final int paginationOffset = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
-        final int paginationPagesize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
-
-        final String paginationTotalcountStr = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
-        final int paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, int.class);
-
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        if(location != null) {
-            Field pkField = cursor.getSelectSqlDef().findPk();
-            if(pkField == null)
-                throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
-            cursor.getSelectSqlDef().setLocateSql(context.getWrappers().getLocateWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), pkField.getName()));
-            preparePkParamValue(params, pkField);
-        }
-        if(paginationPagesize > 0)
-            cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getPaginationWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
-
-        long factOffset = paginationOffset;
-        long totalCount = paginationTotalcount;
-        if(forceCalcCount || paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1))
-            totalCount = calcTotalCount(params, context, cursor, context.getCurrentUser());
-        if(paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1)) {
-            factOffset = DbUtils.calcfactOffset(totalCount, paginationPagesize);
-
-            if(LOG.isDebugEnabled())
-                LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount);
-        }
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount);
-        long locFactOffset = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
-        if(location != null) {
-            if(LOG.isDebugEnabled())
-                LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
-            int locatedPos = context.createDynamicCursor()
-                    .init(context.getCurrentConnection(), cursor.getSelectSqlDef())
-                    .scalar(params, context.getCurrentUser(), int.class, -1);
-            if(locatedPos >= 0){
-                locFactOffset = calcOffset(locatedPos, paginationPagesize);
-                if(LOG.isDebugEnabled())
-                    LOG.debug("Cursor \"{}\" successfully located to [{}] record by pk. Position: [{}], New offset: [{}].", cursor.getBioCode(), location, locatedPos, locFactOffset);
-            } else {
-                if(LOG.isDebugEnabled())
-                    LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
-            }
-        }
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
-        return readStoreData(params, context, cursor, context.getCurrentUser());
+            final CrudOptions crudOptions,
+            final Class<T> beanType) {
+        _prepareLoadPageParams(params, filter, sort, context, cursor, crudOptions.isForceCalcCount());
+        return readStoreData(params, context, cursor, crudOptions, beanType);
     }
 
     /***
@@ -205,23 +139,24 @@ public class CrudReaderApi {
      * @param sort
      * @param context
      * @param cursor
-     * @param forceCalcCount
      * @param user
+     * @param crudOptions
+     * @param beanType
      * @return возвращает страницу
      *
      */
-    public static ABeanPage loadPage(
+    public static <T> BeansPage<T> loadPage(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
             final SQLContext context,
             final SQLDefinition cursor,
-            final boolean forceCalcCount,
-            final User user) {
-        final ABeanPage result = context.execBatch((ctx) -> {
-            return loadPage0(params, filter, sort, ctx, cursor, forceCalcCount);
+            final User user,
+            final CrudOptions crudOptions,
+            final Class<T> beanType) {
+        return context.execBatch((ctx) -> {
+            return loadPage0(params, filter, sort, ctx, cursor, crudOptions, beanType);
         }, user);
-        return result;
     }
 
     /***
@@ -234,16 +169,15 @@ public class CrudReaderApi {
      * @return все записи
      *
      */
-    public static ABeanPage loadAll0(final List<Param> params, final Filter filter, final List<Sort> sort, final SQLContext context, final SQLDefinition cursor) {
-        Connection connTest = context.getCurrentConnection();
-        if (connTest == null)
-            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        return readStoreData(params, context, cursor, context.getCurrentUser());
+    public static <T> BeansPage<T> loadAll0(
+            final List<Param> params,
+            final Filter filter,
+            final List<Sort> sort,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final Class<T> beanType) {
+        _prepareLoadAllParams(filter, sort, context, cursor);
+        return readStoreData(params, context, cursor, beanType);
     }
 
     private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
@@ -344,7 +278,7 @@ public class CrudReaderApi {
         if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        ABeanPage page = readStoreData(params, context, cursor, context.getCurrentUser());
+        BeansPage<ABean> page = readStoreData(params, context, cursor, ABean.class);
 
         HSSFWorkbook wb = null;
         if(page != null && page.getRows() != null && page.getRows().size() > 0) {
@@ -372,17 +306,24 @@ public class CrudReaderApi {
      * @return все записи
      *
      */
-    public static ABeanPage loadAll(final List<Param> params, final Filter filter, final List<Sort> sort, final SQLContext context, final SQLDefinition cursor, User user) {
-        ABeanPage result = context.execBatch((ctx) -> {
-            return loadAll0(params, filter, sort, ctx, cursor);
+    public static <T> BeansPage<T> loadAll(
+            final List<Param> params,
+            final Filter filter,
+            final List<Sort> sort,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final User user,
+            final Class<T> beanType) {
+        BeansPage result = context.execBatch((ctx) -> {
+            return loadAll0(params, filter, sort, ctx, cursor, beanType);
         }, user);
         return result;
     }
 
 
-    public static ABeanPage loadRecord(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final User user) {
-        ABeanPage result = context.execBatch((ctx) -> {
-            return loadRecord0(params, ctx, cursor);
+    public static <T> BeansPage<T> loadRecord(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final User user, final Class<T> beanType) {
+        BeansPage result = context.execBatch((ctx) -> {
+            return loadRecord0(params, ctx, cursor, beanType);
         }, user);
         return result;
     }
@@ -395,7 +336,7 @@ public class CrudReaderApi {
      * @return первую запись
      *
      */
-    public static ABeanPage loadRecord0(final List<Param> params, final SQLContext context, final SQLDefinition cursor) {
+    public static <T> BeansPage<T> loadRecord0(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
         Connection connTest = context.getCurrentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
@@ -405,15 +346,15 @@ public class CrudReaderApi {
             throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-        return readStoreData(params, context, cursor, context.getCurrentUser());
+        return readStoreData(params, context, cursor, beanType);
     }
 
     private static <T> List<T> readStoreDataExt(
             final List<Param> params,
             final SQLContext context,
             final SQLDefinition cursorDef,
-            final Class<T> beanType,
-            final int recordsLimit) {
+            final CrudOptions crudOptions,
+            final Class<T> beanType) {
 
         if (context.getCurrentConnection() == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursorDef.getBioCode()));
@@ -425,8 +366,8 @@ public class CrudReaderApi {
         long startTime = System.currentTimeMillis();
         List<Param> prms = params;
         final LongSupplier limitRecordsToRead = () -> {
-            if (recordsLimit > 0)
-                return recordsLimit;
+            if (crudOptions.getRecordsLimit() > 0)
+                return crudOptions.getRecordsLimit();
             return MAX_RECORDS_FETCH_LIMIT;
         };
 
@@ -458,28 +399,16 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursorDef,
             final Class<T> beanType) {
-        return readStoreDataExt(params, context, cursorDef, beanType, 0);
+        return readStoreDataExt(params, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
-    /***
-     * Выполняет запрос в текущей сессии
-     * @param params
-     * @param filter
-     * @param sort
-     * @param context
-     * @param cursor
-     * @param beanType
-     * @param <T>
-     * @return страницу
-     *
-     */
-    public static <T> List<T> loadPage0Ext(
+    private static void _prepareLoadPageParams(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
             final SQLContext context,
             final SQLDefinition cursor,
-            final Class<T> beanType) {
+            final boolean forceCalcCount) {
         Connection connTest = context.getCurrentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
@@ -509,7 +438,7 @@ public class CrudReaderApi {
 
         long factOffset = paginationOffset;
         long totalCount = paginationTotalcount;
-        if (paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1)) {
+        if (forceCalcCount || paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1)) {
             totalCount = calcTotalCount(params, context, cursor, context.getCurrentUser());
             factOffset = (int) Math.floor(totalCount / paginationPagesize) * paginationPagesize;
             if(LOG.isDebugEnabled())
@@ -535,6 +464,43 @@ public class CrudReaderApi {
         }
         Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
         Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+    }
+
+    private static void _prepareLoadAllParams(
+            final Filter filter,
+            final List<Sort> sort,
+            final SQLContext context,
+            final SQLDefinition cursor) {
+        Connection connTest = context.getCurrentConnection();
+        if (connTest == null)
+            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
+        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
+        if (localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
+            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+    }
+
+    /***
+     * Выполняет запрос в текущей сессии
+     * @param params
+     * @param filter
+     * @param sort
+     * @param context
+     * @param cursor
+     * @param beanType
+     * @param <T>
+     * @return страницу
+     *
+     */
+    public static <T> List<T> loadPage0Ext(
+            final List<Param> params,
+            final Filter filter,
+            final List<Sort> sort,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final Class<T> beanType) {
+        _prepareLoadPageParams(params, filter, sort, context, cursor, false);
         return readStoreDataExt(params, context, cursor, beanType);
     }
 
@@ -584,15 +550,7 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        Connection connTest = context.getCurrentConnection();
-        if (connTest == null)
-            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
-
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+        _prepareLoadAllParams(filter, sort, context, cursor);
         return readStoreDataExt(params, context, cursor, beanType);
     }
 
@@ -662,9 +620,21 @@ public class CrudReaderApi {
             final Class<T> beanType) {
         cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
         List<T> result = context.execBatch((ctx) -> {
-            return readStoreDataExt(params, ctx, cursor, beanType, 1);
+            return readStoreDataExt(params, ctx, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
         }, user);
         return result.size() > 0 ? result.get(0) : null;
+    }
+
+    public static <T> T loadFirstRecordExt(
+            final Filter filter,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final User user,
+            final Class<T> beanType) {
+        List<T> result = context.execBatch((ctx) -> {
+            return loadAll0Ext(null, filter, null, ctx, cursor, beanType);
+        }, user);
+        return result.stream().findFirst().orElse(null);
     }
 
     public static StringBuilder loadJson(
@@ -705,6 +675,15 @@ public class CrudReaderApi {
             final T defaultValue,
             final User user) {
         return DbUtils.processSelectScalar(user, params, context, sqlDefinition, clazz, defaultValue);
+    }
+
+    private static interface StoreDataReadPerformer {
+        <T> List<T> readData(
+                final List<Param> params,
+                final SQLContext context,
+                final SQLDefinition cursorDef,
+                final Class<T> beanType,
+                final int recordsLimit);
     }
 
 }

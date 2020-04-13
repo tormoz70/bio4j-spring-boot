@@ -56,7 +56,7 @@ public class CrudWriterApi {
             for(ABean bean : rows){
                 Object pkvalue = ABeans.extractAttrFromBean(bean, pkFieldName, pkClazz, null);
                 Paramus.setParamValue(prms, RestParamNames.GETROW_PARAM_PKVAL, pkvalue);
-                ABeanPage pg = CrudReaderApi.loadRecord0(prms, ctx, cursor);
+                BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, ctx, cursor, ABean.class);
                 if(pg.getRows().size() > 0)
                     Utl.applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
             }

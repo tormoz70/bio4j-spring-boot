@@ -53,8 +53,8 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
                 LoginResult result = LoginResult.Builder.error(new BioError.MethodNotAllowed());
                 return createEntry(Response.Status.METHOD_NOT_ALLOWED.getStatusCode(), result, MediaType.APPLICATION_JSON);
             } else if (exception instanceof javax.ws.rs.NotFoundException) {
-                LoginResult result = LoginResult.Builder.error(new BioError.MethodNotImplemented());
-                return createEntry(Response.Status.NOT_IMPLEMENTED.getStatusCode(), result, MediaType.APPLICATION_JSON);
+                LoginResult result = LoginResult.Builder.error(exception);
+                return createEntry(Response.Status.NOT_FOUND.getStatusCode(), result, MediaType.APPLICATION_JSON);
             }
             LoginResult result = LoginResult.Builder.error(new BioError(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), "Неизвестная ошибка на сервере"));
             return createEntry(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), result, MediaType.APPLICATION_JSON);

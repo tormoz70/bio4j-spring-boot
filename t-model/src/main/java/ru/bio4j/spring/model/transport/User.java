@@ -11,6 +11,6 @@ public class User extends SsoUser {
     @JsonIgnore
     @Override
     public String getInnerUid() {
-        return getInnerUid();
+        return super.getInnerUid();
     }
 }

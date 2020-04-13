@@ -49,7 +49,9 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
     @Override
 	protected void prepareStatement() {
 	    try {
-            if (this.params == null) {
+            if (this.params == null || this.params.size() == 0) {
+                if(this.params == null)
+                    this.params = new ArrayList<>();
                 StoredProgMetadata sp = DbUtils.getInstance().detectStoredProcParamsAuto(this.storedProcName, this.connection, this.params);
                 try (Paramus p = Paramus.set(sp.getParamDeclaration())) {
                     p.apply(params, true);
@@ -75,15 +77,12 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
         try {
             try {
                 try {
-                    this.resetCommand(); // Сбрасываем состояние
 
                     if (this.params == null)
                         this.params = new ArrayList<>();
 
-                    if(!stayOpened)
-                        prepareStatement();
-
-                    applyInParamsToStatmentParams(prms, false);
+                    // Применяем входящие параметры к параметрам объявленныим
+                    DbUtils.applyParamsToParams(prms, this.params, false, false, false);
 
                     if (!doBeforeStatement(this.params)) // Обрабатываем события
                         return;
@@ -136,11 +135,6 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
     @Override
     public void execSQL(User usr) {
         this.execSQL(null, usr);
-    }
-
-    @Override
-    protected void applyInParamsToStatmentParams(List<Param> params, boolean overwriteType) {
-        DbUtils.applyParamsToParams(params, this.params, false, false, overwriteType);
     }
 
     @Override

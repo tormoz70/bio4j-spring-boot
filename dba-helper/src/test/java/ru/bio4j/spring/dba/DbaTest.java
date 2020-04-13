@@ -18,6 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.model.transport.ABean;
+import ru.bio4j.spring.model.transport.Param;
+
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=DbaAutoConfiguration.class)
@@ -32,7 +35,7 @@ public class DbaTest {
     @Test
     public void doTest() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
-        ABean d = dbaAdapter.loadFirstBean("rcard", null, null, ABean.class);
+        ABean d = dbaAdapter.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
         Assert.assertTrue(d!= null);
     }
 }

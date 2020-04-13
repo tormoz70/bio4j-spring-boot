@@ -39,18 +39,16 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
         boolean rslt = false;
         List<Param> prms = params != null ? params : new ArrayList<>();
         SrvcUtils.applyCurrentUserParams(usr, prms);
-        this.resetCommand(); // Сбрасываем состояние
 
         if (this.params == null)
             this.params = new ArrayList<>();
 
-        applyInParamsToStatmentParams(params, false);
+        DbUtils.applyParamsToParams(params, this.params, false, true, false);
 
         if (!doBeforeStatement(this.params)) // Обрабатываем события
             return rslt;
 
         try {
-
             this.preparedSQL = this.sql;
             // Удаляем из SQL условия #cut#
             this.preparedSQL = DbUtils.cutFilterConditions(this.sql, this.params);
