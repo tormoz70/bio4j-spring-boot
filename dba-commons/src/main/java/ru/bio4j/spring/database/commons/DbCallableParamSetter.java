@@ -80,9 +80,8 @@ public class DbCallableParamSetter implements SQLParamSetter {
         }
         for (Param outParam : outParams) {
             int sqlType = DbUtils.getInstance().paramSqlType(outParam);
-            //String sqlTypeName = DbUtils.getInstance().getSqlTypeName(sqlType);
             String paramName = outParam.getName();
-            statment.registerOutParameter(paramName, sqlType);
+            statment.registerOutParameter(paramName, sqlType, outParam.getDirection() == Param.Direction.INOUT);
         }
     }
 }

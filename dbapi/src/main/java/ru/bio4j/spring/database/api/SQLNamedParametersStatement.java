@@ -21,6 +21,7 @@ public interface SQLNamedParametersStatement extends Statement {
     void setDateAtName(String name, Date value) throws SQLException;
     void setNullAtName(String name) throws SQLException;
     void registerOutParameter(String paramName, int sqlType) throws SQLException;
+    void registerOutParameter(String paramName, int sqlType, boolean isInOut) throws SQLException;
     Object getObject(String paramName) throws SQLException;
     PreparedStatement getStatement();
     boolean execute() throws SQLException;

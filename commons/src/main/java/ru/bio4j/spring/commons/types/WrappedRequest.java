@@ -15,6 +15,7 @@ import java.util.*;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
@@ -44,6 +45,10 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         modHeaders = new HashMap();
         //bioQueryParams = decodeBioQueryParams((HttpServletRequest)this.getRequest());
         bioQueryParams = decodeBioQueryParams(this);
+    }
+
+    public static WrappedRequest as(ServletRequest request) {
+        return (WrappedRequest)request;
     }
 
     public static class SortAndFilterObj {

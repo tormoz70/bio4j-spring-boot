@@ -22,6 +22,7 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
     private final List<String> paramNames;
     private final Map<String, String> paramTypes;
     private final Map<String, String> outParamTypes;
+    private final Map<String, String> inoutParamTypes;
     private final Map<String, Object> paramValues;
     private final Map<String, int[]> indexMap;
     private final String origQuery;
@@ -31,8 +32,9 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
         paramNames = new ArrayList<>();
         paramTypes = new HashMap();
         outParamTypes = new HashMap();
+        inoutParamTypes = new HashMap();
         paramValues = new HashMap();
-        indexMap=new HashMap();
+        indexMap = new HashMap();
         origQuery = query;
         parsedQuery=parse(query, paramNames, indexMap);
         for (String pn : indexMap.keySet()){
@@ -48,9 +50,11 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
             String paramDir = null;
             Object parVal = null;
             for (String key : paramNames) {
-                paramDir = outParamTypes.containsKey(key.toLowerCase()) ?
-                        String.format("%s(out)(%s)", key.toLowerCase(), outParamTypes.get(key.toLowerCase())) :
-                        String.format("%s(in)(%s)", key.toLowerCase(), paramTypes.get(key.toLowerCase()));
+                paramDir = inoutParamTypes.containsKey(key.toLowerCase()) ?
+                            String.format("%s(inout)(%s)", key.toLowerCase(), outParamTypes.get(key.toLowerCase())) : (
+                                outParamTypes.containsKey(key.toLowerCase()) ?
+                                    String.format("%s(out)(%s)", key.toLowerCase(), outParamTypes.get(key.toLowerCase())) :
+                                        String.format("%s(in)(%s)", key.toLowerCase(), paramTypes.get(key.toLowerCase())));
                 paramName = "\t" + Strings.padLeft(""+indx, 4) + "-" + Strings.padRight(paramDir, 50).replace(" ", ".");
                 parVal = paramValues.get(key.toLowerCase());
                 Strings.append(sb, String.format(parVal instanceof String ? "%s\"%s\"" : "%s[%s]", paramName, ""+parVal), ";\n");
@@ -238,8 +242,10 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
     }
 
     @Override
-    public void registerOutParameter(String paramName, int sqlType) throws SQLException {
+    public void registerOutParameter(String paramName, int sqlType, boolean isInOut) throws SQLException {
         outParamTypes.put(paramName.toLowerCase(), DbUtils.getInstance().getSqlTypeName(sqlType));
+        if(isInOut)
+            inoutParamTypes.put(paramName.toLowerCase(), DbUtils.getInstance().getSqlTypeName(sqlType));
 
         if (statement instanceof CallableStatement) {
             int[] indexes = getIndexes(paramName);
@@ -247,6 +253,11 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
                 ((CallableStatement) statement).registerOutParameter(indexes[i], sqlType);
             }
         }
+    }
+
+    @Override
+    public void registerOutParameter(String paramName, int sqlType) throws SQLException {
+        registerOutParameter(paramName, sqlType, false);
     }
 
     @Override
