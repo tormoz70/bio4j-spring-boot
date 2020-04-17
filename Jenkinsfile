@@ -32,8 +32,9 @@ pipeline {
 		
 		stage('Pull') {
 			steps {
+			    //checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: 'http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git', credentialsId: 'jenkins']], branches: [[name: "${params.VERSION_BRANCH}"]]], poll: false
 			    checkout scm: [$class: 'GitSCM', userRemoteConfigs: [[url: 'http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git', credentialsId: 'jenkins']], branches: [[name: "refs/tags/${params.VERSION_TAG}"]]], poll: false
-				//git(url: 'http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git', branch: "refs/tags/${params.VERSION_TAG}", credentialsId: 'jenkins')
+				//git(url: 'http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git', branch: "refs/${params.VERSION_BRANCH}", credentialsId: 'jenkins')
 				//git(url: 'http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git', branch: 'master', credentialsId: 'jenkins')
 			}
 		}
