@@ -24,3 +24,4 @@ out/
 felix-cache/
 runner/
 tmp/
+.PVS-STudio/
