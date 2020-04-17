@@ -142,7 +142,7 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 
 
     public BioQueryParams decodeBioQueryParams(HttpServletRequest request) {
-        if(request.getMethod() == "OPTIONS") return null;
+        if(request.getMethod().equals("OPTIONS")) return null;
         StringBuilder sb = new StringBuilder();
 
         ServletContext servletContext = request.getServletContext();
@@ -228,7 +228,7 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         BasicAutenticationLogin bal = detectBasicAutentication(request);
 
         if(Strings.isNullOrEmpty(bal.username)) {
-            if (result.method == "POST") {
+            if (result.method.equals("POST")) {
                 String usrname = null;
                 String passwd = null;
                 if(request.getParameterMap().containsKey("usrname"))
