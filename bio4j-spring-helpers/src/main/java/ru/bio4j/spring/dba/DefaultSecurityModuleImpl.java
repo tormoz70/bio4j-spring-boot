@@ -34,10 +34,14 @@ public class DefaultSecurityModuleImpl implements SecurityService {
     }
 
     @Override
-    public Boolean loggedin(final BioQueryParams qprms) {
+    public boolean loggedin(final BioQueryParams qprms) {
         return false;
     }
 
+    @Override
+    public boolean status(final BioQueryParams qprms) {
+        return false;
+    }
 
 
 }

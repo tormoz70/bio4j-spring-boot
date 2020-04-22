@@ -3,9 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.6.RELEASE</version>
+    </parent>
+
     <groupId>ru.bio4j.spring</groupId>
-    <artifactId>bio4j-starter</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <artifactId>bio4j-spring-boot</artifactId>
+    <version>2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <repositories>
@@ -35,17 +41,66 @@
     </distributionManagement>
 
     <properties>
+        <dependency-plugin-version>2.7</dependency-plugin-version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
+        <spring-rubbit.version>2.2.5.RELEASE</spring-rubbit.version>
         <org.apache.poi.version>4.1.0</org.apache.poi.version>
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <postgresql-jdbc.version>42.1.4</postgresql-jdbc.version>
         <hikaricp.version>3.4.1</hikaricp.version>
         <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
         <swagger.version>2.9.2</swagger.version>
+        <ehcache.version>2.6.11</ehcache.version>
+
+        <bio4j-spring-boot.version>2.1-SNAPSHOT</bio4j-spring-boot.version>
+
 	</properties>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${dependency-plugin-version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <compilerArgs>
+                            <arg>-Xlint:unchecked,deprecation</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <!--                <configuration>-->
+                    <!--                    <mainClass>${start-class}</mainClass>-->
+                    <!--                    &lt;!&ndash; this is necessary as we're not using the Boot parent &ndash;&gt;-->
+                    <!--                </configuration>-->
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -62,36 +117,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <compilerArgs>
-                        <arg>-Xlint:unchecked,deprecation</arg>
-                    </compilerArgs>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-<!--                <configuration>-->
-<!--                    <mainClass>${start-class}</mainClass>-->
-<!--                    &lt;!&ndash; this is necessary as we're not using the Boot parent &ndash;&gt;-->
-<!--                </configuration>-->
             </plugin>
         </plugins>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <extensions>true</extensions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <dependencyManagement>
@@ -126,11 +154,11 @@
                 <artifactId>spring-boot-starter-jdbc</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-security</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-starter-security</artifactId>-->
+<!--                <version>${spring-boot.version}</version>-->
+<!--            </dependency>-->
 <!--            <dependency>-->
 <!--                <groupId>org.springframework.boot</groupId>-->
 <!--                <artifactId>spring-boot-starter-tomcat</artifactId>-->
@@ -159,13 +187,13 @@
             <dependency>
                 <groupId>org.springframework.amqp</groupId>
                 <artifactId>spring-rabbit</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-rubbit.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-jersey</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.boot</groupId>-->
+<!--                <artifactId>spring-boot-starter-jersey</artifactId>-->
+<!--                <version>${spring-boot.version}</version>-->
+<!--            </dependency>-->
 
             <!-- HttpClient -->
             <dependency>
@@ -184,6 +212,11 @@
                 <version>${org.apache.httpcomponents.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache-core</artifactId>
+                <version>${ehcache.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -222,34 +255,47 @@
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
 
             <!-- bio4j -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-commons-lib</artifactId>
-                <version>${project.version}</version>
+                <version>${bio4j-spring-boot.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-tmodel-lib</artifactId>
-                <version>${project.version}</version>
+                <version>${bio4j-spring-boot.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-dbapi-lib</artifactId>
-                <version>${project.version}</version>
+                <version>${bio4j-spring-boot.version}</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-dba-commons-lib</artifactId>
-                <version>${project.version}</version>
+                <version>${bio4j-spring-boot.version}</version>
             </dependency>
+
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-dba-oracle-lib</artifactId>
-                <version>${project.version}</version>
+                <version>${bio4j-spring-boot.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>ru.bio4j.spring</groupId>
+                <artifactId>bio4j-spring-helpers</artifactId>
+                <version>${bio4j-spring-boot.version}</version>
+            </dependency>
+
 <!--            <dependency>-->
 <!--                <groupId>${project.groupId}</groupId>-->
 <!--                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>-->
@@ -300,7 +346,7 @@
 <!--        <module>dba-pgsql</module>-->
         <module>t-model</module>
 
-		<module>dba-helper</module>
+		<module>bio4j-spring-helpers</module>
 	</modules>
 
 </project>

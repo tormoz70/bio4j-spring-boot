@@ -317,6 +317,14 @@ public class Strings {
         return new ClassPathResource(filePath).getInputStream();
     }
 
+    public static boolean resourceExists(String filePath) {
+        try(InputStream io = new ClassPathResource(filePath).getInputStream()) {
+            return io != null;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public static String loadResourceAsString(String filePath) throws IOException {
         File file = new ClassPathResource(filePath).getFile();
         return new String(Files.readAllBytes(file.toPath()));

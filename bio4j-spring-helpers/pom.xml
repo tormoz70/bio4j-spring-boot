@@ -4,23 +4,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-		<groupId>ru.bio4j.spring</groupId>
-		<artifactId>bio4j-starter</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <groupId>ru.bio4j.spring</groupId>
+        <artifactId>bio4j-spring-boot</artifactId>
+        <version>2.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bio4j-spring-boot-dba-helper</artifactId>
+    <artifactId>bio4j-spring-helpers</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc8</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -47,6 +45,11 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
         </dependency>
 
         <!--bio4j-->

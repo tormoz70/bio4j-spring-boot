@@ -1,4 +1,4 @@
-package ru.bio4j.spring.dba;
+package ru.bio4j.spring.commons.types;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -8,16 +8,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-//import ru.bio4j.ng.commons.utils.Jsons;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.LoginRec;
-import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.BioError;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
+import static ru.bio4j.spring.commons.utils.Strings.isNullOrEmpty;
+
+//import ru.bio4j.ng.commons.utils.Jsons;
 
 public class HttpSimpleClient {
     private HttpClient client = HttpClientBuilder.create().build();
@@ -27,9 +29,9 @@ public class HttpSimpleClient {
         String body;
         String login = null;
         String stoken = null;
-        if(!Strings.isNullOrEmpty(loginOrSToken)) {
+        if(!isNullOrEmpty(loginOrSToken)) {
             LoginRec loginRec = Utl.parsLogin(loginOrSToken);
-            if (Strings.isNullOrEmpty(loginRec.getUsername()) || Strings.isNullOrEmpty(loginRec.getPassword()))
+            if (isNullOrEmpty(loginRec.getUsername()) || isNullOrEmpty(loginRec.getPassword()))
                 stoken = loginOrSToken;
             else
                 login = loginOrSToken;
@@ -44,17 +46,17 @@ public class HttpSimpleClient {
         request.setHeader("X-ForwardIP", forwardIP);
         request.setHeader("X-ForwardClient", forwardClient);
         request.setHeader("Content-Type", "application/json");
-        if(!Strings.isNullOrEmpty(stoken))
+        if(!isNullOrEmpty(stoken))
             request.setHeader("X-SToken", stoken);
 
-        if(!Strings.isNullOrEmpty(login)) {
+        if(!isNullOrEmpty(login)) {
             ABean bean = new ABean();
             bean.put("login", login);
             body = Jecksons.getInstance().encode(bean);
         } else {
             body = json;
         }
-        if(!Strings.isNullOrEmpty(body)) {
+        if(!isNullOrEmpty(body)) {
             try {
                 HttpEntity entity = new ByteArrayEntity(body.getBytes("UTF-8"));
                 request.setEntity(entity);

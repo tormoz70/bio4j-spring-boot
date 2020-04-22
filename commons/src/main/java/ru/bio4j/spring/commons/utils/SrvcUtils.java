@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.model.transport.Param;
+import ru.bio4j.spring.model.transport.SsoUser;
 import ru.bio4j.spring.model.transport.User;
 
 import java.util.List;
@@ -31,6 +32,24 @@ public class SrvcUtils {
                 p.setValue(SrvcUtils.PARAM_CURUSR_CLIENT, usr.getRemoteClient(), Param.Direction.IN, true);
             }
         }
+    }
+
+    public static SsoUser userToSsoUser(User user) {
+        if(user != null) {
+            SsoUser rslt = new SsoUser();
+            Utl.applyValuesToBeanFromBean(user, rslt);
+            return rslt;
+        }
+        return null;
+    }
+
+    public static User ssoUserToUser(SsoUser ssoUser) {
+        if(ssoUser != null) {
+            User rslt = new User();
+            Utl.applyValuesToBeanFromBean(ssoUser, rslt);
+            return rslt;
+        }
+        return null;
     }
 
 }

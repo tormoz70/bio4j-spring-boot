@@ -19,13 +19,28 @@ public class LogWrapper {
         logger.info(msg);
     }
 
+    public void info(String msg, Object ... vars) {
+        logger.info(msg, vars);
+    }
+
     public void debug(String msg) {
-        logger.debug(msg);
+        if(logger.isDebugEnabled())
+            logger.debug(msg);
     }
 
     public void debug(String msg, Object ... vars) {
         if(logger.isDebugEnabled())
             logger.debug(msg, vars);
+    }
+
+    public void trace(String msg, Object ... vars) {
+        if(logger.isDebugEnabled())
+            logger.trace(msg, vars);
+    }
+
+    public void trace(String msg) {
+        if(logger.isDebugEnabled())
+            logger.trace(msg);
     }
 
     public void error(String msg, Exception e) {
