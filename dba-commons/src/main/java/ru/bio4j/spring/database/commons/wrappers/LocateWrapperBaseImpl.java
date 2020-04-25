@@ -22,7 +22,7 @@ public class LocateWrapperBaseImpl extends AbstractWrapper implements LocateWrap
 //        Field pkCol = sqlDef.findPk();
 //        if(pkCol == null)
 //            throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", sqlDef.getBioCode()));
-        String whereclause = "(" + pkFieldName + " = :" + RestParamNames.LOCATE_PARAM_PKVAL + ") AND (rnum$ >= :" + RestParamNames.LOCATE_PARAM_STARTFROM + ")";
+        String whereclause = "(" + pkFieldName + " = :" + RestParamNames.LOCATE_PARAM_PKVAL + ") AND (rnum_num >= :" + RestParamNames.LOCATE_PARAM_STARTFROM + ")";
         String rslt = template.replace(QUERY, sql);
         return rslt.replace(WHERE_CLAUSE, whereclause);
     }

@@ -29,14 +29,19 @@ public class Sort {
             return ordinal();
         }
     }
+    public Sort() {
+    }
 
-//    @XStreamAsAttribute
+    private Sort(String fieldName, Direction direction, NullsPosition nullsPosition, TextLocality textLocality) {
+        this.fieldName = fieldName;
+        this.direction = direction;
+        this.nullsPosition = nullsPosition;
+        this.textLocality = textLocality;
+    }
+
     private String fieldName;
-//    @XStreamAsAttribute
     private Direction direction = Direction.ASC;
-
     private NullsPosition nullsPosition = NullsPosition.DEFAULT;
-
     private TextLocality textLocality = TextLocality.UNDEFINED;
 
     public String getFieldName() {
@@ -71,4 +76,34 @@ public class Sort {
         this.textLocality = textLocality;
     }
 
+    public static class Builder {
+        private String fieldName;
+        private Direction direction = Direction.ASC;
+        private NullsPosition nullsPosition = NullsPosition.DEFAULT;
+        private TextLocality textLocality = TextLocality.UNDEFINED;
+
+        public Builder fieldName(String value) {
+            fieldName = value;
+            return this;
+        }
+        public Builder direction(Direction value) {
+            direction = value;
+            return this;
+        }
+        public Builder nullsPosition(NullsPosition value) {
+            nullsPosition = value;
+            return this;
+        }
+        public Builder textLocality(TextLocality value) {
+            textLocality = value;
+            return this;
+        }
+        public Sort build() {
+            return new Sort(fieldName, direction, nullsPosition, textLocality);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 }

@@ -47,7 +47,7 @@ public class RegexUtlTest {
     @Test
     public void testReplace1() throws Exception {
         final String query_ph = "${QUERY_PLACEHOLDER}";
-        final String templ = "SELECT COUNT(1) ttlCnt$wrpr\n" +
+        final String templ = "SELECT COUNT(1) ttlCnt_wrpr\n" +
                 "FROM ( ${QUERY_PLACEHOLDER} )";
         final String sql = "select 'sdf' as f1 from dual";
         String preparedSQL = Regexs.replace(templ, query_ph, sql, Pattern.MULTILINE+Pattern.LITERAL);
@@ -79,7 +79,7 @@ public class RegexUtlTest {
     public void testReplace() throws Exception {
         final String sql = "\n" +
                 "    SELECT * FROM (\n" +
-                "        SELECT pgng$wrpr0.*, row_number() over (order by aterminalid) rnum$pgng\n" +
+                "        SELECT pgng_wrpr0.*, row_number() over (order by aterminalid) rnum_pgng\n" +
                 "          FROM ( SELECT\n" +
                 "  aterminalid,\n" +
                 "  aterminalkey,\n" +
@@ -92,12 +92,12 @@ public class RegexUtlTest {
                 "  longitude,\n" +
                 "  isdeleted\n" +
                 "FROM aterminal\n" +
-                "WHERE not isdeleted ) as pgng$wrpr0\n" +
-                "    ) pgng$wrpr WHERE (pgng$wrpr.rnum$pgng > :paging$offset) AND (pgng$wrpr.rnum$pgng <= :paging$last)\n" +
+                "WHERE not isdeleted ) as pgng_wrpr0\n" +
+                "    ) pgng_wrpr WHERE (pgng_wrpr.rnum_pgng > :paging$offset) AND (pgng_wrpr.rnum_pgng <= :paging$last)\n" +
                 "    ";
         final String sql1 = "\n" +
                 "    SELECT * FROM (\n" +
-                "        SELECT pgng$wrpr0.*, row_number() over (order by aterminalid) rnum$pgng\n" +
+                "        SELECT pgng_wrpr0.*, row_number() over (order by aterminalid) rnum_pgng\n" +
                 "          FROM ( SELECT\n" +
                 "  aterminalid,\n" +
                 "  aterminalkey,\n" +
@@ -110,8 +110,8 @@ public class RegexUtlTest {
                 "  longitude,\n" +
                 "  isdeleted\n" +
                 "FROM aterminal\n" +
-                "WHERE not isdeleted ) as pgng$wrpr0\n" +
-                "    ) pgng$wrpr WHERE (pgng$wrpr.rnum$pgng > ?) AND (pgng$wrpr.rnum$pgng <= :paging$last)\n" +
+                "WHERE not isdeleted ) as pgng_wrpr0\n" +
+                "    ) pgng_wrpr WHERE (pgng_wrpr.rnum_pgng > ?) AND (pgng_wrpr.rnum_pgng <= :paging$last)\n" +
                 "    ";
         String paramName = "paging$offset";
         String preparedQuery = Regexs.replace(sql, "\\Q:"+paramName+"\\E\\b", "?", Pattern.MULTILINE+Pattern.CASE_INSENSITIVE);

@@ -26,7 +26,7 @@ public class eeeTest {
     @Test
     public void deleteNonSQLSubstringsInSQLTest() throws Exception {
         String sql = "\n" +
-                "        SELECT COUNT(1) ttlCnt$wrpr\n" +
+                "        SELECT COUNT(1) ttlCnt_wrpr\n" +
                 "          FROM ( with \n" +
                 "orgs as (\n" +
                 "  select /*+ MATERIALIZE */ o.id_org, o.holding_id, o.time_zone, o.id_vnd, DECODE (o.test, 1, 'тестовый', 'реальный') AS test,\n" +

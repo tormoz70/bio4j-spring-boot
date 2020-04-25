@@ -1,5 +1,5 @@
     SELECT * FROM (
-        SELECT pgng$wrpr0.*, ROWNUM rnum$pgng
+        SELECT pgng_wrpr0.*, ROWNUM rnum_pgng
           FROM ( with fss as (
     SELECT
       a.film_id, a.org_id, a.pureg_id, a.pu_num,
@@ -74,5 +74,5 @@ select
   :force_org_id as force_org_id
 from sess0
 ORDER BY sroom_name, show_date desc, sess_title
- ) pgng$wrpr0
-    ) pgng$wrpr WHERE (pgng$wrpr.rnum$pgng > :paging$offset) AND (pgng$wrpr.rnum$pgng <= :paging$last)
+ ) pgng_wrpr0
+    ) pgng_wrpr WHERE (pgng_wrpr.rnum_pgng > :paging$offset) AND (pgng_wrpr.rnum_pgng <= :paging$last)

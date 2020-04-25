@@ -9,32 +9,36 @@
         <version>2.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bio4j-spring-dba-oracle-lib</artifactId>
+    <artifactId>bio4j-spring-dba-clickhouse-lib</artifactId>
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>com.oracle</groupId>-->
+<!--            <artifactId>ojdbc8</artifactId>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc8</artifactId>
+            <groupId>ru.yandex.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>ru.bio4j.spring</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-tmodel-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>ru.bio4j.spring</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-commons-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>ru.bio4j.spring</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-dbapi-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>ru.bio4j.spring</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-dba-commons-lib</artifactId>
         </dependency>
 <!--        <dependency>-->
-<!--            <groupId>ru.bio4j.spring</groupId>-->
+<!--            <groupId>${project.groupId}</groupId>-->
 <!--            <artifactId>bio4j-spring-stypes-lib</artifactId>-->
 <!--        </dependency>-->
     </dependencies>

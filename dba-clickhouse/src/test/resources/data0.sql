@@ -1,0 +1,1 @@
+select a.* from jdbc_test.data0 as a

@@ -35,7 +35,7 @@ public class FilteringWrapperBaseImpl extends AbstractWrapper implements Filteri
 
     public String wrap(String sql, Filter filter, List<Field> fields) {
         if(filter != null) {
-            String whereSql = wrapperInterpreter.filterToSQL("fltrng$wrpr", filter, fields);
+            String whereSql = wrapperInterpreter.filterToSQL("fltrng_wrpr", filter, fields);
             return queryPrefix + sql + querySuffix + (Strings.isNullOrEmpty(whereSql) ? "" : " WHERE " + whereSql);
         }
         return sql;

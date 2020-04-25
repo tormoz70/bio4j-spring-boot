@@ -1,0 +1,1 @@
+select min(a.summ) as summ_min, max(a.summ) as summ_max from jdbc_test.data0 as a

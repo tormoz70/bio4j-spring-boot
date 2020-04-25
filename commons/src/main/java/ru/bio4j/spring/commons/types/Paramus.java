@@ -508,15 +508,23 @@ public class Paramus implements Closeable {
     }
 
     public static List<Param> createParams(Object ... params) {
-        List<String> keys = new ArrayList<>();
-        List<Object> vals = new ArrayList<>();
-        for(int i=0; i<params.length; i++) {
-            if(i % 2 == 0)
-                keys.add((String)params[i]);
-            else
-                vals.add(params[i]);
+        if (params.length == 1 && params[0] instanceof List && ((List)params[0]).size() > 0 && ((List)params[0]).get(0) instanceof Param ) {
+            List<Param> rslt = new ArrayList<>();
+            Paramus.applyParams(rslt, (List<Param>) params[0], false, true);
+        } else if ((params.length == 0) || (params.length == 1 && params[0] == null) || (params.length == 1 && params[0] instanceof List && ((List)params[0]).size() == 0)){
+            return new ArrayList<>();
+        } else {
+            List<String> keys = new ArrayList<>();
+            List<Object> vals = new ArrayList<>();
+            for (int i = 0; i < params.length; i++) {
+                if (i % 2 == 0)
+                    keys.add((String) params[i]);
+                else
+                    vals.add(params[i]);
+            }
+            return _createParams(keys, vals);
         }
-        return _createParams(keys, vals);
+        return new ArrayList<>();
     }
 
     public <T> T getParamValue(String paramName, Class<T> type, boolean silent) {

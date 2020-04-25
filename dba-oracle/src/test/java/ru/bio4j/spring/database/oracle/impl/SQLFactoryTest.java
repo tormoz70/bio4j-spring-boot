@@ -608,7 +608,7 @@ public class SQLFactoryTest {
                 @Override
                 public String exec(SQLContext ctx) {
                     String sql = "SELECT * FROM (\n" +
-                            "        SELECT pgng$wrpr0.*, ROWNUM rnum$pgng\n" +
+                            "        SELECT pgng_wrpr0.*, ROWNUM rnum_pgng\n" +
                             "          FROM ( with \n" +
                             "orgs as (\n" +
                             "  select /*+ MATERIALIZE */ o.id_org, o.holding_id, o.time_zone, o.id_vnd, DECODE (o.test, 1, 'тестовый', 'реальный') AS test,\n" +
@@ -707,8 +707,8 @@ public class SQLFactoryTest {
                             "      (a.test like decode(:test, null, '%', '%'||lower(:test)||'%')) \n" +
                             "    )\n" +
                             "  ORDER BY date_incoming desc\n" +
-                            " ) pgng$wrpr0\n" +
-                            "    ) pgng$wrpr WHERE (pgng$wrpr.rnum$pgng > :paging$offset) AND (pgng$wrpr.rnum$pgng <= :paging$last)";
+                            " ) pgng_wrpr0\n" +
+                            "    ) pgng_wrpr WHERE (pgng_wrpr.rnum_pgng > :paging$offset) AND (pgng_wrpr.rnum_pgng <= :paging$last)";
                     int cnt = 0;
                     List<Param> params = new ArrayList<>();
 
@@ -975,9 +975,9 @@ public class SQLFactoryTest {
 	   6-p_sys_curusr_org_uid(in)(VARCHAR)................."1009686";
 	   7-p_sys_curusr_roles(in)(VARCHAR)..................."21";
 	   8-p_sys_curusr_grants(in)(VARCHAR).................."151,152";
-	   9-query$value(in)(VARCHAR)..........................[null];
-	  10-pagination$offset(in)(DECIMAL)....................[0];
-	  11-pagination$limit(in)(DECIMAL).....................[50];
+	   9-query_value(in)(VARCHAR)..........................[null];
+	  10-pagination_offset(in)(DECIMAL)....................[0];
+	  11-pagination_limit(in)(DECIMAL).....................[50];
 	 */
 
 //            Paramus.setParamValue(params, "rlocale", null);
@@ -988,9 +988,9 @@ public class SQLFactoryTest {
             Paramus.setParamValue(params, "p_sys_curusr_org_uid", "1009686");
             Paramus.setParamValue(params, "p_sys_curusr_roles", "21");
             Paramus.setParamValue(params, "p_sys_curusr_grants", "151,152");
-//            Paramus.setParamValue(params, "query$value", null);
-            Paramus.setParamValue(params, "pagination$offset", 0);
-            Paramus.setParamValue(params, "pagination$limit", 50);
+//            Paramus.setParamValue(params, "query_value", null);
+            Paramus.setParamValue(params, "pagination_offset", 0);
+            Paramus.setParamValue(params, "pagination_limit", 50);
 
 
             Var var = new Var();

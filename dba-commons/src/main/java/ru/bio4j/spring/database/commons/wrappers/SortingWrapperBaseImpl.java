@@ -40,28 +40,30 @@ public class SortingWrapperBaseImpl extends AbstractWrapper implements SortingWr
 
     public String wrap(String sql, List<Sort> sort, List<Field> fields) {
         if (sort != null && sort.size() > 0) {
-            List<Sort> notFound = new ArrayList<>();
-            for (Sort s : sort) {
-                if(!Strings.isNullOrEmpty(s.getFieldName())) {
-                    Field fldDef = Lists.first(fields, item -> Strings.compare(s.getFieldName(), item.getName(), true) || Strings.compare(s.getFieldName(), item.getAttrName(), true));
-                    if (fldDef != null) {
-                        if (!Strings.isNullOrEmpty(fldDef.getSorter()))
-                            s.setFieldName(fldDef.getSorter());
-                        else
-                            s.setFieldName(fldDef.getName());
-                        if(s.getNullsPosition() == Sort.NullsPosition.DEFAULT && fldDef.getNullsPosition() != Sort.NullsPosition.DEFAULT)
-                            s.setNullsPosition(fldDef.getNullsPosition());
-                        if(s.getTextLocality() == Sort.TextLocality.UNDEFINED && fldDef.getTextLocality() != Sort.TextLocality.UNDEFINED)
-                            s.setTextLocality(fldDef.getTextLocality());
+            if(fields != null && fields.size() > 0) {
+                List<Sort> notFound = new ArrayList<>();
+                for (Sort s : sort) {
+                    if (!Strings.isNullOrEmpty(s.getFieldName())) {
+                        Field fldDef = Lists.first(fields, item -> Strings.compare(s.getFieldName(), item.getName(), true) || Strings.compare(s.getFieldName(), item.getAttrName(), true));
+                        if (fldDef != null) {
+                            if (!Strings.isNullOrEmpty(fldDef.getSorter()))
+                                s.setFieldName(fldDef.getSorter());
+                            else
+                                s.setFieldName(fldDef.getName());
+                            if (s.getNullsPosition() == Sort.NullsPosition.DEFAULT && fldDef.getNullsPosition() != Sort.NullsPosition.DEFAULT)
+                                s.setNullsPosition(fldDef.getNullsPosition());
+                            if (s.getTextLocality() == Sort.TextLocality.UNDEFINED && fldDef.getTextLocality() != Sort.TextLocality.UNDEFINED)
+                                s.setTextLocality(fldDef.getTextLocality());
+                        } else
+                            notFound.add(s);
                     } else
                         notFound.add(s);
-                } else
-                    notFound.add(s);
+                }
+                for (Sort s : notFound)
+                    sort.remove(s);
             }
-            for(Sort s : notFound)
-                sort.remove(s);
 
-            String orderbySql = wrapperInterpreter.sortToSQL("srtng$wrpr", sort, fields);
+            String orderbySql = wrapperInterpreter.sortToSQL("srtng_wrpr", sort, fields);
             return queryPrefix + sql + querySuffix + (Strings.isNullOrEmpty(orderbySql) ? "" : " ORDER BY " + orderbySql);
         }
         return sql;

@@ -128,8 +128,8 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
-        _prepareLoadPageParams(params, filter, sort, context, cursor, crudOptions.isForceCalcCount());
-        return readStoreData(params, context, cursor, crudOptions, beanType);
+        List<Param> localParams = _prepareLoadPageParams(params, filter, sort, context, cursor, crudOptions.isForceCalcCount());
+        return readStoreData(localParams, context, cursor, crudOptions, beanType);
     }
 
     /***
@@ -402,7 +402,7 @@ public class CrudReaderApi {
         return readStoreDataExt(params, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
-    private static void _prepareLoadPageParams(
+    private static List<Param> _prepareLoadPageParams(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
@@ -413,11 +413,17 @@ public class CrudReaderApi {
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
 
-        final Object location = Paramus.paramValue(params, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
-        final int paginationOffset = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
-        final int paginationPagesize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        final List<Param> localParams = Paramus.createParams(params);
 
-        final String paginationTotalcountStr = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
+        final Object location = Paramus.paramValue(localParams, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
+        final int paginationOffset = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
+        if(Paramus.getParam(localParams, RestParamNames.PAGINATION_PARAM_OFFSET) == null)
+            Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
+        final int paginationPagesize = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
+        if(Paramus.getParam(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE) == null)
+            Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
+
+        final String paginationTotalcountStr = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
         final int paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, int.class);
 
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
@@ -431,28 +437,30 @@ public class CrudReaderApi {
             if (pkField == null)
                 throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
             cursor.getSelectSqlDef().setLocateSql(context.getWrappers().getLocateWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
-            preparePkParamValue(params, pkField);
+            preparePkParamValue(localParams, pkField);
         }
         if (paginationPagesize > 0)
             cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getPaginationWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
 
         long factOffset = paginationOffset;
         long totalCount = paginationTotalcount;
-        if (forceCalcCount || paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1)) {
-            totalCount = calcTotalCount(params, context, cursor, context.getCurrentUser());
-            factOffset = (int) Math.floor(totalCount / paginationPagesize) * paginationPagesize;
+        boolean gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
+        if (forceCalcCount || gotoLastPage) {
+            totalCount = calcTotalCount(localParams, context, cursor, context.getCurrentUser());
+            if(gotoLastPage)
+                factOffset = (int) Math.floor(totalCount / paginationPagesize) * paginationPagesize;
             if(LOG.isDebugEnabled())
                 LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount);
         }
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount);
-        long locFactOffset = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
+        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
+        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount);
+        long locFactOffset = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
         if (location != null) {
             if(LOG.isDebugEnabled())
                 LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
             int locatedPos = context.createDynamicCursor()
                     .init(context.getCurrentConnection(), cursor.getSelectSqlDef().getLocateSql(), cursor.getSelectSqlDef().getParamDeclaration())
-                    .scalar(params, context.getCurrentUser(), int.class, -1);
+                    .scalar(localParams, context.getCurrentUser(), int.class, -1);
             if (locatedPos >= 0) {
                 locFactOffset = calcOffset(locatedPos, paginationPagesize);
                 if(LOG.isDebugEnabled())
@@ -462,8 +470,13 @@ public class CrudReaderApi {
                     LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
             }
         }
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
-        Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
+        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+        if(params != null) {
+            Paramus.applyParams(params, localParams, false, true);
+            return params;
+        }
+        return localParams;
     }
 
     private static void _prepareLoadAllParams(
@@ -500,8 +513,8 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        _prepareLoadPageParams(params, filter, sort, context, cursor, false);
-        return readStoreDataExt(params, context, cursor, beanType);
+        List<Param> localParams = _prepareLoadPageParams(params, filter, sort, context, cursor, false);
+        return readStoreDataExt(localParams, context, cursor, beanType);
     }
 
     /***
@@ -621,6 +634,17 @@ public class CrudReaderApi {
         cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
         List<T> result = context.execBatch((ctx) -> {
             return readStoreDataExt(params, ctx, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
+        }, user);
+        return result.size() > 0 ? result.get(0) : null;
+    }
+
+    public static <T> T loadFirstRecordExt(
+            final SQLContext context, final SQLDefinition cursor,
+            final User user,
+            final Class<T> beanType) {
+        cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
+        List<T> result = context.execBatch((ctx) -> {
+            return readStoreDataExt(null, ctx, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
         }, user);
         return result.size() > 0 ? result.get(0) : null;
     }

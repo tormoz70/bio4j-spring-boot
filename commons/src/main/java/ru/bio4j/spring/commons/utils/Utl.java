@@ -696,7 +696,7 @@ public class Utl {
             bioCode = Strings.combineArray(bioCodeParts, ".");
             return extractBioPath(bioCode, pathSeparator);
         }
-        return pathSeparator;
+        return "";
     }
 
     public static String extractBioParentPath(String bioCode) {
@@ -1130,9 +1130,10 @@ public class Utl {
             for (String item : items) {
                 String checkedItem = Regexs.find(item, "(\\+|\\-)\\w+", Pattern.CASE_INSENSITIVE);
                 if (item.equals(checkedItem)) {
-                    sort = new Sort();
-                    sort.setFieldName(item.substring(1));
-                    sort.setDirection(item.substring(0, 1).equals("+") ? Sort.Direction.ASC : Sort.Direction.DESC);
+                    sort = Sort.builder()
+                            .fieldName(item.substring(1))
+                            .direction(item.substring(0, 1).equals("+") ? Sort.Direction.ASC : Sort.Direction.DESC)
+                    .build();
                     rslt.add(sort);
                 } else
                     return null;
