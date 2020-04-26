@@ -101,14 +101,14 @@ public class SQLFactoryTest {
 
     @Test
     public void testSQLCommandOpenCursor1() {
-        String bioPath = Utl.extractBioParentPath("data0");
-        Assert.assertEquals("", bioPath);
+        String bioPath = Utl.extractBioParentPath("bios.data0");
+        Assert.assertEquals("/bios", bioPath);
     }
 
     @Test
     public void testSQLCommandOpenCursor2() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("data0");
+            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
             BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                         .forceCalcCount(true)
@@ -132,7 +132,7 @@ public class SQLFactoryTest {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("data0minmax");
             ABean rstMinMax = CrudReaderApi.loadFirstRecordExt(context, sqlDefinition, null, ABean.class);
-            sqlDefinition = CursorParser.pars("data0");
+            sqlDefinition = CursorParser.pars("bios.data0");
             List<Sort> sorts = new ArrayList<>();
             sorts.add(Sort.builder()
                     .fieldName("summ")

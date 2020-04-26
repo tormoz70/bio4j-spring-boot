@@ -50,7 +50,7 @@ public class DbaTest {
             "userRole", "6",
             "nationId", 0
         );
-        ABean d = dbaAdapter.loadFirstBean("curTopAll", params, null, ABean.class);
+        ABean d = dbaAdapter.loadFirstBean("bios.curTopAll", params, null, ABean.class);
         Assert.assertTrue(d != null);
     }
 }

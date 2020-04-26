@@ -19,6 +19,7 @@ import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.*;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Field;
+import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.StoreMetadata;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
@@ -518,6 +519,51 @@ public class DbaAdapter {
             return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
         }
         return new ArrayList<>();
+    }
+
+    public void setBioParamToRequest(String paramName, Object paramValue, HttpServletRequest request) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        Paramus.setParamValue(queryParams.bioParams, paramName, paramValue);
+    }
+
+    public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        if(queryParams.sort == null)
+            queryParams.sort = new ArrayList<>();
+        queryParams.sort.clear();
+        if(!Strings.isNullOrEmpty(fieldName)) {
+            Sort newSort = new Sort();
+            newSort.setFieldName(fieldName);
+            newSort.setDirection(direction);
+            queryParams.sort.add(newSort);
+        }
+    }
+
+    public List<Param> setBeanToBioParams(ABean bean, List<Param> params) {
+        if(params == null)
+            params = new ArrayList<>();
+        if(bean == null)
+            return params;
+        for(String key : bean.keySet())
+            Paramus.setParamValue(params, key, bean.get(key));
+        return params;
+    }
+
+    public void setBeanToRequest(ABean bean, HttpServletRequest request) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        setBeanToBioParams(bean, queryParams.bioParams);
+    }
+
+    public boolean bioParamExistsInRequest(String paramName, HttpServletRequest request) {
+        return ((WrappedRequest)request).bioQueryParamExists(paramName);
+    }
+
+    public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType, T defaultValue) {
+        return ((WrappedRequest)request).getBioQueryParam(paramName, paramType, defaultValue);
+    }
+
+    public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType) {
+        return  getBioParamFromRequest(paramName, request, paramType, null);
     }
 
 }
