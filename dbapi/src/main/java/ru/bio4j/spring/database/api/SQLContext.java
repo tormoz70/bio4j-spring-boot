@@ -25,6 +25,7 @@ public interface SQLContext {
     SQLCursor createCursor();
     SQLCursor createDynamicCursor();
     SQLStoredProc createStoredProc();
+    StatementPreparerer createDbStatementPreparerer(SQLCursor cursor);
 
     String getDBMSName();
 

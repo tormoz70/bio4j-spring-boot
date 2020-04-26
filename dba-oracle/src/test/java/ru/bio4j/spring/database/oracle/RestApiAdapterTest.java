@@ -1,4 +1,4 @@
-package ru.bio4j.spring.database.oracle.impl;
+package ru.bio4j.spring.database.oracle;
 
 import org.junit.Test;
 import org.slf4j.Logger;

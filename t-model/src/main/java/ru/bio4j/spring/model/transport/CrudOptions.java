@@ -9,6 +9,7 @@ public class CrudOptions {
         private int recordsLimit = 0;
         private boolean forceCalcCount = false;
         private boolean appendMetadata = false;
+
         public Builder recordsLimit(int value) {
             recordsLimit = value;
             return this;
@@ -45,4 +46,5 @@ public class CrudOptions {
     public boolean isAppendMetadata() {
         return appendMetadata;
     }
+
 }

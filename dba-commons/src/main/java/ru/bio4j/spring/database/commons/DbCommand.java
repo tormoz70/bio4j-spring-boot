@@ -3,6 +3,7 @@ package ru.bio4j.spring.database.commons;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,10 @@ public abstract class DbCommand<T extends SQLCommand> implements SQLCommand {
     protected int timeout = 60;
     protected Connection connection = null;
     protected SQLNamedParametersStatement preparedStatement = null;
+
+
     protected String preparedSQL = null;
+    protected StatementPreparerer statementPreparerer;
 
     protected SQLParamSetter paramSetter;
     protected SQLParamGetter paramGetter;
@@ -78,14 +82,14 @@ public abstract class DbCommand<T extends SQLCommand> implements SQLCommand {
 		this.timeout = timeout;
 		if(sqlDef != null)
             this.params = Paramus.clone(sqlDef.getParamDeclaration());
-        this.prepareStatement();
+		if(statementPreparerer != null)
+            statementPreparerer.prepare(null);
 		return (T)this;
 	}
     public T init(Connection conn, SQLDef sqlDef) {
         return this.init(conn, sqlDef, 60);
     }
 
-	protected abstract void prepareStatement();
 
     protected boolean doBeforeStatement(List<Param> params) {
         boolean locCancel = false;

@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.database.clickhouse.ChWrapperInterpreter;
 import ru.bio4j.spring.model.transport.FilterAndSorter;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 

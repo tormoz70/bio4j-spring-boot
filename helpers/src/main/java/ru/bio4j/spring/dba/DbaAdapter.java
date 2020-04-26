@@ -4,6 +4,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
@@ -70,8 +71,8 @@ public class DbaAdapter {
         return sqlContext;
     }
 
-    public SQLDefinitionImpl getSQLDefinition(String bioCode) {
-        SQLDefinitionImpl cursor = CursorParser.pars(bioCode);
+    public SQLDefinition getSQLDefinition(String bioCode) {
+        SQLDefinition cursor = CursorParser.pars(bioCode);
         if(cursor == null)
             throw Utl.wrapErrorAsRuntimeException(String.format("Cursor \"%s\" not found in service \"%s\"!", bioCode, this.getClass().getName()));
         prepareSQL(cursor);

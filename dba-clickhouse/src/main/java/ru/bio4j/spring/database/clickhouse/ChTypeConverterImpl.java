@@ -2,7 +2,6 @@ package ru.bio4j.spring.database.clickhouse;
 
 import ru.bio4j.spring.commons.converter.Types;
 import ru.bio4j.spring.database.commons.SqlTypeConverterImpl;
-import ru.yandex.clickhouse.domain.ClickHouseDataType;
 
 import java.sql.ResultSet;
 

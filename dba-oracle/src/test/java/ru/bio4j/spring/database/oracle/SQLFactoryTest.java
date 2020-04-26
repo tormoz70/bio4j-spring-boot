@@ -1,4 +1,4 @@
-package ru.bio4j.spring.database.oracle.impl;
+package ru.bio4j.spring.database.oracle;
 
 import org.junit.*;
 import ru.bio4j.spring.model.transport.ConvertValueException;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 

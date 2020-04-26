@@ -250,11 +250,11 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql-jdbc.version}</version>
             </dependency>
-            <dependency>
-                <groupId>ru.yandex.clickhouse</groupId>
-                <artifactId>clickhouse-jdbc</artifactId>
-                <version>${clickhouse-jdbc.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>ru.yandex.clickhouse</groupId>-->
+<!--                <artifactId>clickhouse-jdbc</artifactId>-->
+<!--                <version>${clickhouse-jdbc.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -293,6 +293,11 @@
             <dependency>
                 <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-dba-oracle-lib</artifactId>
+                <version>${bio4j-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-dba-clickhouse-lib</artifactId>
                 <version>${bio4j-spring-boot.version}</version>
             </dependency>
 

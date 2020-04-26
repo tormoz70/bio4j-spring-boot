@@ -176,12 +176,16 @@ public abstract class DbContextAbstract implements SQLContext {
 
     @Override
     public SQLCursor createCursor(){
-        return new DbCursor();
+        return new DbCursor(this);
     }
 
     @Override
     public SQLCursor createDynamicCursor(){
-        return new DbDynamicCursor();
+        return new DbDynamicCursor(this);
+    }
+
+    public StatementPreparerer createDbStatementPreparerer(DbCursor cursor) {
+        return new DbStatementPreparerer(cursor);
     }
 
     @Override
@@ -210,5 +214,9 @@ public abstract class DbContextAbstract implements SQLContext {
         return DbUtils.getInstance().detectStoredProcParamsAuto(sql, conn, paramsDeclaration);
     }
 
+    @Override
+    public StatementPreparerer createDbStatementPreparerer(SQLCursor cursor) {
+        return new DbStatementPreparerer(cursor);
+    }
 
 }

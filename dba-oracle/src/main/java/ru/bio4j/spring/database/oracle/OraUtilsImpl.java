@@ -111,7 +111,7 @@ public class OraUtilsImpl implements RDBMSUtils {
         try {
             OraUtilsImpl.PackageName pkg = this.parsStoredProcName(storedProcName);
             List<Param> params = new ArrayList<>();
-            try (SQLNamedParametersStatement st = DbNamedParametersStatement.prepareStatement(conn, SQL_GET_PARAMS_FROM_DBMS)) {
+            try (SQLNamedParametersStatement st = DbNamedParametersStatement.prepareStatement(conn, SQL_GET_PARAMS_FROM_DBMS, DbNamedParametersStatement.class)) {
                 st.setStringAtName("schema_name", pkg.schemaName);
                 st.setStringAtName("package_name", pkg.pkgName);
                 st.setStringAtName("method_name", pkg.methodName);

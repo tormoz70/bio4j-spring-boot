@@ -5,7 +5,7 @@
         multiselection="false">
     <SQL action="select">
         <text><![CDATA[
-SELECT 'FTW' as rcard_id FROM DUAL
+SELECT 'FTW' as rcard_id
         ]]></text>
     </SQL>
     <fields>

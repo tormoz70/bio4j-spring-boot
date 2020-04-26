@@ -1,8 +1,9 @@
-package ru.bio4j.spring.database.oracle.impl;
+package ru.bio4j.spring.database.oracle;
 
 import org.junit.Assert;
 import org.junit.Test;
 import ru.bio4j.spring.commons.utils.Jecksons;
+import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.oracle.OraWrapperInterpreter;
 import ru.bio4j.spring.model.transport.FilterAndSorter;
@@ -34,7 +35,7 @@ public class OraWrapperInterpreterTest {
 //    }
     @Test
     public void filterAndSorterToSQLTest() throws Exception {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("filter2.json");
+        InputStream inputStream = Strings.openResourceAsStream("filter2.json");
         String json = Utl.readStream(inputStream);
         FilterAndSorter fs = Jecksons.getInstance().decodeFilterAndSorter(json);
         OraWrapperInterpreter filterWrapper = new OraWrapperInterpreter();
@@ -44,7 +45,7 @@ public class OraWrapperInterpreterTest {
 
     @Test
     public void filterAndSorterToSQLTest1() throws Exception {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("filter3.json");
+        InputStream inputStream = Strings.openResourceAsStream("filter3.json");
         String json = Utl.readStream(inputStream);
         FilterAndSorter fs = Jecksons.getInstance().decodeFilterAndSorter(json);
         OraWrapperInterpreter filterWrapper = new OraWrapperInterpreter();

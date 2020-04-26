@@ -3,6 +3,7 @@ package ru.bio4j.spring.database.commons;
 import ru.bio4j.spring.commons.utils.Regexs;
 import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 
 import java.io.InputStream;
@@ -15,20 +16,20 @@ import java.util.regex.Pattern;
 
 public class DbNamedParametersStatement implements SQLNamedParametersStatement {
     /** The statement this object is wrapping. */
-    private PreparedStatement statement;
+    protected PreparedStatement statement;
 
     /** Maps parameter names to arrays of ints which are the parameter indices.
      */
-    private final List<String> paramNames;
-    private final Map<String, String> paramTypes;
-    private final Map<String, String> outParamTypes;
-    private final Map<String, String> inoutParamTypes;
-    private final Map<String, Object> paramValues;
-    private final Map<String, int[]> indexMap;
-    private final String origQuery;
-    private final String parsedQuery;
+    protected final List<String> paramNames;
+    protected final Map<String, String> paramTypes;
+    protected final Map<String, String> outParamTypes;
+    protected final Map<String, String> inoutParamTypes;
+    protected final Map<String, Object> paramValues;
+    protected final Map<String, int[]> indexMap;
+    protected final String origQuery;
+    protected final String parsedQuery;
 
-    private DbNamedParametersStatement(String query) {
+    public DbNamedParametersStatement(String query) {
         paramNames = new ArrayList<>();
         paramTypes = new HashMap();
         outParamTypes = new HashMap();
@@ -72,10 +73,14 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
         return parsedQuery;
     }
 
-    public static SQLNamedParametersStatement prepareStatement(Connection connection, String query) throws SQLException {
-        DbNamedParametersStatement sttmnt = new DbNamedParametersStatement(query);
-        sttmnt.statement = connection.prepareStatement(sttmnt.parsedQuery);
-        return sttmnt;
+    public static SQLNamedParametersStatement prepareStatement(Connection connection, String query, Class<? extends DbNamedParametersStatement> statementType) {
+        try {
+            DbNamedParametersStatement sttmnt = statementType.getConstructor(String.class).newInstance(query);
+            sttmnt.statement = connection.prepareStatement(sttmnt.parsedQuery);
+            return sttmnt;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
     }
 
     public static SQLNamedParametersStatement prepareCall(Connection connection, String query) throws SQLException {
@@ -137,7 +142,7 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
 
     }
 
-    private int[] getIndexes(String name) {
+    protected int[] getIndexes(String name) {
         int[] indexes=indexMap.get(name.toLowerCase());
         if(indexes==null) {
             throw new IllegalArgumentException("Parameter not found: "+name.toLowerCase());

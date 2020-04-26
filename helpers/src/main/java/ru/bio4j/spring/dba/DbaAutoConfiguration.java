@@ -3,19 +3,19 @@ package ru.bio4j.spring.dba;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.cache.impl.CacheServiceImpl;
 import ru.bio4j.spring.commons.types.*;
-import ru.bio4j.spring.commons.utils.Jecksons;
+import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.database.clickhouse.OraContext;
+import ru.bio4j.spring.database.clickhouse.ChContext;
+import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.model.transport.CacheProperties;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Sso2ClientProperties;
@@ -49,6 +49,8 @@ public class DbaAutoConfiguration {
 
     @Bean
     public SQLContext sqlContext() {
+        if(Strings.compare(dataSourceProperties.getDbmsName(), "clickhouse", true))
+            return DbContextFactory.createHikariCP(dataSourceProperties, ChContext.class);
         return DbContextFactory.createHikariCP(dataSourceProperties, OraContext.class);
     }
 

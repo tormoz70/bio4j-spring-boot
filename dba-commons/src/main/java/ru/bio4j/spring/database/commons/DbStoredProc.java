@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar
@@ -23,6 +24,33 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
     private static final Logger LOG = LoggerFactory.getLogger(DbStoredProc.class);
 
     private String storedProcName;
+
+    public DbStoredProc() {
+        this.statementPreparerer = new StatementPreparerer() {
+            @Override
+            public void prepare(Supplier<String> sqlSupplier) {
+                try {
+                    if (params == null || params.size() == 0) {
+                        if(params == null)
+                            params = new ArrayList<>();
+                        StoredProgMetadata sp = DbUtils.getInstance().detectStoredProcParamsAuto(storedProcName, connection, params);
+                        try (Paramus p = Paramus.set(sp.getParamDeclaration())) {
+                            p.apply(params, true);
+                            params = p.get();
+                        }
+                    }
+
+                    String signature = DbUtils.generateSignature(storedProcName, params);
+                    preparedSQL = String.format("{call %s}", signature);
+                    preparedStatement = DbNamedParametersStatement.prepareCall(connection, preparedSQL);
+                    preparedStatement.setQueryTimeout(timeout);
+                } catch (SQLException e) {
+                    throw BioSQLException.create(e);
+                }
+
+            }
+        };
+    }
 
 	@Override
 	public SQLStoredProc init(Connection conn, UpdelexSQLDef sqlDef, int timeout) {
@@ -46,28 +74,6 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
         return this.init(conn, storedProcName);
     }
 
-    @Override
-	protected void prepareStatement() {
-	    try {
-            if (this.params == null || this.params.size() == 0) {
-                if(this.params == null)
-                    this.params = new ArrayList<>();
-                StoredProgMetadata sp = DbUtils.getInstance().detectStoredProcParamsAuto(this.storedProcName, this.connection, this.params);
-                try (Paramus p = Paramus.set(sp.getParamDeclaration())) {
-                    p.apply(params, true);
-                    params = p.get();
-                }
-            }
-
-            String signature = DbUtils.generateSignature(storedProcName, params);
-            preparedSQL = String.format("{call %s}", signature);
-            preparedStatement = DbNamedParametersStatement.prepareCall(this.connection, this.preparedSQL);
-            preparedStatement.setQueryTimeout(this.timeout);
-        } catch (SQLException e) {
-	        throw BioSQLException.create(e);
-        }
-	}
-	
     @Override
 	public void execSQL(Object params, User usr, boolean stayOpened) {
         List<Param> prms = params != null ? DbUtils.decodeParams(params) : new ArrayList<>();

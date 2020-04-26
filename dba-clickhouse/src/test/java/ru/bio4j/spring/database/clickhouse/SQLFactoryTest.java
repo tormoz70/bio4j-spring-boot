@@ -2,28 +2,19 @@ package ru.bio4j.spring.database.clickhouse;
 
 import org.junit.*;
 import ru.bio4j.spring.commons.utils.ABeans;
-import ru.bio4j.spring.commons.utils.Filters;
-import ru.bio4j.spring.commons.utils.Lists;
 import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
-import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
-import java.sql.*;
 import java.util.*;
-import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class SQLFactoryTest {
 
@@ -32,8 +23,10 @@ public class SQLFactoryTest {
 //    таблица jdbc_test.data0
 
     private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
-    private static final String testDBDriverName = "ru.yandex.clickhouse.ClickHouseDriver";
-    private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:8123/default";
+    private static final String testDBDriverName = "com.github.housepower.jdbc.ClickHouseDriver";
+//    private static final String testDBDriverName = "ru.yandex.clickhouse.ClickHouseDriver";
+//    private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:8123/default";
+    private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:9000";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@cmon-ora-dev:1521:MICEXDB";
     //private static final String testDBUrl = "jdbc:oracle:oci:@GIVCDB_EKBS03";

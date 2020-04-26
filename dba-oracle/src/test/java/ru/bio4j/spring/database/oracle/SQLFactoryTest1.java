@@ -1,4 +1,4 @@
-package ru.bio4j.spring.database.oracle.impl;
+package ru.bio4j.spring.database.oracle;
 
 import junit.framework.TestCase;
 import org.junit.AfterClass;
@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 
 public class SQLFactoryTest1 extends TestCase {

@@ -2,17 +2,18 @@ package ru.bio4j.spring.database.commons;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.SrvcUtils;
+import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
-import ru.bio4j.spring.database.api.DelegateSQLFetch;
-import ru.bio4j.spring.database.api.SQLCursor;
-import ru.bio4j.spring.database.api.SQLReader;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar
@@ -20,9 +21,10 @@ import java.util.List;
 public class DbDynamicCursor extends DbCursor implements SQLCursor {
     private static final Logger LOG = LoggerFactory.getLogger(DbDynamicCursor.class);
 
-    @Override
-	protected void prepareStatement() {
-	}
+
+    public DbDynamicCursor(SQLContext context) {
+        super(context);
+    }
 
     @Override
     public SQLReader createReader() {
@@ -34,37 +36,41 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
 		return this.sql;
 	}
 
+    public SQLCursor init(Connection conn, SQLDef sqlDef, int timeout) {
+        this.connection = conn;
+        this.timeout = timeout;
+        if(sqlDef != null)
+            this.params = Paramus.clone(sqlDef.getParamDeclaration());
+        return this;
+    }
+
     @Override
-    public boolean fetch(List<Param> params, User usr, DelegateSQLFetch onrecord) {
+    public boolean fetch(List<Param> inParams, User usr, DelegateSQLFetch onrecord) {
         boolean rslt = false;
-        List<Param> prms = params != null ? params : new ArrayList<>();
+        List<Param> prms = inParams != null ? inParams : new ArrayList<>();
         SrvcUtils.applyCurrentUserParams(usr, prms);
 
-        if (this.params == null)
-            this.params = new ArrayList<>();
+        if (params == null)
+            params = new ArrayList<>();
 
-        DbUtils.applyParamsToParams(params, this.params, false, true, false);
+        DbUtils.applyParamsToParams(inParams, params, false, true, false);
 
-        if (!doBeforeStatement(this.params)) // Обрабатываем события
+        if (!doBeforeStatement(params)) // Обрабатываем события
             return rslt;
 
         try {
-            this.preparedSQL = this.sql;
-            // Удаляем из SQL условия #cut#
-            this.preparedSQL = DbUtils.cutFilterConditions(this.sql, this.params);
-            this.preparedStatement = DbNamedParametersStatement.prepareStatement(this.connection, this.preparedSQL);
-            preparedStatement.setQueryTimeout(this.timeout);
-
+            if(statementPreparerer != null)
+                statementPreparerer.prepare(() -> { return DbUtils.cutFilterConditions(sql, params); });
             setParamsToStatement(); // Применяем параметры
 
             if (LOG.isDebugEnabled())
-                LOG.debug("Try to execute: {}", getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
-            try (ResultSet result = this.preparedStatement.executeQuery()) {
-                this.isActive = true;
-                while (this.reader.next(result)) {
+                LOG.debug("Try to execute: {}", getSQL2Execute(preparedSQL, preparedStatement.getParamsAsString()));
+            try (ResultSet result = preparedStatement.executeQuery()) {
+                isActive = true;
+                while (reader.next(result)) {
                     rslt = true;
                     if (onrecord != null) {
-                        if (!onrecord.callback(this.reader))
+                        if (!onrecord.callback(reader))
                             break;
                     }
                 }
@@ -72,9 +78,9 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
         } catch (SQLException e) {
             DbUtils.getInstance().tryForwardSQLAsApplicationError(e);
         } finally {
-            if (this.preparedStatement != null)
+            if (preparedStatement != null)
                 try {
-                    this.preparedStatement.close();
+                    preparedStatement.close();
                 } catch (Exception ignore) {
                 }
         }

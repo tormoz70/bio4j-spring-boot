@@ -241,7 +241,7 @@ public class UtlTest {
     public void extractBioPathTest() throws Exception {
         Assert.assertEquals(Utl.extractBioPath("qwe.asd.fgh.fgh"), "/qwe/asd/fgh/fgh");
         Assert.assertEquals(Utl.extractBioParentPath("qwe.asd.fgh.fgh"), "/qwe/asd/fgh");
-        Assert.assertEquals(Utl.extractBioParentPath("qwe"), "/");
+        Assert.assertEquals(Utl.extractBioParentPath("qwe"), "");
     }
 
 //    @Test

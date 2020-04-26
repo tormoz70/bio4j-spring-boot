@@ -15,10 +15,19 @@ public class DataSourceProperties {
     @Value("${spring.datasource.hikari.maximumPoolSize}")
     private String maximumPoolSize;
 
+    private String dbmsName;
     private String driverClassName;
     private String url;
     private String username;
     private String password;
+
+    public String getDbmsName() {
+        return dbmsName;
+    }
+
+    public void setDbmsName(String dbmsName) {
+        this.dbmsName = dbmsName;
+    }
 
     public static class Builder {
         private String currentSchema;

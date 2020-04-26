@@ -32,6 +32,11 @@ public class DbUtils {
     public static DbUtils getInstance() {return instance;}
 
     private static final String INIT_ERRORS_TEMPL = "Instance of \"%s\" is not initiated!";
+
+    public SqlTypeConverter getConverter() {
+        return converter;
+    }
+
     public void init(SqlTypeConverter converter, RDBMSUtils rdbmsUtils) {
         this.converter = converter;
         this.rdbmsUtils = rdbmsUtils;

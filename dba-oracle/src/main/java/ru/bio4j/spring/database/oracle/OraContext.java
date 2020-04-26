@@ -3,10 +3,9 @@ package ru.bio4j.spring.database.oracle;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.database.api.SQLConnectionConnectedEvent;
-import ru.bio4j.spring.database.api.SQLContext;
-import ru.bio4j.spring.database.api.SQLReader;
+import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
+import ru.bio4j.spring.database.commons.DbStatementPreparerer;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 

@@ -16,9 +16,15 @@
 <!--            <groupId>com.oracle</groupId>-->
 <!--            <artifactId>ojdbc8</artifactId>-->
 <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>ru.yandex.clickhouse</groupId>-->
+<!--            <artifactId>clickhouse-jdbc</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
+            <groupId>com.github.housepower</groupId>
+            <artifactId>clickhouse-native-jdbc</artifactId>
+            <version>2.1-stable</version>
         </dependency>
 
         <dependency>

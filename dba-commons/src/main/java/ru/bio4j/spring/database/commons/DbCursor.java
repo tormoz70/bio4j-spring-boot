@@ -14,6 +14,7 @@ import ru.bio4j.spring.database.api.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar
@@ -24,12 +25,33 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
 
 	protected boolean isActive = false;
 
+	protected SQLContext context;
+
+
     protected String sql = null;
     protected SQLReader reader;
 
-    public DbCursor() {
+    public DbCursor(SQLContext context) {
+        this.context = context;
         this.setParamSetter(new DbSelectableParamSetter());
         this.reader = createReader();
+        this.statementPreparerer = this.context.createDbStatementPreparerer(this);
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+    public int getTimeout() {
+        return this.timeout;
+    }
+    public void setPreparedStatement(SQLNamedParametersStatement preparedStatement) {
+        this.preparedStatement = preparedStatement;
+    }
+    public SQLNamedParametersStatement getPreparedStatement() {
+        return preparedStatement;
+    }
+    public void setPreparedSQL(String preparedSQL) {
+        this.preparedSQL = preparedSQL;
     }
 
 	@Override
@@ -57,24 +79,13 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
 
     @Override
     public SQLCursor init(final Connection conn, final String sql, final List<Param> paramDeclaration) {
-        this.params = Paramus.clone(paramDeclaration);
-        return this.init(conn, sql, 60);
+        params = Paramus.clone(paramDeclaration);
+        return init(conn, sql, 60);
     }
 
     @Override
     public SQLCursor init(Connection conn, String sql) {
         return this.init(conn, sql, 60);
-    }
-
-    @Override
-	protected void prepareStatement() {
-        try {
-            this.preparedSQL = this.sql;
-            this.preparedStatement = DbNamedParametersStatement.prepareStatement(this.connection, this.preparedSQL);
-            preparedStatement.setQueryTimeout(this.timeout);
-        } catch(SQLException e) {
-            throw BioSQLException.create(e);
-        }
     }
 
     @Override

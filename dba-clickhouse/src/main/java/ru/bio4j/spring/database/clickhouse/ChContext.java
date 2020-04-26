@@ -1,12 +1,11 @@
 package ru.bio4j.spring.database.clickhouse;
 
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.database.api.SQLConnectionConnectedEvent;
-import ru.bio4j.spring.database.api.SQLContext;
-import ru.bio4j.spring.database.api.SQLReader;
+import org.springframework.stereotype.Component;
+import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
+import ru.bio4j.spring.database.commons.DbDynamicCursor;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 
@@ -43,13 +42,15 @@ public class ChContext extends DbContextAbstract {
     }
 
     @Override
+    public StatementPreparerer createDbStatementPreparerer(SQLCursor cursor) {
+        return new ChStatementPreparerer(cursor);
+    }
+
+    @Override
     public String getDBMSName() {
         return "clickhouse";
     }
 
-    @Override
-    public SQLReader createReader(){
-        return new ChReader();
-    }
+
 
 }

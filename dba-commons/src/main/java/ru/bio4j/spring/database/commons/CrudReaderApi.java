@@ -371,6 +371,7 @@ public class CrudReaderApi {
             return MAX_RECORDS_FETCH_LIMIT;
         };
 
+        //todo: сделать wrapper который накладывает лимит выбранных записей из CrudOptions.getRecordsLimit если нет пагинации
         context.createDynamicCursor()
                 .init(context.getCurrentConnection(), cursorDef.getSelectSqlDef())
                 .fetch(prms, context.getCurrentUser(), rs -> {
