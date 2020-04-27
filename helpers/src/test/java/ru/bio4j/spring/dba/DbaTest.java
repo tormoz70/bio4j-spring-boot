@@ -1,6 +1,7 @@
 package ru.bio4j.spring.dba;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class DbaTest {
         ABean d = dbaAdapter.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
         Assert.assertTrue(d != null);
     }
+    @Ignore
     @Test
     public void doTest2() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
