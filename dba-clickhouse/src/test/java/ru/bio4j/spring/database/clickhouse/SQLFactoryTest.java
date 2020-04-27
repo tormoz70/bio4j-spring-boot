@@ -102,7 +102,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor1() {
         String bioPath = Utl.extractBioParentPath("bios.data0");
-        Assert.assertEquals("/bios", bioPath);
+        Assert.assertEquals("bios", bioPath);
     }
 
     @Test

@@ -675,10 +675,10 @@ public class Utl {
     public static String extractBioPath(String bioCode, String pathSeparator) {
         String[] bioCodeParts = Strings.split(bioCode, "@");
         if (bioCodeParts.length == 2) {
-            String path = pathSeparator + bioCodeParts[1].replace(".", pathSeparator);
+            String path = bioCodeParts[1].replace(".", pathSeparator);
             return path;
         } else if (bioCodeParts.length == 1) {
-            return pathSeparator + bioCode.replace(".", pathSeparator);
+            return bioCode.replace(".", pathSeparator);
         }
         return null;
     }

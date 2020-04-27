@@ -3,9 +3,13 @@ package ru.bio4j.spring.commons.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -313,22 +317,34 @@ public class Strings {
         return String.format("%d %02d:%02d:%02d.%03d", days, hours, minutes, seconds, millis);
     }
 
-    public static InputStream openResourceAsStream(String filePath) throws IOException {
-        return new ClassPathResource(filePath).getInputStream();
+    public static boolean resourceExists(String filePath) {
+        URL url = Strings.findResource(filePath);
+        if (url != null) {
+            try(InputStream ignored = url.openStream()) {
+                return true;
+            } catch(IOException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
-    public static boolean resourceExists(String filePath) {
-        try(InputStream io = new ClassPathResource(filePath).getInputStream()) {
-            return io != null;
-        } catch (IOException e) {
-            return false;
+    public static InputStream openResourceAsStream(String filePath) throws IOException {
+        URL url = Strings.findResource(filePath);
+        if (url != null) {
+            return url.openStream();
+        }
+        return null;
+    }
+
+
+    public static String loadResourceAsString(String filePath) throws IOException {
+        try (InputStream inputStream = openResourceAsStream(filePath)) {
+            String document = Utl.readStream(inputStream);
+            return document;
         }
     }
 
-    public static String loadResourceAsString(String filePath) throws IOException {
-        File file = new ClassPathResource(filePath).getFile();
-        return new String(Files.readAllBytes(file.toPath()));
-    }
 
     public static URL findResource(String filePath) {
 	    try {

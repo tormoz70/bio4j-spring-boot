@@ -276,23 +276,25 @@ public class CursorParser {
     private static String PATTERN_EXTRACT_FILE_NAME = "(?<=\\{text-file:)(\\w|-)+\\.sql(?=\\})";
 
     private static String tryLoadSQL(final String bioCode, String sqlText) {
-        String bioParentPath = Utl.extractBioParentPath(bioCode);
+        String separator = Utl.DEFAULT_BIO_PATH_SEPARATOR;
+        String bioParentPath = Utl.extractBioParentPath(bioCode, separator);
         Matcher m = Regexs.match(sqlText, PATTERN_EXTRACT_FILE_NAME, Pattern.CASE_INSENSITIVE);
         if (m.find()) {
-            String sqlFileName = bioParentPath + (Strings.isNullOrEmpty(bioParentPath) ? "" : Utl.DEFAULT_BIO_PATH_SEPARATOR) + m.group();
+            String sqlFileName = bioParentPath + (Strings.isNullOrEmpty(bioParentPath) ? "" : separator) + m.group();
             try {
                 sqlText = Strings.loadResourceAsString(sqlFileName);
             } catch (IOException e) {
-                throw Utl.wrapErrorAsRuntimeException(String.format("Файл %s, на который ссылается объект %s не наден в ресурсах!", sqlFileName, bioCode));
+                throw Utl.wrapErrorAsRuntimeException(String.format("The %s file referenced by %s is not found in resources!", sqlFileName, bioCode));
             }
         }
         return sqlText;
     }
 
     private static String tryLoadSQL(final String contentPath, final String bioCode, String sqlText) {
+        String separator = File.separator;
         Matcher m = Regexs.match(sqlText, PATTERN_EXTRACT_FILE_NAME, Pattern.CASE_INSENSITIVE);
         if (m.find()) {
-            String sqlFileName = Utl.extractBioParentPath(bioCode) + Utl.DEFAULT_BIO_PATH_SEPARATOR + m.group();
+            String sqlFileName = Utl.extractBioParentPath(bioCode) + separator + m.group();
             Path p = Paths.get(sqlFileName);
             try {
                 if (Files.exists(p))
@@ -300,7 +302,7 @@ public class CursorParser {
                         sqlText = Utl.readStream(is);
                     }
                 else
-                    throw new IOException(String.format("Файл %s, на который ссылается объект %s не наден в ресурсах!", sqlFileName, bioCode));
+                    throw new IOException(String.format("The %s file referenced by %s is not found in resources!", sqlFileName, bioCode));
             } catch(IOException e) {
                 throw Utl.wrapErrorAsRuntimeException(e);
             }

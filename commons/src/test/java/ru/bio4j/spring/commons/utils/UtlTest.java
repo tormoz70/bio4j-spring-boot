@@ -15,8 +15,10 @@ import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -239,8 +241,8 @@ public class UtlTest {
 
     @Test
     public void extractBioPathTest() throws Exception {
-        Assert.assertEquals(Utl.extractBioPath("qwe.asd.fgh.fgh"), "/qwe/asd/fgh/fgh");
-        Assert.assertEquals(Utl.extractBioParentPath("qwe.asd.fgh.fgh"), "/qwe/asd/fgh");
+        Assert.assertEquals(Paths.get("qwe","asd","fgh","fgh").toString(), Utl.extractBioPath("qwe.asd.fgh.fgh", File.separator));
+        Assert.assertEquals(Paths.get("qwe","asd","fgh").toString(), Utl.extractBioParentPath("qwe.asd.fgh.fgh", File.separator));
         Assert.assertEquals(Utl.extractBioParentPath("qwe"), "");
     }
 
