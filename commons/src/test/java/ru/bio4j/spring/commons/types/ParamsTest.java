@@ -11,6 +11,13 @@ import java.util.*;
 
 public class ParamsTest {
 
+    @Test
+    public void create1() {
+        List<Param> params1 = Paramus.createParams("param1", 123, "param2", 124, "param3", 125);
+        Assert.assertTrue(params1.size() == 3 && (int)params1.get(1).getValue() == 124);
+        List<Param> params2 = Paramus.createParams(params1);
+        Assert.assertTrue(params2.size() == 3 && (int)params2.get(1).getValue() == 124);
+    }
 
 	@Test
 	public void add1() {

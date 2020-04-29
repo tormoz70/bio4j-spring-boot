@@ -511,6 +511,7 @@ public class Paramus implements Closeable {
         if (params.length == 1 && params[0] instanceof List && ((List)params[0]).size() > 0 && ((List)params[0]).get(0) instanceof Param ) {
             List<Param> rslt = new ArrayList<>();
             Paramus.applyParams(rslt, (List<Param>) params[0], false, true);
+            return rslt;
         } else if ((params.length == 0) || (params.length == 1 && params[0] == null) || (params.length == 1 && params[0] instanceof List && ((List)params[0]).size() == 0)){
             return new ArrayList<>();
         } else {
@@ -524,7 +525,6 @@ public class Paramus implements Closeable {
             }
             return _createParams(keys, vals);
         }
-        return new ArrayList<>();
     }
 
     public <T> T getParamValue(String paramName, Class<T> type, boolean silent) {
