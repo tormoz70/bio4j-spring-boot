@@ -1,6 +1,7 @@
 package ru.bio4j.spring.database.clickhouse;
 
 import org.junit.*;
+import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
@@ -14,7 +15,10 @@ import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.Date;
 
 public class SQLFactoryTest {
 
@@ -23,10 +27,12 @@ public class SQLFactoryTest {
 //    таблица jdbc_test.data0
 
     private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
+//    private static final String testDBDriverName = "cc.blynk.clickhouse.ClickHouseDriver";
     private static final String testDBDriverName = "com.github.housepower.jdbc.ClickHouseDriver";
 //    private static final String testDBDriverName = "ru.yandex.clickhouse.ClickHouseDriver";
 //    private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:8123/default";
     private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:9000";
+//    private static final String testDBUrl = "jdbc:clickhouse://192.168.70.101:8123";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@cmon-ora-dev:1521:MICEXDB";
     //private static final String testDBUrl = "jdbc:oracle:oci:@GIVCDB_EKBS03";
@@ -69,6 +75,33 @@ public class SQLFactoryTest {
                 return null;
             }
         }, null);
+
+    }
+
+    @Test
+    public void testSQLCommandOpenCursor0() {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:9000", "default", "j12");
+            PreparedStatement stmt = conn.prepareStatement("select ? as periodStart\n" +
+                    "      ,? as periodEnd\n" +
+                    "      ,toDate(0) as emptyDate");
+            java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().pars("2009-01-01").getTime());
+            java.sql.Date endDate = new java.sql.Date(DateTimeParser.getInstance().pars("2009-01-02").getTime());
+            stmt.setObject(1, java.sql.Date.valueOf(LocalDate.now()));
+            stmt.setObject(2, java.sql.Date.valueOf(LocalDate.now()));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Object periodStart = rs.getObject("periodStart");
+                Object periodEnd = rs.getObject("periodEnd");
+                System.out.println(periodStart + "(" + periodStart.getClass() + ")\t" + periodEnd + "(" + periodEnd.getClass() + ")\t");
+            }
+
+
+        } catch (Exception ex) {
+            LOG.error("Error!", ex);
+            Assert.fail();
+        }
 
     }
 
@@ -151,6 +184,29 @@ public class SQLFactoryTest {
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(50, rst.getPaginationPageSize());
             Assert.assertEquals(ABeans.extractAttrFromBean(rst.getRows().get(0), "summ", Double.class, 0.0), ABeans.extractAttrFromBean(rstMinMax, "summ_max", Double.class, 0.0));
+        } catch (Exception ex) {
+            LOG.error("Error!", ex);
+            Assert.fail();
+        }
+
+    }
+
+    @Ignore
+    @Test
+    public void testSQLCommandOpenCursor4() {
+        try {
+            SQLDefinition sqlDefinition = CursorParser.pars("bios.testDT");
+            List<Param> params = Paramus.createParams();
+            Paramus.setParamValue(params, "periodStart", DateTimeParser.getInstance().pars("2009-01-01"));
+            Paramus.setParamValue(params, "periodEnd", DateTimeParser.getInstance().pars("2009-01-02"));
+            BeansPage<ABean> rst = CrudReaderApi.loadPage(params, null, null, context, sqlDefinition, null,
+                    CrudOptions.builder()
+                            .forceCalcCount(true)
+                            .recordsLimit(10000)
+                            .appendMetadata(true).build(),
+                    ABean.class);
+            Assert.assertEquals(Paramus.paramValue(params, "periodStart"), ABeans.extractAttrFromBean(rst.getRows().get(0), "periodStart", Object.class, null));
+            Assert.assertEquals(Paramus.paramValue(params, "periodEnd"), ABeans.extractAttrFromBean(rst.getRows().get(0), "periodEnd", Object.class, null));
         } catch (Exception ex) {
             LOG.error("Error!", ex);
             Assert.fail();

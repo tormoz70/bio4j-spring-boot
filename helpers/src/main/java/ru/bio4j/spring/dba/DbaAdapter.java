@@ -523,7 +523,12 @@ public class DbaAdapter {
 
     public void setBioParamToRequest(String paramName, Object paramValue, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        Paramus.setParamValue(queryParams.bioParams, paramName, paramValue);
+        Class<?> forceType = paramValue != null ? paramValue.getClass() : null;
+        if(forceType != null) {
+            MetaType forceMetaType = MetaTypeConverter.read(forceType);
+            Paramus.setParamValue(queryParams.bioParams, paramName, paramValue, forceMetaType);
+        } else
+            Paramus.setParamValue(queryParams.bioParams, paramName, paramValue);
     }
 
     public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {

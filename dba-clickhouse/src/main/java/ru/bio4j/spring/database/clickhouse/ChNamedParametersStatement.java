@@ -1,22 +1,17 @@
 package ru.bio4j.spring.database.clickhouse;
 
 import ru.bio4j.spring.commons.converter.Converter;
-import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.converter.hanlers.MetaTypeHandler;
-import ru.bio4j.spring.commons.utils.Regexs;
-import ru.bio4j.spring.commons.utils.Sqls;
-import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
+import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.database.commons.DbNamedParametersStatement;
 import ru.bio4j.spring.database.commons.DbUtils;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Date;
 
 
 public class ChNamedParametersStatement extends DbNamedParametersStatement {
@@ -56,9 +51,9 @@ public class ChNamedParametersStatement extends DbNamedParametersStatement {
             } else if (Arrays.asList(Types.BOOLEAN).contains(targetSqlType)) {
                 statement.setBoolean(indx, Converter.toType(value, Boolean.class));
             } else if (Arrays.asList(Types.DATE).contains(targetSqlType)) {
-                statement.setDate(indx, new Date(((java.util.Date) value).getTime()));
+                statement.setDate(indx, new java.sql.Date(((Date) value).getTime()));
             } else if (Arrays.asList(Types.TIMESTAMP).contains(targetSqlType)) {
-                statement.setTimestamp(indx, new Timestamp(((java.util.Date) value).getTime()));
+                statement.setTimestamp(indx, new Timestamp(((Date) value).getTime()));
             } else {
                 statement.setString(indx, (String)value);
             }

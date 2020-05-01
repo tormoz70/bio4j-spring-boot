@@ -47,13 +47,10 @@
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <spring-rubbit.version>2.2.5.RELEASE</spring-rubbit.version>
         <org.apache.poi.version>4.1.0</org.apache.poi.version>
-        <ojdbc.version>12.2.0.1</ojdbc.version>
-        <postgresql-jdbc.version>42.1.4</postgresql-jdbc.version>
         <hikaricp.version>3.4.1</hikaricp.version>
         <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
         <swagger.version>2.9.2</swagger.version>
         <ehcache.version>2.6.11</ehcache.version>
-        <clickhouse-jdbc.version>0.2.4</clickhouse-jdbc.version>
 
         <bio4j-spring-boot.version>2.1-SNAPSHOT</bio4j-spring-boot.version>
 
@@ -155,16 +152,6 @@
                 <artifactId>spring-boot-starter-jdbc</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-starter-security</artifactId>-->
-<!--                <version>${spring-boot.version}</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-starter-tomcat</artifactId>-->
-<!--                <version>${spring-boot.version}</version>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
@@ -190,11 +177,6 @@
                 <artifactId>spring-rabbit</artifactId>
                 <version>${spring-rubbit.version}</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot-starter-jersey</artifactId>-->
-<!--                <version>${spring-boot.version}</version>-->
-<!--            </dependency>-->
 
             <!-- HttpClient -->
             <dependency>
@@ -240,21 +222,6 @@
                 <artifactId>HikariCP</artifactId>
                 <version>${hikaricp.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc8</artifactId>
-                <version>${ojdbc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>${postgresql-jdbc.version}</version>
-            </dependency>
-<!--            <dependency>-->
-<!--                <groupId>ru.yandex.clickhouse</groupId>-->
-<!--                <artifactId>clickhouse-jdbc</artifactId>-->
-<!--                <version>${clickhouse-jdbc.version}</version>-->
-<!--            </dependency>-->
 
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -300,18 +267,17 @@
                 <artifactId>bio4j-spring-dba-clickhouse-lib</artifactId>
                 <version>${bio4j-spring-boot.version}</version>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>${project.groupId}</groupId>-->
+<!--                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-helpers</artifactId>
                 <version>${bio4j-spring-boot.version}</version>
             </dependency>
-
-<!--            <dependency>-->
-<!--                <groupId>${project.groupId}</groupId>-->
-<!--                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>-->
-<!--                <version>${project.version}</version>-->
-<!--            </dependency>-->
 
         </dependencies>
     </dependencyManagement>

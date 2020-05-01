@@ -65,7 +65,16 @@
                                 <xs:complexType>
                                     <xs:attribute name="name" type="xs:string" use="required">
                                         <xs:annotation>
-                                            <xs:documentation>Имя параметра.</xs:documentation>
+                                            <xs:documentation>Имя параметра.
+                                                Возможны системные параметры:
+                                                "p_sys_stoken" - текущий токен безопастности
+                                                "p_sys_curusr_uid" - UID текущего пользователя
+                                                "p_sys_curusr_org_uid" - UID организации, к которой принадлежит пользователь
+                                                "p_sys_curusr_roles" - список ролей текущего пользователя
+                                                "p_sys_curusr_grants" - список разрешений текущего пользователя
+                                                "p_sys_curusr_ip" - IP адрес текущего пользователя
+                                                "p_sys_curusr_client" - клиент текущего пользователя
+                                            </xs:documentation>
                                         </xs:annotation>
                                     </xs:attribute>
                                     <xs:attribute name="type" type="ftype" use="required"/>
