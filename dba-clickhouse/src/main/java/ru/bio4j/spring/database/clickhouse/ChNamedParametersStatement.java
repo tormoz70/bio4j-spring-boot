@@ -51,7 +51,7 @@ public class ChNamedParametersStatement extends DbNamedParametersStatement {
             } else if (Arrays.asList(Types.BOOLEAN).contains(targetSqlType)) {
                 statement.setBoolean(indx, Converter.toType(value, Boolean.class));
             } else if (Arrays.asList(Types.DATE).contains(targetSqlType)) {
-                statement.setDate(indx, new java.sql.Date(((Date) value).getTime()));
+                statement.setTimestamp(indx, new Timestamp(((Date) value).getTime()));
             } else if (Arrays.asList(Types.TIMESTAMP).contains(targetSqlType)) {
                 statement.setTimestamp(indx, new Timestamp(((Date) value).getTime()));
             } else {
