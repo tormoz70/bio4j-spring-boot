@@ -21,7 +21,7 @@ public class ChStatementPreparerer implements StatementPreparerer {
     public void prepare(Supplier<String> sqlSupplier) {
         try {
             command.setPreparedSQL(command.getSQL());
-            command.setPreparedStatement(ChNamedParametersStatement.prepareStatement(command.getConnection(), command.getPreparedSQL(), ChNamedParametersStatement.class));
+            command.setPreparedStatement(DbNamedParametersStatement.prepareStatement(command.getConnection(), command.getPreparedSQL(), ChNamedParametersStatement.class));
             command.getPreparedStatement().setQueryTimeout(command.getTimeout());
         } catch(SQLException e) {
             throw BioSQLException.create(e);

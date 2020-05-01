@@ -81,25 +81,37 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor0() {
         try {
+//            Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:8123/default", "default", "j12");
             Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:9000", "default", "j12");
             PreparedStatement stmt = conn.prepareStatement("select ? as periodStart\n" +
+                    "      ,toDate(?) as periodStart1\n" +
                     "      ,? as periodEnd\n" +
-                    "      ,toDate(0) as emptyDate");
+                    "      ,toDateTime(?) as periodEnd1\n" +
+                    "      ,now() as emptyDate");
             java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().pars("2009-01-01").getTime());
-            java.sql.Date endDate = new java.sql.Date(DateTimeParser.getInstance().pars("2009-01-02").getTime());
-            stmt.setObject(1, java.sql.Date.valueOf(LocalDate.now()));
-            stmt.setObject(2, java.sql.Date.valueOf(LocalDate.now()));
+            java.sql.Timestamp endDate = new java.sql.Timestamp(DateTimeParser.getInstance().pars("2009-01-02T12:00:00").getTime());
+            stmt.setObject(1, startDate);
+            stmt.setObject(2, startDate);
+            stmt.setObject(3, endDate);
+            stmt.setObject(4, endDate);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 Object periodStart = rs.getObject("periodStart");
                 Object periodEnd = rs.getObject("periodEnd");
-                System.out.println(periodStart + "(" + periodStart.getClass() + ")\t" + periodEnd + "(" + periodEnd.getClass() + ")\t");
+                Object periodStart1 = rs.getObject("periodStart1");
+                Object periodEnd1 = rs.getObject("periodEnd1");
+                Object emptyDate = rs.getObject("emptyDate");
+                System.out.println(
+                        periodStart + "(" + periodStart.getClass() + ")\t" +
+                                periodStart1 + "(" + periodStart1.getClass() + ")\t" +
+                                periodEnd + "(" + periodEnd.getClass() + ")\t" +
+                                periodEnd1 + "(" + periodEnd1.getClass() + ")\t" +
+                                emptyDate + "(" + emptyDate.getClass() + ")\t");
             }
 
-
         } catch (Exception ex) {
-            LOG.error("Error!", ex);
+            System.out.println(ex);
             Assert.fail();
         }
 
