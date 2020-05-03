@@ -9,98 +9,74 @@ import ru.bio4j.spring.model.transport.MetaType;
 public class Field {
 
     private int id;
-    /**
-     * Имя поля
-     */
+
+    /** Имя поля */
     private String name;
 
-    /**
-     * Имя атрибута
-     */
+    /** Имя атрибута */
     private String attrName;
 
-    /**
-     * Формат отображения
-     */
+    /** Формат отображения */
     private String format;
 
-    /**
-     * Выравнивание
-     */
+    /** Выравнивание */
     private Alignment align;
 
-    /**
-     * Заголовок
-     */
+    /** Заголовок */
     private String title;
 
-    /**
-     * Отображать всплывающую подсказаку с полным текстом ячейки
-     */
+    /** Отображать всплывающую подсказаку с полным текстом ячейки */
     private boolean showTooltip;
 
-    /**
-     * Не отображать
-     */
+    /** Не отображать */
     private boolean hidden;
 
-    /**
-     * Фильтрация
-     */
+    /** Фильтрация */
     private boolean filter;
 
-    /**
-     * Только чтение
-     */
+    /** Только чтение */
     private boolean readonly;
 
-    /**
-     * Требуется заполнение пользоватлем
-     */
+    /** Требуется заполнение пользоватлем */
     private boolean mandatory;
 
-    /**
-     * Первичный ключ
-     */
+    /** Первичный ключ */
     private boolean pk;
 
-    /**
-     * На клиенте не приводить значение null к типу колонки
-     */
+    /** На клиенте не приводить значение null к типу колонки */
     private boolean useNull;
 
-    /**
-     * Ширина колонки
-     */
+    /** Ширина колонки */
     private String width;
 
-    /**
-     * Значение по умолчанию
-     */
+    /** Значение по умолчанию */
     private Object defaultVal;
 
-    /**
-     * Имя поля, по которому будет сортировка, если null, то sorter == name
-     */
+    /** Имя поля, по которому будет сортировка, если null, то sorter == name */
     private String sorter;
 
+    /** Кудп помнстить NULLS при сортировке */
     private Sort.NullsPosition nullsPosition;
 
-    /**
-     * Имя поля, из которого будет взято значение для отображения tooltip, если null, то tooltip == name
-     */
+    /** Имя поля, из которого будет взято значение для отображения tooltip, если null, то tooltip == name */
     private String tooltip;
 
-    /**
-     * Тип колонки
-     */
+    /** Тип колонки */
     private MetaType metaType = MetaType.UNDEFINED;
 
+    /** Включить в экспорт */
     private Boolean expEnabled;
+    /** Формат при экспорте */
     private String expFormat;
+    /** Ширина при экспорте */
     private String expWidth;
 
+    /** Использовать локализованную сортировку при сортировке по текстовому полю */
     private Sort.TextLocality textLocality = Sort.TextLocality.UNDEFINED;
+
+
+    /** Агригруемое поле */
+    private Total.Aggrigate aggrigate;
 
     @Override
     public String toString() {
@@ -296,5 +272,13 @@ public class Field {
 
     public void setTextLocality(Sort.TextLocality textLocality) {
         this.textLocality = textLocality;
+    }
+
+    public Total.Aggrigate getAggrigate() {
+        return aggrigate;
+    }
+
+    public void setAggrigate(Total.Aggrigate aggrigate) {
+        this.aggrigate = aggrigate;
     }
 }

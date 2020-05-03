@@ -17,6 +17,7 @@ import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
+import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 import ru.bio4j.spring.database.api.*;
 
@@ -59,7 +60,7 @@ public class CrudReaderApi {
     }
 
     private static <T> BeansPage<T> readStoreData(
-            final List<Param> params,
+            final PrepareLoadPageResult prepareLoadPageResult,
             final SQLContext context,
             final SQLDefinition cursorDef,
             final CrudOptions crudOptions,
@@ -67,45 +68,66 @@ public class CrudReaderApi {
         if(LOG.isDebugEnabled())
             LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
         BeansPage result = new BeansPage();
-        final int paginationPagesize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
-        result.setTotalCount(Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, int.class, 0));
-        result.setPaginationOffset(Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0));
+        final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, long.class, 0L);
+        result.setTotalCount(Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, long.class, 0L));
+        result.setPaginationOffset(Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L));
         if(crudOptions.isAppendMetadata()) result.setMetadata(cursorDef.getFields());
-        result.setRows(readStoreDataExt(params, context, cursorDef, crudOptions, beanType));
+        result.setRows(readStoreDataExt(prepareLoadPageResult.preparedParams, context, cursorDef, crudOptions, beanType));
+        result.setTotals(prepareLoadPageResult.preparedTotals);
         result.setPaginationCount(result.getRows().size());
         result.setPaginationPageSize(paginationPagesize);
         result.setPaginationPage(paginationPagesize > 0 ? (int)Math.floor(result.getPaginationOffset() / paginationPagesize) + 1 : 0);
         if(result.getRows().size() < paginationPagesize) {
             result.setTotalCount(result.getPaginationOffset() + result.getRows().size());
-            Paramus.setParamValue(params, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, result.getTotalCount());
+            Paramus.setParamValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, result.getTotalCount());
         }
         return result;
     }
 
     private static <T> BeansPage<T> readStoreData(
-            final List<Param> params,
+            final PrepareLoadPageResult prepareLoadPageResult,
             final SQLContext context,
             final SQLDefinition cursorDef,
             final Class<T> beanType) {
-        return readStoreData(params, context, cursorDef, CrudOptions.builder().build(), beanType);
+        return readStoreData(prepareLoadPageResult, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
-    private static long calcOffset(int locatedPos, int pageSize){
+    private static long calcOffset(long locatedPos, long pageSize){
         long pg = ((long)((double)(locatedPos - 1) / (double)pageSize) + 1);
         return (pg - 1) * pageSize;
     }
 
-    public static long calcTotalCount(
+    private static void _addTotal2Totals(List<Total> totals, Total total) {
+        Total foundTotal = totals.stream().filter(f -> {
+            return (total.getAggrigate() == Total.Aggrigate.COUNT && f.getAggrigate() == Total.Aggrigate.COUNT) ||
+                    Strings.compare(total.getFieldName(), f.getFieldName(), true);
+        }).findFirst().orElse(null);
+        if(foundTotal != null) {
+            foundTotal.setFact(total.getFact());
+            foundTotal.setFieldType(total.getFact() != null ? total.getFact().getClass() : total.getFieldType());
+        } else {
+            totals.add(total);
+        }
+    }
+
+    public static List<Total> calcTotalsRemote(
+            final List<Total> totals,
             final List<Param> params,
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        long result = context.execBatch((ctx) -> {
+        context.execBatch((ctx) -> {
             SQLCursor c = ctx.createDynamicCursor();
             c.init(ctx.getCurrentConnection(), cursor.getSelectSqlDef().getTotalsSql());
-            return c.scalar(params, user, long.class, 0L);
+            ABean totalsBean = c.firstBean(params, user, ABean.class);
+            for (Total total : totals) {
+                _addTotal2Totals(totals, total);
+                total.setFact(ABeans.extractAttrFromBean(totalsBean,
+                        total.getAggrigate() == Total.Aggrigate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
+                        total.getFieldType(), null));
+            }
         }, user);
-        return result;
+        return totals;
     }
 
     /***
@@ -124,12 +146,13 @@ public class CrudReaderApi {
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
-        List<Param> localParams = _prepareLoadPageParams(params, filter, sort, context, cursor, crudOptions.isForceCalcCount());
-        return readStoreData(localParams, context, cursor, crudOptions, beanType);
+        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, totals, context, cursor, crudOptions.isForceCalcCount());
+        return readStoreData(prepareLoadPageResult, context, cursor, crudOptions, beanType);
     }
 
     /***
@@ -149,14 +172,52 @@ public class CrudReaderApi {
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor,
             final User user,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
         return context.execBatch((ctx) -> {
-            return loadPage0(params, filter, sort, ctx, cursor, crudOptions, beanType);
+            return loadPage0(params, filter, sort, totals, ctx, cursor, crudOptions, beanType);
         }, user);
+    }
+
+    private static <T> void _processCurrentRecordOnTotals(final List<Total> pageTotals, final T bean, final Total total) {
+        String field = total.getFieldName();
+        double value;
+        if(bean instanceof HashMap)
+            value = ABeans.extractAttrFromBean((Map)bean, field, double.class, null);
+        else
+            value = Utl.fieldValue(bean, field, double.class);
+        Total rsTotal = pageTotals.stream().filter(t -> Strings.compare(t.getFieldName(), total.getFieldName(), true)).findFirst().orElse(null);
+        if(rsTotal == null) {
+            rsTotal = Total.builder()
+                    .fieldName(total.getFieldName())
+                    .aggrigate(total.getAggrigate())
+                    .fieldType(total.getFieldType())
+                    .fact(Converter.toType(0D, total.getFieldType()))
+                    .build();
+        }
+        double newValue = Converter.toType(rsTotal.getFact(), double.class) + value;
+        rsTotal.setFact(Converter.toType(newValue, total.getFieldType()));
+    }
+
+    private static <T> BeansPage<T> _calcTotals(final BeansPage<T> page, final List<Total> totals) {
+        for (T bean : page.getRows()){
+            for(Total total : totals)
+                _processCurrentRecordOnTotals(page.getTotals(), bean, total);
+        }
+        return page;
+    }
+
+    public static <T> List<Total> _calcTotals(final List<T> pageData, final List<Total> totals) {
+        List<Total> result = new ArrayList<>();
+        for (T bean : pageData){
+            for(Total total : totals)
+                _processCurrentRecordOnTotals(result, bean, total);
+        }
+        return result;
     }
 
     /***
@@ -173,11 +234,13 @@ public class CrudReaderApi {
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        _prepareLoadAllParams(filter, sort, context, cursor);
-        return readStoreData(params, context, cursor, beanType);
+        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadAllParams(filter, sort, totals, context, cursor);
+        prepareLoadPageResult.preparedParams = params;
+        return _calcTotals(readStoreData(prepareLoadPageResult, context, cursor, beanType), totals);
     }
 
     private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
@@ -278,7 +341,7 @@ public class CrudReaderApi {
         if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        BeansPage<ABean> page = readStoreData(params, context, cursor, ABean.class);
+        BeansPage<ABean> page = readStoreData(new PrepareLoadPageResult(params), context, cursor, ABean.class);
 
         HSSFWorkbook wb = null;
         if(page != null && page.getRows() != null && page.getRows().size() > 0) {
@@ -310,12 +373,13 @@ public class CrudReaderApi {
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor,
             final User user,
             final Class<T> beanType) {
         BeansPage result = context.execBatch((ctx) -> {
-            return loadAll0(params, filter, sort, ctx, cursor, beanType);
+            return loadAll0(params, filter, sort, totals, ctx, cursor, beanType);
         }, user);
         return result;
     }
@@ -346,7 +410,7 @@ public class CrudReaderApi {
             throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-        return readStoreData(params, context, cursor, beanType);
+        return readStoreData(new PrepareLoadPageResult(params), context, cursor, beanType);
     }
 
     private static <T> List<T> readStoreDataExt(
@@ -403,10 +467,27 @@ public class CrudReaderApi {
         return readStoreDataExt(params, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
-    private static List<Param> _prepareLoadPageParams(
+    private static class PrepareLoadPageResult {
+        private List<Param> preparedParams;
+        private List<Total> preparedTotals;
+
+        public PrepareLoadPageResult() {
+
+        }
+        public PrepareLoadPageResult(List<Param> params, List<Total> totals) {
+            preparedParams = params;
+            preparedTotals = totals;
+        }
+        public PrepareLoadPageResult(List<Param> params) {
+            preparedParams = params;
+        }
+    }
+
+    private static PrepareLoadPageResult _prepareLoadPageParams(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor,
             final boolean forceCalcCount) {
@@ -414,21 +495,27 @@ public class CrudReaderApi {
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
 
-        final List<Param> localParams = Paramus.createParams(params);
+        PrepareLoadPageResult result = new PrepareLoadPageResult(Paramus.createParams(params));
 
-        final Object location = Paramus.paramValue(localParams, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
-        final int paginationOffset = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
-        if(Paramus.getParam(localParams, RestParamNames.PAGINATION_PARAM_OFFSET) == null)
-            Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
-        final int paginationPagesize = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
-        if(Paramus.getParam(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE) == null)
-            Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
+        final Object location = Paramus.paramValue(result.preparedParams, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
+        final long paginationOffset = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
+        if(Paramus.getParam(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET) == null)
+            Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
+        final long paginationPagesize = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
+        if(Paramus.getParam(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE) == null)
+            Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
 
-        final String paginationTotalcountStr = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
-        final int paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, int.class);
+        final String paginationTotalcountStr = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
+        final long paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, long.class);
 
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
+        result.preparedTotals = new ArrayList<>();
+        for(Total total : totals)
+            _addTotal2Totals(result.preparedTotals, total);
+        boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() != Total.Aggrigate.UNDEFINED);
+        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
+            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(paginationTotalcount).build());
+        cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), result.preparedTotals, cursor.getSelectSqlDef().getFields()));
         List<Sort> localSort = sort != null ? sort : new ArrayList<>();
         if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
@@ -438,30 +525,31 @@ public class CrudReaderApi {
             if (pkField == null)
                 throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
             cursor.getSelectSqlDef().setLocateSql(context.getWrappers().getLocateWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
-            preparePkParamValue(localParams, pkField);
+            preparePkParamValue(result.preparedParams, pkField);
         }
         if (paginationPagesize > 0)
             cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getPaginationWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
 
         long factOffset = paginationOffset;
-        long totalCount = paginationTotalcount;
+        Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
         boolean gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
-        if (forceCalcCount || gotoLastPage) {
-            totalCount = calcTotalCount(localParams, context, cursor, context.getCurrentUser());
+        if (calcTotals || forceCalcCount || gotoLastPage) {
+            result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.getCurrentUser());
+            totalCount = result.preparedTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
             if(gotoLastPage)
-                factOffset = (int) Math.floor(totalCount / paginationPagesize) * paginationPagesize;
+                factOffset = (long) Math.floor((long)totalCount.getFact() / paginationPagesize) * paginationPagesize;
             if(LOG.isDebugEnabled())
-                LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount);
+                LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount.getFact());
         }
-        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
-        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount);
-        long locFactOffset = Paramus.paramValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
+        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
+        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount.getFact());
+        long locFactOffset = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
         if (location != null) {
             if(LOG.isDebugEnabled())
                 LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
             int locatedPos = context.createDynamicCursor()
                     .init(context.getCurrentConnection(), cursor.getSelectSqlDef().getLocateSql(), cursor.getSelectSqlDef().getParamDeclaration())
-                    .scalar(localParams, context.getCurrentUser(), int.class, -1);
+                    .scalar(result.preparedParams, context.getCurrentUser(), int.class, -1);
             if (locatedPos >= 0) {
                 locFactOffset = calcOffset(locatedPos, paginationPagesize);
                 if(LOG.isDebugEnabled())
@@ -471,18 +559,19 @@ public class CrudReaderApi {
                     LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
             }
         }
-        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
-        Paramus.setParamValue(localParams, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
+        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
         if(params != null) {
-            Paramus.applyParams(params, localParams, false, true);
-            return params;
+            Paramus.applyParams(params, result.preparedParams, false, true);
+            result.preparedParams = params;
         }
-        return localParams;
+        return result;
     }
 
-    private static void _prepareLoadAllParams(
+    private static PrepareLoadPageResult _prepareLoadAllParams(
             final Filter filter,
             final List<Sort> sort,
+            final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor) {
         Connection connTest = context.getCurrentConnection();
@@ -493,6 +582,12 @@ public class CrudReaderApi {
         if (localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+
+        PrepareLoadPageResult result = new PrepareLoadPageResult();
+        result.preparedTotals = totals != null ? totals : new ArrayList<>();
+        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
+            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(0L).build());
+        return result;
     }
 
     /***
@@ -514,8 +609,8 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        List<Param> localParams = _prepareLoadPageParams(params, filter, sort, context, cursor, false);
-        return readStoreDataExt(localParams, context, cursor, beanType);
+        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, null, context, cursor, false);
+        return readStoreDataExt(params, context, cursor, beanType);
     }
 
     /***
@@ -564,7 +659,7 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        _prepareLoadAllParams(filter, sort, context, cursor);
+        _prepareLoadAllParams(filter, sort, null, context, cursor);
         return readStoreDataExt(params, context, cursor, beanType);
     }
 

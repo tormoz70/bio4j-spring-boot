@@ -134,6 +134,21 @@ public class DbUtils {
         return bean;
     }
 
+    public static ABean createABeanFromResultSet(ResultSet resultSet) {
+        ABean bean = new ABean();
+        try {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            for (int i = 0; i < metaData.getColumnCount(); i++) {
+                String attrName = metaData.getColumnName(i+1);
+                Object val = resultSet.getObject(i+1);
+                bean.put(attrName.toLowerCase(), val);
+            }
+            return bean;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
     public static ABean createABeanFromReader(List<ru.bio4j.spring.model.transport.jstore.Field> metaData, SQLReader reader) {
         if(metaData != null && metaData.size() > 0) {
             ABean bean = new ABean();
@@ -169,26 +184,39 @@ public class DbUtils {
         if(clazz == null)
             throw new IllegalArgumentException("Argument \"bean\" cannot be null!");
         T result = Utl.newInstance(clazz);
-        for(java.lang.reflect.Field fld : Utl.getAllObjectFields(clazz)) {
-            String attrName = fld.getName();
-            Prop p = Utl.findAnnotation(Prop.class, fld);
-            if(p != null)
-                attrName = p.name();
-            String fldName = metaData != null ? findFieldName(metaData, attrName) : attrName;
-            if(Strings.isNullOrEmpty(fldName))
-                fldName = attrName;
-            Object valObj = null;
-            DBField f = reader.getField(fldName);
-            if (f != null)
-                valObj = reader.getValue(f.getId());
+        if(result instanceof Map) {
+            for (DBField dbField : reader.getFields()) {
+                Object valObj = reader.getValue(dbField.getId());
+                ru.bio4j.spring.model.transport.jstore.Field fldModel = null;
+                if(metaData != null)
+                    fldModel = metaData.stream()
+                        .filter(f -> Strings.compare(f.getName(), dbField.getName(), true) || Strings.compare(f.getAttrName(), dbField.getName(), true))
+                        .findFirst().orElse(null);
+                ((Map) result).put(fldModel != null ? fldModel.getAttrName() : dbField.getName(), valObj);
+            }
+            return result;
+        } else {
+            for (java.lang.reflect.Field fld : Utl.getAllObjectFields(clazz)) {
+                String attrName = fld.getName();
+                Prop p = Utl.findAnnotation(Prop.class, fld);
+                if (p != null)
+                    attrName = p.name();
+                String fldName = metaData != null ? findFieldName(metaData, attrName) : attrName;
+                if (Strings.isNullOrEmpty(fldName))
+                    fldName = attrName;
+                Object valObj = null;
+                DBField f = reader.getField(fldName);
+                if (f != null)
+                    valObj = reader.getValue(f.getId());
 
-            if(valObj != null){
-                try {
-                    Object val = (fld.getType() == Object.class) ? valObj : Converter.toType(valObj, fld.getType());
-                    fld.setAccessible(true);
-                    fld.set(result, val);
-                } catch (Exception e) {
-                    throw new ApplyValuesToBeanException(attrName, String.format("Can't set value %s to field %s(%s). Msg: %s", valObj, fld.getName(), fld.getType(), e.getMessage()));
+                if (valObj != null) {
+                    try {
+                        Object val = (fld.getType() == Object.class) ? valObj : Converter.toType(valObj, fld.getType());
+                        fld.setAccessible(true);
+                        fld.set(result, val);
+                    } catch (Exception e) {
+                        throw new ApplyValuesToBeanException(attrName, String.format("Can't set value %s to field %s(%s). Msg: %s", valObj, fld.getName(), fld.getType(), e.getMessage()));
+                    }
                 }
             }
         }

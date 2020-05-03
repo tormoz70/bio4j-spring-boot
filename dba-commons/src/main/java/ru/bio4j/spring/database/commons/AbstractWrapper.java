@@ -8,8 +8,9 @@ import ru.bio4j.spring.database.api.WrapperInterpreter;
  */
 public abstract class AbstractWrapper {
 
-    public static final String QUERY = "${QUERY_PLACEHOLDER}";
-    public static final String WHERE_CLAUSE = "${WHERECLAUSE_PLACEHOLDER}";
+    public static final String QUERY_PLACEHOLDER = "${QUERY_PLACEHOLDER}";
+    public static final String WHERE_CLAUSE_PLACEHOLDER = "${WHERECLAUSE_PLACEHOLDER}";
+    public static final String TOTALS_FIELDS_PLACEHOLDER = "${TOTALS_FIELDS_PLACEHOLDER}";
     protected WrapperInterpreter wrapperInterpreter;
 
     public AbstractWrapper(String template, WrapperInterpreter wrapperInterpreter) {

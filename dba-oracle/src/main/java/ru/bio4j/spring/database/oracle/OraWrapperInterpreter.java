@@ -6,6 +6,7 @@ import ru.bio4j.spring.database.api.WrapperInterpreter;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
+import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.*;
 
 import java.text.SimpleDateFormat;
@@ -123,4 +124,27 @@ public class OraWrapperInterpreter implements WrapperInterpreter {
         }
         return null;
     }
+
+    @Override
+    public String totalsToSQL(String alias, List<Total> totals, List<Field> fields) {
+        if(totals != null) {
+            StringBuilder result = new StringBuilder();
+            char comma;
+            Total.Aggrigate aggrigate;
+            for (Total t : totals){
+                comma = (result.length() == 0) ? ' ' : ',';
+                final String fieldName = t.getFieldName();
+                aggrigate = t.getAggrigate();
+                if(aggrigate != Total.Aggrigate.UNDEFINED) {
+                    if(aggrigate != Total.Aggrigate.COUNT)
+                        result.append("COUNT(1)");
+                    else
+                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggrigate.name(), alias, fieldName, fieldName));
+                }
+            }
+            return result.toString();
+        }
+        return null;
+    }
+
 }

@@ -21,14 +21,14 @@ public class FilteringWrapperBaseImpl extends AbstractWrapper implements Filteri
     @Override
     protected void parseTemplate(String template){
         //ищем место куда встявляется запрос
-        int queryStart = template.indexOf(QUERY);
-        int whereStart = template.indexOf(WHERE_CLAUSE);
+        int queryStart = template.indexOf(QUERY_PLACEHOLDER);
+        int whereStart = template.indexOf(WHERE_CLAUSE_PLACEHOLDER);
         if(queryStart < 0)
-            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+QUERY);
+            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+ QUERY_PLACEHOLDER);
         if(whereStart < 0)
-            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+WHERE_CLAUSE);
+            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+ WHERE_CLAUSE_PLACEHOLDER);
 
-        int queryEnd = queryStart + QUERY.length();
+        int queryEnd = queryStart + QUERY_PLACEHOLDER.length();
         queryPrefix = template.substring(0, queryStart);
         querySuffix = template.substring(queryEnd, whereStart - 1);
     }

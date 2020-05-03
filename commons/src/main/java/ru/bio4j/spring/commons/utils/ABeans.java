@@ -4,15 +4,16 @@ import ru.bio4j.spring.commons.converter.Converter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ABeans {
 
-    public static HashMap<String, Object> extractBean(final HashMap<String, Object> bean, final String attrName) {
+    public static Map<String, Object> extractBean(final Map<String, Object> bean, final String attrName) {
         if(bean != null) {
             for (String key : bean.keySet()) {
                 if (Strings.compare(key, attrName, true)) {
-                    if(bean.get(key) instanceof HashMap)
-                    return (HashMap<String, Object>) bean.get(key);
+                    if(bean.get(key) instanceof Map)
+                    return (Map<String, Object>) bean.get(key);
                 }
             }
         }
@@ -31,13 +32,13 @@ public class ABeans {
         return null;
     }
 
-    public static <T> T extractAttrFromBean(final HashMap<String, Object> bean, final String path, Class<T> clazz, T defauldValue) {
+    public static <T> T extractAttrFromBean(final Map<String, Object> bean, final String path, Class<T> clazz, T defauldValue) {
         if(bean != null) {
             if(Strings.isNullOrEmpty(path))
                 return defauldValue;
             if(path.indexOf("/") >= 0){
                 String nextLevelAttr = getNextPathItem(path);
-                HashMap<String, Object> hextBean = extractBean(bean, nextLevelAttr);
+                Map<String, Object> hextBean = extractBean(bean, nextLevelAttr);
                 return extractAttrFromBean(hextBean, cutNextPathItem(path), clazz, defauldValue);
             } else {
                 for (String key : bean.keySet()) {
@@ -49,43 +50,43 @@ public class ABeans {
         return defauldValue;
     }
 
-    public static HashMap<String, Object> extractBeanFromBean(final HashMap<String, Object> bean, final String path) throws Exception {
+    public static Map<String, Object> extractBeanFromBean(final Map<String, Object> bean, final String path) throws Exception {
         if(bean != null) {
             if(Strings.isNullOrEmpty(path))
                 return null;
             if(path.indexOf("/") >= 0){
                 String nextLevelAttr = getNextPathItem(path);
-                HashMap<String, Object> hextBean = extractBean(bean, nextLevelAttr);
+                Map<String, Object> hextBean = extractBean(bean, nextLevelAttr);
                 return extractBeanFromBean(hextBean, cutNextPathItem(path));
             } else {
                 for (String key : bean.keySet()) {
                     if (Strings.compare(key, path, true))
-                        return (HashMap<String, Object>)bean.get(key);
+                        return (Map<String, Object>)bean.get(key);
                 }
             }
         }
         return null;
     }
 
-    public static List<HashMap<String, Object>> extractBeansFromBean(final HashMap<String, Object> bean, final String path) throws Exception {
+    public static List<Map<String, Object>> extractBeansFromBean(final Map<String, Object> bean, final String path) throws Exception {
         if(bean != null) {
             if(Strings.isNullOrEmpty(path))
                 return null;
             if(path.indexOf("/") >= 0){
                 String nextLevelAttr = getNextPathItem(path);
-                HashMap<String, Object> hextBean = extractBean(bean, nextLevelAttr);
+                Map<String, Object> hextBean = extractBean(bean, nextLevelAttr);
                 return extractBeansFromBean(hextBean, cutNextPathItem(path));
             } else {
                 for (String key : bean.keySet()) {
                     if (Strings.compare(key, path, true))
-                        return (List<HashMap<String, Object>>)bean.get(key);
+                        return (List<Map<String, Object>>)bean.get(key);
                 }
             }
         }
         return null;
     }
 
-    public static void renameAttr(final HashMap<String, Object> bean, final String oldAttrName, final String newAttrName) throws Exception {
+    public static void renameAttr(final Map<String, Object> bean, final String oldAttrName, final String newAttrName) throws Exception {
         Object val = null;
         String foundKey = null;
         for (String key : bean.keySet()) {

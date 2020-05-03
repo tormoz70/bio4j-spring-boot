@@ -18,6 +18,6 @@ public class PaginationWrapperBaseImpl extends AbstractWrapper implements Pagina
     }
 
     public String wrap(String sql) {
-        return template.replace(QUERY, sql);
+        return template.replace(QUERY_PLACEHOLDER, sql);
     }
 }

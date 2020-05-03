@@ -6,6 +6,7 @@ import ru.bio4j.spring.database.api.WrapperInterpreter;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
+import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.*;
 
 import java.text.SimpleDateFormat;
@@ -117,6 +118,28 @@ public class ChWrapperInterpreter implements WrapperInterpreter {
                         result.append(String.format("%s NLSSORT(%s.%s, 'NLS_SORT=RUSSIAN') %s %s", comma, alias, fieldName, direction.toString(), nullsPos));
                     else
                         result.append(String.format("%s %s.%s %s %s", comma, alias, fieldName, direction.toString(), nullsPos));
+                }
+            }
+            return result.toString();
+        }
+        return null;
+    }
+
+    @Override
+    public String totalsToSQL(String alias, List<Total> totals, List<Field> fields) {
+        if(totals != null) {
+            StringBuilder result = new StringBuilder();
+            String comma;
+            Total.Aggrigate aggrigate;
+            for (Total t : totals){
+                comma = (result.length() == 0) ? "" : ", ";
+                final String fieldName = t.getFieldName();
+                aggrigate = t.getAggrigate();
+                if(aggrigate != Total.Aggrigate.UNDEFINED) {
+                    if(aggrigate == Total.Aggrigate.COUNT)
+                        result.append(String.format("%sCOUNT(1) as %s", comma, Total.TOTALCOUNT_FIELD_NAME));
+                    else
+                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggrigate.name(), alias, fieldName, fieldName.toUpperCase()));
                 }
             }
             return result.toString();

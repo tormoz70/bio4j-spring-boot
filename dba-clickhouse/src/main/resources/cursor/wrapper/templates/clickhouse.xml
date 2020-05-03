@@ -37,8 +37,8 @@
       ${QUERY_PLACEHOLDER} - запрос в котором небходимо вычислить кол-во записей
     -->
     <template type="totals"><![CDATA[
-        SELECT COUNT(1) as ttlCnt_wrpr
-          FROM ( ${QUERY_PLACEHOLDER} )
+        SELECT ${TOTALS_FIELDS_PLACEHOLDER}
+          FROM ( ${QUERY_PLACEHOLDER} ) AS ttls_wrpr
     ]]></template>
 
     <!--

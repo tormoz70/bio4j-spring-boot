@@ -1,17 +1,19 @@
 package ru.bio4j.spring.model.transport;
 
 import ru.bio4j.spring.model.transport.jstore.Field;
+import ru.bio4j.spring.model.transport.jstore.Total;
 
 import java.util.List;
 
 public class BeansPage<T> {
     private List<T> rows;
-    private int paginationPage;
-    private int paginationOffset;
-    private int paginationCount;
-    private int paginationPageSize;
-    private int totalCount;
+    private long paginationPage;
+    private long paginationOffset;
+    private long paginationCount;
+    private long paginationPageSize;
+    private long totalCount;
     private List<Field> metadata;
+    private List<Total> totals;
 
     public List<T> getRows() {
         return rows;
@@ -21,19 +23,19 @@ public class BeansPage<T> {
         this.rows = rows;
     }
 
-    public int getPaginationOffset() {
+    public long getPaginationOffset() {
         return paginationOffset;
     }
 
-    public void setPaginationOffset(int paginationOffset) {
+    public void setPaginationOffset(long paginationOffset) {
         this.paginationOffset = paginationOffset;
     }
 
-    public int getPaginationCount() {
+    public long getPaginationCount() {
         return paginationCount;
     }
 
-    public void setPaginationCount(int paginationCount) {
+    public void setPaginationCount(long paginationCount) {
         this.paginationCount = paginationCount;
     }
 
@@ -45,27 +47,35 @@ public class BeansPage<T> {
         this.metadata = metadata;
     }
 
-    public int getPaginationPage() {
+    public long getPaginationPage() {
         return paginationPage;
     }
 
-    public void setPaginationPage(int paginationPage) {
+    public void setPaginationPage(long paginationPage) {
         this.paginationPage = paginationPage;
     }
 
-    public int getTotalCount() {
+    public long getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCount(int totalCount) {
+    public void setTotalCount(long totalCount) {
         this.totalCount = totalCount;
     }
 
-    public int getPaginationPageSize() {
+    public long getPaginationPageSize() {
         return paginationPageSize;
     }
 
-    public void setPaginationPageSize(int paginationPageSize) {
+    public void setPaginationPageSize(long paginationPageSize) {
         this.paginationPageSize = paginationPageSize;
+    }
+
+    public List<Total> getTotals() {
+        return totals;
+    }
+
+    public void setTotals(List<Total> totals) {
+        this.totals = totals;
     }
 }

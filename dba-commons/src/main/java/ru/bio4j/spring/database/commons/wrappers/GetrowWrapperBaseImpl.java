@@ -20,7 +20,7 @@ public class GetrowWrapperBaseImpl extends AbstractWrapper implements GetrowWrap
 
     public String wrap(String sql, String pkFieldName) {
         String whereclause = "(" + pkFieldName + " = :" + RestParamNames.GETROW_PARAM_PKVAL + ")";
-        String rslt = template.replace(QUERY, sql);
-        return rslt.replace(WHERE_CLAUSE, whereclause);
+        String rslt = template.replace(QUERY_PLACEHOLDER, sql);
+        return rslt.replace(WHERE_CLAUSE_PLACEHOLDER, whereclause);
     }
 }

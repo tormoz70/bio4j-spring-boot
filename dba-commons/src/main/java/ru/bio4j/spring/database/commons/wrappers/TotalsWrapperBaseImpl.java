@@ -1,8 +1,17 @@
 package ru.bio4j.spring.database.commons.wrappers;
 
+import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.utils.Lists;
+import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.TotalsWrapper;
 import ru.bio4j.spring.database.api.WrapperInterpreter;
 import ru.bio4j.spring.database.commons.AbstractWrapper;
+import ru.bio4j.spring.model.transport.MetaType;
+import ru.bio4j.spring.model.transport.jstore.Field;
+import ru.bio4j.spring.model.transport.jstore.Total;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrapper {
 
@@ -17,7 +26,43 @@ public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrap
         this.template = template;
     }
 
-    public String wrap(String sql) {
-        return template.replace(QUERY, sql);
+    public String wrap(String sql, List<Total> totals, List<Field> fields) {
+        if (totals != null && totals.size() > 0) {
+            if(fields != null && fields.size() > 0) {
+                List<Total> notFound = new ArrayList<>();
+                for (Total t : totals) {
+                    if(t.getAggrigate() == Total.Aggrigate.COUNT) {
+                        t.setFieldName("*");
+                        t.setFieldType(long.class);
+                        continue;
+                    }
+                    if (!Strings.isNullOrEmpty(t.getFieldName())) {
+                        Field fldDef = Lists.first(fields, item -> Strings.compare(t.getFieldName(), item.getName(), true) || Strings.compare(t.getFieldName(), item.getAttrName(), true));
+                        if (fldDef != null) {
+                            t.setFieldName(fldDef.getName());
+                            if(t.getFieldType() == null)
+                                t.setFieldType(fldDef.getMetaType() != MetaType.UNDEFINED ? MetaTypeConverter.write(fldDef.getMetaType()) : double.class);
+                            if (t.getAggrigate() == Total.Aggrigate.UNDEFINED && fldDef.getAggrigate() != Total.Aggrigate.UNDEFINED)
+                                t.setAggrigate(fldDef.getAggrigate());
+                        } else
+                            notFound.add(t);
+                    } else
+                        notFound.add(t);
+                }
+                for (Total t : notFound)
+                    totals.remove(t);
+                for(Field field : fields){
+                    if(field.getAggrigate() != Total.Aggrigate.UNDEFINED) {
+                        Total exists = totals.stream().filter(f -> Strings.compare(f.getFieldName(), field.getName(), true) || Strings.compare(f.getFieldName(), field.getAttrName(), true)).findFirst().orElse(null);
+                        if(exists == null)
+                            totals.add(Total.builder().fieldName(field.getName()).aggrigate(field.getAggrigate()).build());
+                    }
+                }
+            }
+
+            String totalsSql = wrapperInterpreter.totalsToSQL("ttls_wrpr", totals, fields);
+            return template.replace(TOTALS_FIELDS_PLACEHOLDER, totalsSql).replace(QUERY_PLACEHOLDER, sql);
+        }
+        return sql;
     }
 }

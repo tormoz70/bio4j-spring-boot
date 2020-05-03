@@ -13,6 +13,7 @@ import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
+import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import java.sql.*;
@@ -154,7 +155,7 @@ public class SQLFactoryTest {
     public void testSQLCommandOpenCursor2() {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
-            BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, context, sqlDefinition, null,
+            BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                         .forceCalcCount(true)
                         .recordsLimit(10000)
@@ -165,6 +166,33 @@ public class SQLFactoryTest {
             Assert.assertEquals(1, rst.getPaginationPage());
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(50, rst.getPaginationPageSize());
+        } catch (Exception ex) {
+            LOG.error("Error!", ex);
+            Assert.fail();
+        }
+
+    }
+
+    @Test
+    public void testSQLCommandOpenCursor22() {
+        try {
+            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
+            List<Total> totals = new ArrayList<>();
+            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.SUM).fieldType(double.class).build());
+            BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, totals, context, sqlDefinition, null,
+                    CrudOptions.builder()
+                            .forceCalcCount(false)
+                            .recordsLimit(10000)
+                            .appendMetadata(true).build(),
+                    ABean.class);
+            Assert.assertEquals(100, rst.getTotalCount());
+            Assert.assertEquals(50, rst.getPaginationCount());
+            Assert.assertEquals(1, rst.getPaginationPage());
+            Assert.assertEquals(0, rst.getPaginationOffset());
+            Assert.assertEquals(50, rst.getPaginationPageSize());
+            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggrigate() == Total.Aggrigate.COUNT).findFirst().get().getFact());
+            Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
         } catch (Exception ex) {
             LOG.error("Error!", ex);
             Assert.fail();
@@ -184,7 +212,7 @@ public class SQLFactoryTest {
                     .direction(Sort.Direction.DESC)
                     .build());
             Filter filter = Utl.restoreSimpleFilter("{region_id:\"0100000000000 \"}");
-            BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, sorts, context, sqlDefinition, null,
+            BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, sorts, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(true)
                             .recordsLimit(10000)
@@ -211,7 +239,7 @@ public class SQLFactoryTest {
             List<Param> params = Paramus.createParams();
             Paramus.setParamValue(params, "periodStart", DateTimeParser.getInstance().pars("2009-01-01"));
             Paramus.setParamValue(params, "periodEnd", DateTimeParser.getInstance().pars("2009-01-02"));
-            BeansPage<ABean> rst = CrudReaderApi.loadPage(params, null, null, context, sqlDefinition, null,
+            BeansPage<ABean> rst = CrudReaderApi.loadPage(params, null, null, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(true)
                             .recordsLimit(10000)

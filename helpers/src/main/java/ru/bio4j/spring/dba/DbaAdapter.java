@@ -21,10 +21,12 @@ import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.StoreMetadata;
+import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -85,6 +87,7 @@ public class DbaAdapter {
             final Object params,
             final User user,
             final FilterAndSorter filterAndSorter,
+            final List<Total> totals,
             final CrudOptions crudOptions,
             final Class<T> beanType
             ) {
@@ -93,62 +96,74 @@ public class DbaAdapter {
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         int pageSize = Paramus.paramValue(prms, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         if(pageSize == 0)
-            return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+            return CrudReaderApi.loadAll(prms,
+                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                    totals,
+                    context, sqlDefinition, user, beanType);
         else
             return CrudReaderApi.loadPage(
                     prms,
                     filterAndSorter != null ? filterAndSorter.getFilter() : null,
                     filterAndSorter != null ? filterAndSorter.getSorter() : null,
-                    context, sqlDefinition, user, crudOptions, beanType);
+                    totals, context, sqlDefinition, user, crudOptions, beanType);
     }
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
             final User user,
             final FilterAndSorter filterAndSorter,
+            final List<Total> totals,
             final Class<T> beanType
     ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        return CrudReaderApi.loadAll(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+        return CrudReaderApi.loadAll(prms,
+                filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                totals, context, sqlDefinition, user, beanType);
     }
 
     public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
             final User user,
+            final List<Total> totals,
             final Class<T> beanType) {
-        return loadPage(bioCode, params, user, null, CrudOptions.builder().build(), beanType);
+        return loadPage(bioCode, params, user, null, totals, CrudOptions.builder().build(), beanType);
     }
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
             final User user,
+            final List<Total> totals,
             final Class<T> beanType) {
-        return loadAll(bioCode, params, user, null, beanType);
+        return loadAll(bioCode, params, user, totals, beanType);
     }
 
     public <T> BeansPage<T> loadPage(
             final String bioCode,
             final HttpServletRequest request,
+            final List<Total> totals,
             final Class<T> beanType) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         final List<Param> params = _extractBioParams(queryParams);
         final User user = ((WrappedRequest)request).getUser();
         FilterAndSorter fs = createFilterAndSorter(queryParams);
         boolean forceCalcCount = Converter.toType(queryParams.gcount, boolean.class);
-        return loadPage(bioCode, params, user, fs, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
+        return loadPage(bioCode, params, user, fs, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
     }
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final HttpServletRequest request,
+            final List<Total> totals,
             final Class<T> beanType) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         final List<Param> params = _extractBioParams(queryParams);
         final User user = ((WrappedRequest)request).getUser();
         FilterAndSorter fs = createFilterAndSorter(queryParams);
-        return loadAll(bioCode, params, user, fs, beanType);
+        return loadAll(bioCode, params, user, fs, totals, beanType);
     }
 
     public ABean calcTotalCount(
@@ -164,9 +179,10 @@ public class DbaAdapter {
         ABean rslt = new ABean();
         Filter filter = fs != null ? fs.getFilter() : null;
         sqlDefinition.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(sqlDefinition.getSelectSqlDef().getPreparedSql(), filter, sqlDefinition.getSelectSqlDef().getFields()));
-        sqlDefinition.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(sqlDefinition.getSelectSqlDef().getPreparedSql()));
-        long totalCount = CrudReaderApi.calcTotalCount(params, context, sqlDefinition, user);
-        rslt.put("totalCount", totalCount);
+        Total countDef = Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(0L).build();
+        sqlDefinition.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(sqlDefinition.getSelectSqlDef().getPreparedSql(), Arrays.asList(countDef), sqlDefinition.getSelectSqlDef().getFields()));
+        List<Total> countFact = CrudReaderApi.calcTotalsRemote(Arrays.asList(countDef), params, context, sqlDefinition, user);
+        rslt.put("totalCount", countFact.stream().findFirst().get().getFact());
         return rslt;
     }
 

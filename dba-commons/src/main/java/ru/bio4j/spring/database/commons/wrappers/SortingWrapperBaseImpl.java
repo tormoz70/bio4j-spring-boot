@@ -13,7 +13,6 @@ import java.util.List;
 
 public class SortingWrapperBaseImpl extends AbstractWrapper implements SortingWrapper {
 
-    public static final String EXPRESSION = "sorting$expression";
     public static final String ORDER_BY_CLAUSE = "${ORDERBYCLAUSE_PLACEHOLDER}";
 
     private String queryPrefix;
@@ -26,18 +25,19 @@ public class SortingWrapperBaseImpl extends AbstractWrapper implements SortingWr
     @Override
     protected void parseTemplate(String template){
         //ищем место куда встявляется запрос
-        int queryStart = template.indexOf(QUERY);
+        int queryStart = template.indexOf(QUERY_PLACEHOLDER);
         int orderbyStart = template.indexOf(ORDER_BY_CLAUSE);
         if(queryStart < 0)
-            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+QUERY);
+            throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+ QUERY_PLACEHOLDER);
         if(orderbyStart < 0)
             throw new IllegalArgumentException("Query: \"" + template + "\" is not contain "+ORDER_BY_CLAUSE);
 
-        int queryEnd = queryStart + QUERY.length();
+        int queryEnd = queryStart + QUERY_PLACEHOLDER.length();
         queryPrefix = template.substring(0, queryStart);
         querySuffix = template.substring(queryEnd, orderbyStart - 1);
     }
 
+    @Override
     public String wrap(String sql, List<Sort> sort, List<Field> fields) {
         if (sort != null && sort.size() > 0) {
             if(fields != null && fields.size() > 0) {
