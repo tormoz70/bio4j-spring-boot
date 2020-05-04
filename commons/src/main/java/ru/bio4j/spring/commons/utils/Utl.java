@@ -1,5 +1,7 @@
 package ru.bio4j.spring.commons.utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -479,6 +481,37 @@ public class Utl {
                 if (addIfNotExists)
                     dstBean.put(key.toString(), vals.get(key));
             }
+        }
+    }
+
+    public static void applyValuesToABeanFromJSONObject(JSONObject jsonObject, Object dstBean) {
+        if (jsonObject == null)
+            throw new IllegalArgumentException("Argument \"srcBean\" cannot be null!");
+        if (dstBean == null)
+            throw new IllegalArgumentException("Argument \"dstBean\" cannot be null!");
+        Map<String, Object> values = new HashMap<>();
+        Iterator keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = (String)keys.next();
+            try {
+                values.put(key, jsonObject.get(key));
+            } catch(JSONException e) {
+                throw Utl.wrapErrorAsRuntimeException(e);
+            }
+        }
+        if(dstBean instanceof ABean)
+            applyValuesToABeanFromMap(values, (ABean) dstBean, true);
+        else
+            applyValuesToBeanFromMap(values, dstBean);
+    }
+
+    public static <T> T createBeanFromJSONObject(JSONObject jsonObject, Class<T> beanType) {
+        try {
+            T instance = beanType.newInstance();
+            applyValuesToABeanFromJSONObject(jsonObject, instance);
+            return instance;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
         }
     }
 

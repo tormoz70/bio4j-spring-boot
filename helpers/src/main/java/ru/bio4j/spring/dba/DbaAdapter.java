@@ -1,6 +1,8 @@
 package ru.bio4j.spring.dba;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @Component
@@ -628,6 +631,38 @@ public class DbaAdapter {
 
     public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType) {
         return  getBioParamFromRequest(paramName, request, paramType, null);
+    }
+
+    public <T> BeansPage<T> requestByClickhouse4j(String bioCode, HttpServletRequest request, Class<T> beanType) {
+        try {
+            String json = requestScalar(bioCode, request, String.class, null);
+            if(Strings.isNullOrEmpty(json))
+                throw new BioError("Запрос вернул пустую строку!");
+            BeansPage<T> rslt = new BeansPage<>();
+            rslt.setRows(new ArrayList<>());
+            rslt.setTotals(new ArrayList<>());
+            JSONObject jsonObj = new JSONObject(json);
+            JSONArray data = jsonObj.has("data") ? jsonObj.getJSONArray("data") : null;
+            JSONArray meta = jsonObj.has("meta") ? jsonObj.getJSONArray("meta") : null;
+            JSONObject totals = jsonObj.has("totals") ? jsonObj.getJSONObject("totals") : null;
+            if(data != null && meta != null) {
+                for(int i=0; i<data.length(); i++) {
+                    JSONObject obj = data.getJSONObject(i);
+                    T bean = Utl.createBeanFromJSONObject(obj, beanType);
+                    rslt.getRows().add(bean);
+                }
+                if(totals != null) {
+                    Iterator keys = totals.keys();
+                    while (keys.hasNext()) {
+                        String key = (String)keys.next();
+                        rslt.getTotals().add(Total.builder().fieldName(key).fact(totals.get(key)).aggrigate(Total.Aggrigate.UNDEFINED).build());
+                    }
+                }
+            }
+            return rslt;
+        } catch(Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
     }
 
 }

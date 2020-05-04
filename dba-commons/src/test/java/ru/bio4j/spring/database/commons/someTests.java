@@ -1,16 +1,18 @@
 package ru.bio4j.spring.database.commons;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
+import ru.bio4j.spring.model.transport.ABean;
+import ru.bio4j.spring.model.transport.BeansPage;
 import ru.bio4j.spring.model.transport.Param;
+import ru.bio4j.spring.model.transport.jstore.Total;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -103,5 +105,13 @@ public class someTests {
         System.out.println(DbUtils.calcfactOffset(5144, 5));
         System.out.println(DbUtils.calcfactOffset(5144, 8));
     }
+
+
+//    @Test
+//    public void parsClockhouse4jJsonTest() {
+//        String json = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("1.json"));
+//        BeansPage<ABean> rrr = parsClockhouse4jJson(json, ABean.class);
+//        Assert.assertTrue(rrr != null);
+//    }
 
 }

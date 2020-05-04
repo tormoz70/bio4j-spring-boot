@@ -1,0 +1,54 @@
+{
+  "meta":
+  [
+    {
+      "name": "region_id",
+      "type": "FixedString(14)"
+    },
+    {
+      "name": "summ",
+      "type": "Float64"
+    }
+  ],
+
+  "data":
+  [
+    {
+      "region_id": "7300000000000\u0000",
+      "summ": 13050
+    },
+    {
+      "region_id": "7200000000000\u0000",
+      "summ": 6100
+    },
+    {
+      "region_id": "4600000000000\u0000",
+      "summ": 100
+    },
+    {
+      "region_id": "6600000000000\u0000",
+      "summ": 2400
+    },
+    {
+      "region_id": "6700000000000\u0000",
+      "summ": 4750
+    }
+  ],
+
+  "totals":
+  {
+    "region_id": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000",
+    "summ": 774097
+  },
+
+  "rows": 5,
+
+  "rows_before_limit_at_least": 37,
+
+  "statistics":
+  {
+    "elapsed": 0.000304882,
+    "rows_read": 100,
+    "bytes_read": 1808
+  }
+}
