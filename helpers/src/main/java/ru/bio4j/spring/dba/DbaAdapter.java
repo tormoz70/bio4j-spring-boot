@@ -125,6 +125,42 @@ public class DbaAdapter {
                 totals, context, sqlDefinition, user, beanType);
     }
 
+    public <T> BeansPage<T> loadAll(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final FilterAndSorter filterAndSorter,
+            final Class<T> beanType
+    ) {
+        return loadAll(bioCode, params, user, filterAndSorter,null, beanType);
+    }
+
+    public <T> BeansPage<T> loadAll(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final Class<T> beanType) {
+        return loadAll(bioCode, params, user, null, null, beanType);
+    }
+    public <T> BeansPage<T> requestAll(
+            final String bioCode,
+            final HttpServletRequest request,
+            final List<Total> totals,
+            final Class<T> beanType) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final List<Param> params = _extractBioParams(queryParams);
+        final User user = ((WrappedRequest)request).getUser();
+        FilterAndSorter fs = createFilterAndSorter(queryParams);
+        return loadAll(bioCode, params, user, fs, totals, beanType);
+    }
+    public <T> BeansPage<T> requestAll(
+            final String bioCode,
+            final HttpServletRequest request,
+            final Class<T> beanType) {
+        return loadAll(bioCode, request, null, beanType);
+    }
+
+
     public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
@@ -133,16 +169,15 @@ public class DbaAdapter {
             final Class<T> beanType) {
         return loadPage(bioCode, params, user, null, totals, CrudOptions.builder().build(), beanType);
     }
-    public <T> BeansPage<T> loadAll(
+
+    public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
             final User user,
-            final List<Total> totals,
             final Class<T> beanType) {
-        return loadAll(bioCode, params, user, totals, beanType);
+        return loadPage(bioCode, params, user, null, null, CrudOptions.builder().build(), beanType);
     }
-
-    public <T> BeansPage<T> loadPage(
+    public <T> BeansPage<T> requestPage(
             final String bioCode,
             final HttpServletRequest request,
             final List<Total> totals,
@@ -154,17 +189,13 @@ public class DbaAdapter {
         boolean forceCalcCount = Converter.toType(queryParams.gcount, boolean.class);
         return loadPage(bioCode, params, user, fs, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
     }
-    public <T> BeansPage<T> loadAll(
+    public <T> BeansPage<T> requestPage(
             final String bioCode,
             final HttpServletRequest request,
-            final List<Total> totals,
             final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
-        return loadAll(bioCode, params, user, fs, totals, beanType);
+        return requestPage(bioCode, request, null, beanType);
     }
+
 
     public ABean calcTotalCount(
             final String bioCode,
@@ -303,7 +334,7 @@ public class DbaAdapter {
 
     }
 
-    public <T> List<T> loadPageExt(
+    public <T> List<T> requestPageExt(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> beanType) {
@@ -335,7 +366,7 @@ public class DbaAdapter {
         return fs;
     }
 
-    public <T> List<T> loadAllExt(
+    public <T> List<T> requestAllExt(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> beanType) {
@@ -376,7 +407,7 @@ public class DbaAdapter {
         return metadata;
     }
 
-    public ABean loadBean(
+    public ABean requestBean(
             final String bioCode,
             final HttpServletRequest request,
             final Object id) {
@@ -393,7 +424,7 @@ public class DbaAdapter {
         return null;
     }
 
-    public StringBuilder loadJson(
+    public StringBuilder requestJson(
             final String bioCode,
             final HttpServletRequest request) {
         final List<Param> params = _extractBioParams(request);
@@ -404,7 +435,7 @@ public class DbaAdapter {
         return rslt;
     }
 
-    public List<ABean> saveBeans(
+    public List<ABean> storeBeans(
             final String bioCode,
             final HttpServletRequest request,
             final List<ABean> rows) {
@@ -448,7 +479,7 @@ public class DbaAdapter {
         CrudWriterApi.execSQL(params, context, sqlDefinition, user);
     }
 
-    public <T> T selectScalar(
+    public <T> T requestScalar(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> clazz,
