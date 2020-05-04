@@ -29,4 +29,6 @@ public interface SQLReader {
     Object getValue(int fieldId);
 
     List<Object> getValues();
+
+    ResultSet getResultSet();
 }

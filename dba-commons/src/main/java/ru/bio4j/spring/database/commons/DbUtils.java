@@ -99,26 +99,47 @@ public class DbUtils {
         }, usr);
     }
 
-    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final SQLDefinition sqlDefinition, Class<T> clazz, T defaultValue) {
+    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final SQLDefinition sqlDefinition, final String fieldName, final Class<T> clazz, final T defaultValue) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         final SelectSQLDef sqlDef = sqlDefinition.getSelectSqlDef();
         return context.createCursor()
-                    .init(context.getCurrentConnection(), sqlDef).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
+                    .init(context.getCurrentConnection(), sqlDef).scalar(prms, context.getCurrentUser(), fieldName, clazz, defaultValue);
+    }
+    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final SQLDefinition sqlDefinition, final Class<T> clazz, final T defaultValue) {
+        final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
+        final SelectSQLDef sqlDef = sqlDefinition.getSelectSqlDef();
+        return context.createCursor()
+                .init(context.getCurrentConnection(), sqlDef).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
     }
 
-    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final SQLDefinition sqlDefinition, Class<T> clazz, T defaultValue) {
+    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final SQLDefinition sqlDefinition, final String fieldName, final Class<T> clazz, final T defaultValue) {
+        return ctx.execBatch((context) -> {
+            return processSelectScalar0(params, ctx, sqlDefinition, fieldName, clazz, defaultValue);
+        }, usr);
+    }
+    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final SQLDefinition sqlDefinition, final Class<T> clazz, final T defaultValue) {
         return ctx.execBatch((context) -> {
             return processSelectScalar0(params, ctx, sqlDefinition, clazz, defaultValue);
         }, usr);
     }
 
-    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final String sql, Class<T> clazz, T defaultValue) {
+    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final String sql, final String fieldName, final Class<T> clazz, final T defaultValue) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         return context.createCursor()
-                    .init(context.getCurrentConnection(), sql).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
+                    .init(context.getCurrentConnection(), sql).scalar(prms, context.getCurrentUser(), fieldName, clazz, defaultValue);
+    }
+    public static <T> T processSelectScalar0(final Object params, final SQLContext context, final String sql, final Class<T> clazz, final T defaultValue) {
+        final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
+        return context.createCursor()
+                .init(context.getCurrentConnection(), sql).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
     }
 
-    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final String sql, Class<T> clazz, T defaultValue) {
+    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final String sql, final String fieldName, final Class<T> clazz, final T defaultValue) {
+        return ctx.execBatch((SQLActionScalar0<T>) (context) -> {
+            return processSelectScalar0(params, ctx, sql, fieldName, clazz, defaultValue);
+        }, usr);
+    }
+    public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final String sql, final Class<T> clazz, final T defaultValue) {
         return ctx.execBatch((SQLActionScalar0<T>) (context) -> {
             return processSelectScalar0(params, ctx, sql, clazz, defaultValue);
         }, usr);

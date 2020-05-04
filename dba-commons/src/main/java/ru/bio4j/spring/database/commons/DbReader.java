@@ -56,49 +56,60 @@ public class DbReader implements SQLReader {
         return bFile;
     }
 
+    public ResultSet getResultSet() {
+        return currentResultSet;
+    }
+
+    private ResultSet currentResultSet = null;
+
     @Override
     public boolean next(final ResultSet resultSet) {
-        if(resultSet == null)
+        currentResultSet = resultSet;
+        if(currentResultSet == null)
             throw new IllegalArgumentException("ResultSet must be defined!");
         try {
-            if (resultSet.next()) {
+            if (currentResultSet.next()) {
                 currentFetchedRowPosition++;
-                fields.clear();
-                rowValues.clear();
-                ResultSetMetaData metadata = resultSet.getMetaData();
-                for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                    Class<?> type = null;
-                    int sqlType = metadata.getColumnType(i);
-                    try {
-                        String className = metadata.getColumnClassName(i);
-                        if ((sqlType == Types.BLOB) || (sqlType == Types.BINARY))
-                            type = Byte[].class;
-                        else if (sqlType == Types.CLOB)
-                            type = String.class;
-                        else
-                            type = getClass().getClassLoader().loadClass(className);
-                    } catch (ClassNotFoundException ex) {
-                        throw new SQLException(ex);
+                ResultSetMetaData metadata = currentResultSet.getMetaData();
+                if(metadata != null) {
+                    fields.clear();
+                    rowValues.clear();
+                    for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                        Class<?> type = null;
+                        int sqlType = metadata.getColumnType(i);
+                        try {
+                            String className = metadata.getColumnClassName(i);
+                            if ((sqlType == Types.BLOB) || (sqlType == Types.BINARY))
+                                type = Byte[].class;
+                            else if (sqlType == Types.CLOB)
+                                type = String.class;
+                            else
+                                type = getClass().getClassLoader().loadClass(className);
+                        } catch (ClassNotFoundException ex) {
+                            throw new SQLException(ex);
+                        }
+                        String fieldName = metadata.getColumnName(i);
+                        DBField field = new DBFieldImpl(type, i, fieldName, sqlType);
+                        fields.add(field);
                     }
-                    String fieldName = metadata.getColumnName(i);
-                    DBField field = new DBFieldImpl(type, i, fieldName, sqlType);
-                    fields.add(field);
-                }
-                for (int i = 0; i < fields.size(); i++)
-                    rowValues.add(null);
-                for (DBField field : fields) {
-                    int valueIndex = field.getId() - 1;
-                    Object value;
-                    int sqlType = field.getSqlType();
-                    if (sqlType == Types.CLOB) {
-                        value = readClob(resultSet.getClob(field.getId()));
-                    } else if (Arrays.asList(Types.BLOB, Types.BINARY).contains(sqlType)) {
-                        value = readBlob(resultSet.getBinaryStream(field.getId()));
-                    } else if (sqlType == Types.VARCHAR) {
-                        value = resultSet.getString(field.getId());
-                    } else
-                        value = resultSet.getObject(field.getId());
-                    rowValues.set(valueIndex, value);
+                    for (int i = 0; i < fields.size(); i++)
+                        rowValues.add(null);
+                    for (DBField field : fields) {
+                        int valueIndex = field.getId() - 1;
+                        Object value;
+                        int sqlType = field.getSqlType();
+                        if (sqlType == Types.CLOB) {
+                            value = readClob(currentResultSet.getClob(field.getId()));
+                        } else if (Arrays.asList(Types.BLOB, Types.BINARY).contains(sqlType)) {
+                            value = readBlob(currentResultSet.getBinaryStream(field.getId()));
+                        } else if (sqlType == Types.VARCHAR) {
+                            value = currentResultSet.getString(field.getId());
+                        } else
+                            value = currentResultSet.getObject(field.getId());
+                        rowValues.set(valueIndex, value);
+                    }
+                } else {
+
                 }
                 return true;
             }

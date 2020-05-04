@@ -12,6 +12,7 @@ import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
 //import ru.bio4j.ng.commons.utils.Jsons;
+import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Jecksons;
@@ -45,7 +46,7 @@ public class DbaAdapter {
     }
 
     private static List<Param>_extractBioParams(final HttpServletRequest request) {
-        final BioQueryParams queryParams = null; ///---((WrappedRequest)request).getBioQueryParams();
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         return _extractBioParams(queryParams);
     }
 
@@ -199,6 +200,15 @@ public class DbaAdapter {
         return requestPage(bioCode, request, null, beanType);
     }
 
+    public <T> T requestFirstBean(
+            final String bioCode,
+            final HttpServletRequest request,
+            final Class<T> beanType) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final List<Param> params = _extractBioParams(queryParams);
+        final User user = ((WrappedRequest)request).getUser();
+        return loadFirstBean(bioCode, params, user, beanType);
+    }
 
     public ABean calcTotalCount(
             final String bioCode,
@@ -493,6 +503,18 @@ public class DbaAdapter {
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         return CrudReaderApi.selectScalar(params, context, sqlDefinition, clazz, defaultValue, user);
     }
+    public <T> T requestScalar(
+            final String bioCode,
+            final HttpServletRequest request,
+            final String fieldName,
+            final Class<T> clazz,
+            final T defaultValue) {
+        final List<Param> params = _extractBioParams(request);
+        final User user = ((WrappedRequest)request).getUser();
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        return CrudReaderApi.selectScalar(params, context, sqlDefinition, fieldName, clazz, defaultValue, user);
+    }
 
     public <T> T selectScalar(
             final String bioCode,
@@ -503,6 +525,17 @@ public class DbaAdapter {
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         return CrudReaderApi.selectScalar(params, context, sqlDefinition, clazz, defaultValue, user);
+    }
+    public <T> T selectScalar(
+            final String bioCode,
+            final Object params,
+            final String fieldName,
+            final Class<T> clazz,
+            final T defaultValue,
+            final User user) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        return CrudReaderApi.selectScalar(params, context, sqlDefinition, fieldName, clazz, defaultValue, user);
     }
 
     public static void execBatch(final SQLContext context, final SQLActionVoid0 action, final User user) {
@@ -635,7 +668,9 @@ public class DbaAdapter {
 
     public <T> BeansPage<T> requestByClickhouse4j(String bioCode, HttpServletRequest request, Class<T> beanType) {
         try {
-            String json = requestScalar(bioCode, request, String.class, null);
+//            ABean firstBean = requestFirstBean(bioCode, request, ABean.class);
+//            String json = ABeans.extractAttrFromBean(firstBean, "json", String.class, null);
+            String json = requestScalar(bioCode, request, "json", String.class, null);
             if(Strings.isNullOrEmpty(json))
                 throw new BioError("Запрос вернул пустую строку!");
             BeansPage<T> rslt = new BeansPage<>();

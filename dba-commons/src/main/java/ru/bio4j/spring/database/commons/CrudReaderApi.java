@@ -806,11 +806,30 @@ public class CrudReaderApi {
             final Object params,
             final SQLContext context,
             final SQLDefinition sqlDefinition,
+            final String fieldName,
+            final Class<T> clazz,
+            final T defaultValue) {
+        return DbUtils.processSelectScalar0(params, context, sqlDefinition, fieldName, clazz, defaultValue);
+    }
+    public static <T> T selectScalar0(
+            final Object params,
+            final SQLContext context,
+            final SQLDefinition sqlDefinition,
             final Class<T> clazz,
             final T defaultValue) {
         return DbUtils.processSelectScalar0(params, context, sqlDefinition, clazz, defaultValue);
     }
 
+    public static <T> T selectScalar(
+            final Object params,
+            final SQLContext context,
+            final SQLDefinition sqlDefinition,
+            final String fieldName,
+            final Class<T> clazz,
+            final T defaultValue,
+            final User user) {
+        return DbUtils.processSelectScalar(user, params, context, sqlDefinition, fieldName, clazz, defaultValue);
+    }
     public static <T> T selectScalar(
             final Object params,
             final SQLContext context,

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
@@ -165,6 +166,21 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
                     rslt.result = rs.getValue(1, clazz);
                 else
                     rslt.result = rs.getValue(fieldName, clazz);
+            } else {
+                try {
+                    if (Strings.isNullOrEmpty(fieldName))
+                        rslt.result = Converter.toType(rs.getResultSet().getObject(1), clazz);
+                    else {
+                        if(fieldName.equals("json")) {
+                            String jsonString = rs.getResultSet().getString(fieldName);
+                            rslt.result = (T)jsonString;
+                        } else {
+                            rslt.result = Converter.toType(rs.getResultSet().getObject(fieldName), clazz);
+                        }
+                    }
+                } catch(SQLException e) {
+                    throw Utl.wrapErrorAsRuntimeException(e);
+                }
             }
             return false;
         })))
