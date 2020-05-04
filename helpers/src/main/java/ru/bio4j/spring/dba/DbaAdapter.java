@@ -578,6 +578,18 @@ public class DbaAdapter {
             Paramus.setParamValue(queryParams.bioParams, paramName, paramValue);
     }
 
+    public void setBioParamToRequest(Param param, HttpServletRequest request) {
+        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        if(queryParams.bioParams == null)
+            queryParams.bioParams = new ArrayList<>();
+        Paramus.applyParams(queryParams.bioParams, Arrays.asList(param), false, true);
+    }
+
+    public void setBioParamsToRequest(List<Param> params, HttpServletRequest request) {
+        for(Param param : params)
+            setBioParamToRequest(param, request);
+    }
+
     public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         if(queryParams.sort == null)
