@@ -179,7 +179,10 @@ public class SQLFactoryTest {
             SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
             List<Total> totals = new ArrayList<>();
             totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
             totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.SUM).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MIN).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MAX).fieldType(double.class).build());
             BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, totals, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(false)
