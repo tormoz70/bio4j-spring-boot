@@ -27,10 +27,7 @@
       :pagination_limit    - записей на странице
     -->
     <template type="pagination"><![CDATA[
-    SELECT * FROM (
-        SELECT pgng_wrpr0.*
-          FROM ( ${QUERY_PLACEHOLDER} ) as pgng_wrpr0
-    ) pgng_wrpr LIMIT :pagination_limit OFFSET :pagination_offset
+${QUERY_PLACEHOLDER} LIMIT :pagination_limit OFFSET :pagination_offset
     ]]></template>
 
     <!--
