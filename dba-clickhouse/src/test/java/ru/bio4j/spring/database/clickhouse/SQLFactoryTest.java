@@ -204,6 +204,31 @@ public class SQLFactoryTest {
     }
 
     @Test
+    public void testSQLCommandOpenCursor23() {
+        try {
+            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
+            List<Total> totals = new ArrayList<>();
+            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.SUM).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MIN).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MAX).fieldType(double.class).build());
+            BeansPage<ABean> rst = CrudReaderApi.loadAll(null, null, null, totals, context, sqlDefinition, null, ABean.class);
+            Assert.assertEquals(100L, rst.getTotalCount());
+            Assert.assertEquals(100L, rst.getPaginationCount());
+            Assert.assertEquals(0, rst.getPaginationPage());
+            Assert.assertEquals(0, rst.getPaginationOffset());
+            Assert.assertEquals(0, rst.getPaginationPageSize());
+            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggrigate() == Total.Aggrigate.COUNT).findFirst().get().getFact());
+            Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
+        } catch (Exception ex) {
+            LOG.error("Error!", ex);
+            Assert.fail();
+        }
+
+    }
+
+    @Test
     public void testSQLCommandOpenCursor3() {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("data0minmax");

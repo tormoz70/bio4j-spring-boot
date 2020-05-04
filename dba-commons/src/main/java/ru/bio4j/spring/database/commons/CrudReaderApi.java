@@ -21,6 +21,7 @@ import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 import ru.bio4j.spring.database.api.*;
 
+import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.util.*;
 import java.util.function.LongSupplier;
@@ -60,7 +61,7 @@ public class CrudReaderApi {
     }
 
     private static <T> BeansPage<T> readStoreData(
-            final PrepareLoadPageResult prepareLoadPageResult,
+            final PreparePageParams prepareLoadPageResult,
             final SQLContext context,
             final SQLDefinition cursorDef,
             final CrudOptions crudOptions,
@@ -85,7 +86,7 @@ public class CrudReaderApi {
     }
 
     private static <T> BeansPage<T> readStoreData(
-            final PrepareLoadPageResult prepareLoadPageResult,
+            final PreparePageParams prepareLoadPageResult,
             final SQLContext context,
             final SQLDefinition cursorDef,
             final Class<T> beanType) {
@@ -151,7 +152,7 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
-        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, totals, context, cursor, crudOptions.isForceCalcCount());
+        PreparePageParams prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, totals, context, cursor, crudOptions.isForceCalcCount());
         return readStoreData(prepareLoadPageResult, context, cursor, crudOptions, beanType);
     }
 
@@ -184,40 +185,55 @@ public class CrudReaderApi {
     }
 
     private static <T> void _processCurrentRecordOnTotals(final List<Total> pageTotals, final T bean, final Total total) {
-        String field = total.getFieldName();
-        double value;
-        if(bean instanceof HashMap)
-            value = ABeans.extractAttrFromBean((Map)bean, field, double.class, null);
-        else
-            value = Utl.fieldValue(bean, field, double.class);
-        Total rsTotal = pageTotals.stream().filter(t -> Strings.compare(t.getFieldName(), total.getFieldName(), true)).findFirst().orElse(null);
-        if(rsTotal == null) {
-            rsTotal = Total.builder()
-                    .fieldName(total.getFieldName())
-                    .aggrigate(total.getAggrigate())
-                    .fieldType(total.getFieldType())
-                    .fact(Converter.toType(0D, total.getFieldType()))
-                    .build();
+        if(total.getAggrigate() != Total.Aggrigate.COUNT) {
+            String field = total.getFieldName();
+            double value;
+            if (bean instanceof HashMap)
+                value = ABeans.extractAttrFromBean((Map) bean, field, double.class, null);
+            else
+                value = Utl.fieldValue(bean, field, double.class);
+            Total rsTotal = pageTotals.stream().filter(t -> Strings.compare(t.getFieldName(), total.getFieldName(), true)).findFirst().orElse(null);
+            if(rsTotal == null) {
+                rsTotal = Total.builder()
+                        .fieldName(total.getFieldName())
+                        .aggrigate(total.getAggrigate())
+                        .fieldType(total.getFieldType())
+                        .fact(Converter.toType(0D, total.getFieldType()))
+                        .build();
+            }
+            double newValue = Converter.toType(rsTotal.getFact(), double.class) + value;
+            rsTotal.setFact(Converter.toType(newValue, total.getFieldType()));
+        } else {
+            Total rsTotal = pageTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(null);
+            if(rsTotal == null) {
+                rsTotal = Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).fact(0L).build();
+                pageTotals.add(rsTotal);
+            }
+            rsTotal.setFact(Converter.toType(rsTotal.getFact(), long.class) + 1L);
         }
-        double newValue = Converter.toType(rsTotal.getFact(), double.class) + value;
-        rsTotal.setFact(Converter.toType(newValue, total.getFieldType()));
     }
 
-    private static <T> BeansPage<T> _calcTotals(final BeansPage<T> page, final List<Total> totals) {
-        for (T bean : page.getRows()){
-            for(Total total : totals)
-                _processCurrentRecordOnTotals(page.getTotals(), bean, total);
-        }
-        return page;
-    }
-
-    public static <T> List<Total> _calcTotals(final List<T> pageData, final List<Total> totals) {
-        List<Total> result = new ArrayList<>();
+    public static <T> List<Total> calcTotals(final List<T> pageData, final List<Total> totals) {
+        PreparePageParams preparePageParams = new PreparePageParams();
+        _initPreparedTotals(preparePageParams, totals);
         for (T bean : pageData){
-            for(Total total : totals)
-                _processCurrentRecordOnTotals(result, bean, total);
+            for(Total total : preparePageParams.preparedTotals)
+                _processCurrentRecordOnTotals(preparePageParams.preparedTotals, bean, total);
         }
-        return result;
+        return preparePageParams.preparedTotals;
+    }
+    private static <T> BeansPage<T> _calcTotals(final BeansPage<T> page, final List<Total> totals) {
+        PreparePageParams preparePageParams = new PreparePageParams();
+        preparePageParams.preparedTotals = page.getTotals();
+        _initPreparedTotals(preparePageParams, totals);
+        for (T bean : page.getRows()){
+            for(Total total : preparePageParams.preparedTotals)
+                _processCurrentRecordOnTotals(preparePageParams.preparedTotals, bean, total);
+        }
+        page.setTotals(preparePageParams.preparedTotals);
+        Total couner = page.getTotals().stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(null);
+        page.setTotalCount(couner != null ? Converter.toType(couner.getFact(), long.class) : 0L);
+        return page;
     }
 
     /***
@@ -238,7 +254,7 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadAllParams(filter, sort, totals, context, cursor);
+        PreparePageParams prepareLoadPageResult = _prepareLoadAllParams(filter, sort, totals, context, cursor);
         prepareLoadPageResult.preparedParams = params;
         return _calcTotals(readStoreData(prepareLoadPageResult, context, cursor, beanType), totals);
     }
@@ -341,7 +357,7 @@ public class CrudReaderApi {
         if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        BeansPage<ABean> page = readStoreData(new PrepareLoadPageResult(params), context, cursor, ABean.class);
+        BeansPage<ABean> page = readStoreData(new PreparePageParams(params), context, cursor, ABean.class);
 
         HSSFWorkbook wb = null;
         if(page != null && page.getRows() != null && page.getRows().size() > 0) {
@@ -410,7 +426,7 @@ public class CrudReaderApi {
             throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-        return readStoreData(new PrepareLoadPageResult(params), context, cursor, beanType);
+        return readStoreData(new PreparePageParams(params), context, cursor, beanType);
     }
 
     private static <T> List<T> readStoreDataExt(
@@ -467,23 +483,33 @@ public class CrudReaderApi {
         return readStoreDataExt(params, context, cursorDef, CrudOptions.builder().build(), beanType);
     }
 
-    private static class PrepareLoadPageResult {
+    private static class PreparePageParams {
         private List<Param> preparedParams;
         private List<Total> preparedTotals;
 
-        public PrepareLoadPageResult() {
+        public PreparePageParams() {
 
         }
-        public PrepareLoadPageResult(List<Param> params, List<Total> totals) {
+        public PreparePageParams(List<Param> params, List<Total> totals) {
             preparedParams = params;
             preparedTotals = totals;
         }
-        public PrepareLoadPageResult(List<Param> params) {
+        public PreparePageParams(List<Param> params) {
             preparedParams = params;
         }
     }
 
-    private static PrepareLoadPageResult _prepareLoadPageParams(
+    private static void _initPreparedTotals(PreparePageParams preparePageParams, List<Total> totals) {
+        if(preparePageParams.preparedTotals == null)
+            preparePageParams.preparedTotals = new ArrayList<>();
+
+        if(totals != null) {
+            for (Total total : totals)
+                _addTotal2Totals(preparePageParams.preparedTotals, total);
+        }
+    }
+
+    private static PreparePageParams _prepareLoadPageParams(
             final List<Param> params,
             final Filter filter,
             final List<Sort> sort,
@@ -495,7 +521,7 @@ public class CrudReaderApi {
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
 
-        PrepareLoadPageResult result = new PrepareLoadPageResult(Paramus.createParams(params));
+        PreparePageParams result = new PreparePageParams(Paramus.createParams(params));
 
         final Object location = Paramus.paramValue(result.preparedParams, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
         final long paginationOffset = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
@@ -509,11 +535,7 @@ public class CrudReaderApi {
         final long paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, long.class);
 
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        result.preparedTotals = new ArrayList<>();
-        if(totals != null) {
-            for (Total total : totals)
-                _addTotal2Totals(result.preparedTotals, total);
-        }
+        _initPreparedTotals(result, totals);
         boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() != Total.Aggrigate.UNDEFINED);
         if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
             result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(paginationTotalcount).build());
@@ -570,7 +592,7 @@ public class CrudReaderApi {
         return result;
     }
 
-    private static PrepareLoadPageResult _prepareLoadAllParams(
+    private static PreparePageParams _prepareLoadAllParams(
             final Filter filter,
             final List<Sort> sort,
             final List<Total> totals,
@@ -585,8 +607,8 @@ public class CrudReaderApi {
             localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
 
-        PrepareLoadPageResult result = new PrepareLoadPageResult();
-        result.preparedTotals = totals != null ? totals : new ArrayList<>();
+        PreparePageParams result = new PreparePageParams();
+        _initPreparedTotals(result, totals);
         if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
             result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(0L).build());
         return result;
@@ -611,7 +633,7 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final Class<T> beanType) {
-        PrepareLoadPageResult prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, null, context, cursor, false);
+        PreparePageParams prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, null, context, cursor, false);
         return readStoreDataExt(params, context, cursor, beanType);
     }
 
