@@ -41,12 +41,12 @@ public class WrappedRequest extends HttpServletRequestWrapper {
     public WrappedRequest(final HttpServletRequest request) {
         super(request);
         ServletContextHolder.setServletContext(request.getServletContext());
-        httpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
+        HttpParamMap defaultHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
+        httpParamMap = defaultHttpParamMap.getOverride() != null ? defaultHttpParamMap.getOverride() : defaultHttpParamMap;
         modParameters = new TreeMap<>();
         appendParams(request.getParameterMap());
         modHeaders = new HashMap();
         appendHeaders(request);
-        //bioQueryParams = decodeBioQueryParams((HttpServletRequest)this.getRequest());
         bioQueryParams = decodeBioQueryParams(this);
     }
 

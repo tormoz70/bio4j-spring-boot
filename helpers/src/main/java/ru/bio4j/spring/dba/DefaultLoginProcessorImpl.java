@@ -26,24 +26,16 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
     @Qualifier("default")
     private SecurityService defaultSecurityService;
 
-    @Autowired(required = false)
-    @Qualifier("override")
-    private SecurityService overridenSecurityService;
-
     @Autowired
     @Qualifier("default")
     private ErrorProcessor defaultErrorProcessor;
 
-    @Autowired(required = false)
-    @Qualifier("override")
-    private ErrorProcessor overridenErrorProcessor;
-
     private SecurityService getSecurityService() {
-        return overridenSecurityService != null ? overridenSecurityService : defaultSecurityService;
+        return defaultSecurityService.getOverride() != null ? defaultSecurityService.getOverride() : defaultSecurityService;
     }
 
     private ErrorProcessor getErrorProcessor() {
-        return overridenErrorProcessor != null ? overridenErrorProcessor : defaultErrorProcessor;
+        return defaultErrorProcessor.getOverride() != null ? defaultErrorProcessor.getOverride() : defaultErrorProcessor;
     }
 
     private BioQueryParams decodeQParams(final HttpServletRequest request) {

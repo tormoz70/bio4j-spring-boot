@@ -19,7 +19,7 @@ import ru.bio4j.spring.commons.converter.Types;
 import ru.bio4j.spring.model.transport.BioQueryParams;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.model.transport.RestParamNames;
+import ru.bio4j.spring.model.transport.Rest2sqlParamNames;
 import ru.bio4j.spring.commons.utils.*;
 
 /**
@@ -717,13 +717,13 @@ public class Paramus implements Closeable {
     public static void setQueryParamsToBioParams(BioQueryParams qprms) {
         if(qprms.bioParams == null)
             qprms.bioParams = new ArrayList<>();
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.PAGINATION_PARAM_PAGE, qprms.page, MetaType.INTEGER);
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, qprms.pageSize, MetaType.INTEGER);
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.PAGINATION_PARAM_OFFSET, qprms.offset, MetaType.INTEGER);
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, qprms.totalCount);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGE, qprms.page, MetaType.INTEGER);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, qprms.pageSize, MetaType.INTEGER);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, qprms.offset, MetaType.INTEGER);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, qprms.totalCount);
 //        Paramus.setParamValue(qprms.bioParams, RestParamNames.GETROW_PARAM_PKVAL, qprms.id);
 //        Paramus.setParamValue(qprms.bioParams, RestParamNames.RAPI_PARAM_FILEHASHCODE, qprms.fileHashCode);
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.QUERY_PARAM_VALUE, qprms.query);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.QUERY_PARAM_VALUE, qprms.query);
         Object location = qprms.location;
         if (location != null && location instanceof String) {
             if (((String) location).startsWith("1||"))
@@ -731,9 +731,9 @@ public class Paramus implements Closeable {
             if (((String) location).startsWith("0||")) {
                 location = Regexs.find((String) location, "(?<=0\\|\\|)(\\w|\\d|-|\\+)+", Pattern.CASE_INSENSITIVE);
             }
-            Paramus.setParamValue(qprms.bioParams, RestParamNames.LOCATE_PARAM_PKVAL, location);
+            Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.LOCATE_PARAM_PKVAL, location);
         }
-        Paramus.setParamValue(qprms.bioParams, RestParamNames.LOCATE_PARAM_STARTFROM, qprms.offset);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.LOCATE_PARAM_STARTFROM, qprms.offset);
     }
 
 }

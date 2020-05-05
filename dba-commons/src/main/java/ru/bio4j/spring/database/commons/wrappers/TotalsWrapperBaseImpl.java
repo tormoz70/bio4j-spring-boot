@@ -3,6 +3,7 @@ package ru.bio4j.spring.database.commons.wrappers;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.utils.Lists;
 import ru.bio4j.spring.commons.utils.Strings;
+import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.TotalsWrapper;
 import ru.bio4j.spring.database.api.WrapperInterpreter;
 import ru.bio4j.spring.database.commons.AbstractWrapper;
@@ -31,7 +32,7 @@ public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrap
             if(fields != null && fields.size() > 0) {
                 List<Total> notFound = new ArrayList<>();
                 for (Total t : totals) {
-                    if(t.getAggrigate() == Total.Aggrigate.COUNT) {
+                    if(t.getAggregate() == Total.Aggregate.COUNT) {
                         t.setFieldName("*");
                         t.setFieldType(long.class);
                         continue;
@@ -42,8 +43,8 @@ public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrap
                             t.setFieldName(fldDef.getName());
                             if(t.getFieldType() == null)
                                 t.setFieldType(fldDef.getMetaType() != MetaType.UNDEFINED ? MetaTypeConverter.write(fldDef.getMetaType()) : double.class);
-                            if (t.getAggrigate() == Total.Aggrigate.UNDEFINED && fldDef.getAggrigate() != Total.Aggrigate.UNDEFINED)
-                                t.setAggrigate(fldDef.getAggrigate());
+                            if (t.getAggregate() == Total.Aggregate.UNDEFINED && fldDef.getAggregate() != Total.Aggregate.UNDEFINED)
+                                t.setAggregate(fldDef.getAggregate());
                         } else
                             notFound.add(t);
                     } else
@@ -52,10 +53,10 @@ public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrap
                 for (Total t : notFound)
                     totals.remove(t);
                 for(Field field : fields){
-                    if(field.getAggrigate() != Total.Aggrigate.UNDEFINED) {
+                    if(Utl.nvl(field.getAggregate(), Total.Aggregate.UNDEFINED) != Total.Aggregate.UNDEFINED) {
                         Total exists = totals.stream().filter(f -> Strings.compare(f.getFieldName(), field.getName(), true) || Strings.compare(f.getFieldName(), field.getAttrName(), true)).findFirst().orElse(null);
                         if(exists == null)
-                            totals.add(Total.builder().fieldName(field.getName()).aggrigate(field.getAggrigate()).build());
+                            totals.add(Total.builder().fieldName(field.getName()).aggrigate(field.getAggregate()).build());
                     }
                 }
             }

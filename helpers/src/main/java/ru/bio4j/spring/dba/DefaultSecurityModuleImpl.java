@@ -2,6 +2,8 @@ package ru.bio4j.spring.dba;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.bio4j.spring.commons.types.SecurityService;
 import ru.bio4j.spring.model.transport.*;
 
@@ -10,6 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 
 public class DefaultSecurityModuleImpl implements SecurityService {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSecurityModuleImpl.class);
+
+    @Autowired(required = false)
+    @Qualifier("override")
+    private SecurityService overrideSecurityService;
 
     @Override
     public boolean checkPathIsOpened(HttpServletRequest request) { return true; }
@@ -36,6 +42,11 @@ public class DefaultSecurityModuleImpl implements SecurityService {
     @Override
     public boolean loggedin(final BioQueryParams qprms) {
         return false;
+    }
+
+    @Override
+    public SecurityService getOverride() {
+        return overrideSecurityService;
     }
 
     @Override

@@ -7,20 +7,32 @@ public class Total {
 
     public static final String TOTALCOUNT_FIELD_NAME = "TOTAL_COUNTER_SFIELD";
 
-    public enum Aggrigate {
+    public enum Aggregate {
         UNDEFINED, COUNT, SUM, AVG, MAX, MIN;
     }
 
-    private Total(String fieldName, Aggrigate aggrigate, Class<?> fieldType, Object fact) {
+    private Total(String fieldName, Aggregate aggregate, Class<?> fieldType, Object fact) {
         this.fieldName = fieldName;
-        this.aggrigate = aggrigate;
+        this.aggregate = aggregate;
         this.fieldType = fieldType;
         this.fact = fact;
     }
 
+    /**
+     * Имя поля, по которому необходимо вычислить агрегат
+     */
     private String fieldName;
-    private Aggrigate aggrigate;
+    /**
+     * Агрегат
+     */
+    private Aggregate aggregate;
+    /**
+     * Тип возвращаемого значения
+     */
     private Class<?> fieldType;
+    /**
+     * Значение
+     */
     private Object fact;
 
     public String getFieldName() {
@@ -30,11 +42,11 @@ public class Total {
         this.fieldName = fieldName;
     }
 
-    public Aggrigate getAggrigate() {
-        return aggrigate;
+    public Aggregate getAggregate() {
+        return aggregate;
     }
-    public void setAggrigate(Aggrigate aggrigate) {
-        this.aggrigate = aggrigate;
+    public void setAggregate(Aggregate aggregate) {
+        this.aggregate = aggregate;
     }
     public Class<?> getFieldType() {
         return fieldType;
@@ -51,7 +63,7 @@ public class Total {
 
     public static class Builder {
         private String fieldName;
-        private Aggrigate aggrigate = Aggrigate.COUNT;
+        private Aggregate aggregate = Aggregate.COUNT;
         private Class<?> fieldType;
         private Object fact;
 
@@ -59,8 +71,8 @@ public class Total {
             fieldName = value;
             return this;
         }
-        public Builder aggrigate(Aggrigate value) {
-            aggrigate = value;
+        public Builder aggrigate(Aggregate value) {
+            aggregate = value;
             return this;
         }
         public Builder fieldType(Class<?> value) {
@@ -72,7 +84,7 @@ public class Total {
             return this;
         }
         public Total build() {
-            return new Total(fieldName, aggrigate, fieldType, fact);
+            return new Total(fieldName, aggregate, fieldType, fact);
         }
     }
 

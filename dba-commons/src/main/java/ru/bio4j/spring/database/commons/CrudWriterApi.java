@@ -55,7 +55,7 @@ public class CrudWriterApi {
             Class<?> pkClazz = MetaTypeConverter.write(pkField.getMetaType());
             for(ABean bean : rows){
                 Object pkvalue = ABeans.extractAttrFromBean(bean, pkFieldName, pkClazz, null);
-                Paramus.setParamValue(prms, RestParamNames.GETROW_PARAM_PKVAL, pkvalue);
+                Paramus.setParamValue(prms, Rest2sqlParamNames.GETROW_PARAM_PKVAL, pkvalue);
                 BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, ctx, cursor, ABean.class);
                 if(pg.getRows().size() > 0)
                     Utl.applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
@@ -83,7 +83,7 @@ public class CrudWriterApi {
             try {
                 cmd.init(ctx.getCurrentConnection(), sqlDef);
                 for (Object id : ids) {
-                    Param prm = Paramus.getParam(cmd.getParams(), RestParamNames.DELETE_PARAM_PKVAL);
+                    Param prm = Paramus.getParam(cmd.getParams(), Rest2sqlParamNames.DELETE_PARAM_PKVAL);
                     if (prm == null)
                         prm = cmd.getParams().size() > 0 ? cmd.getParams().get(0) : null;
                     if (prm != null) {

@@ -130,16 +130,16 @@ public class ChWrapperInterpreter implements WrapperInterpreter {
         if(totals != null) {
             StringBuilder result = new StringBuilder();
             String comma;
-            Total.Aggrigate aggrigate;
+            Total.Aggregate aggregate;
             for (Total t : totals){
                 comma = (result.length() == 0) ? "" : ", ";
                 final String fieldName = t.getFieldName();
-                aggrigate = t.getAggrigate();
-                if(aggrigate != Total.Aggrigate.UNDEFINED) {
-                    if(aggrigate == Total.Aggrigate.COUNT)
+                aggregate = t.getAggregate();
+                if(aggregate != Total.Aggregate.UNDEFINED) {
+                    if(aggregate == Total.Aggregate.COUNT)
                         result.append(String.format("%sCOUNT(1) as %s", comma, Total.TOTALCOUNT_FIELD_NAME));
                     else
-                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggrigate.name(), alias, fieldName, fieldName.toUpperCase()));
+                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggregate.name(), alias, fieldName, fieldName.toUpperCase()));
                 }
             }
             return result.toString();

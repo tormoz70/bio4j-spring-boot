@@ -10,12 +10,20 @@ import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
 import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.commons.utils.Utl;
+import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.SelectSQLDef;
+import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.model.transport.ABean;
+import ru.bio4j.spring.model.transport.BeansPage;
+import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Field;
+import ru.bio4j.spring.model.transport.jstore.Sort;
+import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,5 +176,6 @@ public class ExcelBuilderImpl implements ExcelBuilder {
         SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         return toExcel(rows, sqlDefinition);
     }
+
 
 }

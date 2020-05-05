@@ -55,6 +55,7 @@ public class DbaAutoConfiguration {
     }
 
     @Bean
+    @Qualifier("default")
     public HttpParamMap httpParamMap() {
         return new DefaultHttpParamMapImpl();
     }
@@ -89,5 +90,10 @@ public class DbaAutoConfiguration {
     @Bean
     public Sso2Client sso2Client() {
         return new Sso2ClientImpl(sso2ClientProperties);
+    }
+
+    @Bean
+    public ExcelBuilder excelBuilder() {
+        return new ExcelBuilderImpl();
     }
 }

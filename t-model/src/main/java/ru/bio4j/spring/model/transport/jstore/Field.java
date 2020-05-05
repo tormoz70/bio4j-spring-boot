@@ -76,7 +76,7 @@ public class Field {
 
 
     /** Агригруемое поле */
-    private Total.Aggrigate aggrigate;
+    private Total.Aggregate aggregate;
 
     @Override
     public String toString() {
@@ -274,11 +274,11 @@ public class Field {
         this.textLocality = textLocality;
     }
 
-    public Total.Aggrigate getAggrigate() {
-        return aggrigate;
+    public Total.Aggregate getAggregate() {
+        return aggregate;
     }
 
-    public void setAggrigate(Total.Aggrigate aggrigate) {
-        this.aggrigate = aggrigate;
+    public void setAggregate(Total.Aggregate aggregate) {
+        this.aggregate = aggregate;
     }
 }

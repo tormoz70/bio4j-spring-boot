@@ -295,6 +295,21 @@
                                                     <xs:documentation>ѕри сохранении поле должно быть заполнено об€зательно</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="aggregate">
+                                                <xs:annotation>
+                                                    <xs:documentation>¬ычисл€ть агрегат</xs:documentation>
+                                                </xs:annotation>
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:NMTOKEN">
+                                                        <xs:enumeration value="UNDEFINED"/>
+                                                        <xs:enumeration value="COUNT"/>
+                                                        <xs:enumeration value="SUM"/>
+                                                        <xs:enumeration value="AVG"/>
+                                                        <xs:enumeration value="MAX"/>
+                                                        <xs:enumeration value="MIN"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
+                                            </xs:attribute>
                                         </xs:extension>
                                     </xs:simpleContent>
                                 </xs:complexType>

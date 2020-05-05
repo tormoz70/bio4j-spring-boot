@@ -17,9 +17,7 @@ import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.*;
-import java.util.Date;
 
 public class SQLFactoryTest {
 
@@ -178,11 +176,11 @@ public class SQLFactoryTest {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
             List<Total> totals = new ArrayList<>();
-            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.SUM).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MIN).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MAX).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(double.class).build());
             BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, totals, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(false)
@@ -194,7 +192,7 @@ public class SQLFactoryTest {
             Assert.assertEquals(1, rst.getPaginationPage());
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(50, rst.getPaginationPageSize());
-            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggrigate() == Total.Aggrigate.COUNT).findFirst().get().getFact());
+            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggregate() == Total.Aggregate.COUNT).findFirst().get().getFact());
             Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
         } catch (Exception ex) {
             LOG.error("Error!", ex);
@@ -208,18 +206,18 @@ public class SQLFactoryTest {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
             List<Total> totals = new ArrayList<>();
-            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.SUM).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MIN).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggrigate.MAX).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(double.class).build());
             BeansPage<ABean> rst = CrudReaderApi.loadAll(null, null, null, totals, context, sqlDefinition, null, ABean.class);
             Assert.assertEquals(100L, rst.getTotalCount());
             Assert.assertEquals(100L, rst.getPaginationCount());
             Assert.assertEquals(0, rst.getPaginationPage());
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(0, rst.getPaginationPageSize());
-            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggrigate() == Total.Aggrigate.COUNT).findFirst().get().getFact());
+            Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggregate() == Total.Aggregate.COUNT).findFirst().get().getFact());
             Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
         } catch (Exception ex) {
             LOG.error("Error!", ex);

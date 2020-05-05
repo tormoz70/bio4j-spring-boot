@@ -4,4 +4,8 @@ import javax.servlet.ServletResponse;
 
 public interface ErrorProcessor {
     void doResponse(Exception exception, ServletResponse response);
+
+    default ErrorProcessor getOverride() {
+        return null;
+    }
 }

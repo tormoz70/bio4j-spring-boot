@@ -13,4 +13,8 @@ public interface SecurityService {
     User login(final BioQueryParams qprms);
     void logout(final BioQueryParams qprms);
     boolean loggedin(final BioQueryParams qprms);
+
+    default SecurityService getOverride() {
+        return null;
+    }
 }

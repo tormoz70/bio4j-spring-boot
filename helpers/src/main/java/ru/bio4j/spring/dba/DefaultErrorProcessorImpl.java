@@ -1,5 +1,7 @@
 package ru.bio4j.spring.dba;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.bio4j.spring.commons.types.ErrorProcessor;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Utl;
@@ -15,6 +17,11 @@ import javax.ws.rs.core.Response;
 import java.util.function.Function;
 
 public class DefaultErrorProcessorImpl implements ErrorProcessor {
+
+    @Autowired(required = false)
+    @Qualifier("override")
+    private ErrorProcessor overrideErrorProcessor;
+
 
     public static class ErrorResponseEntry {
         public int code;
@@ -78,6 +85,11 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
         } catch (Exception e) {
             throw BioError.wrap(e);
         }
+    }
+
+    @Override
+    public ErrorProcessor getOverride() {
+        return overrideErrorProcessor;
     }
 
 }

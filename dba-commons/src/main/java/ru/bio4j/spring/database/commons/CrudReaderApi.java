@@ -21,7 +21,6 @@ import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 import ru.bio4j.spring.database.api.*;
 
-import javax.annotation.PreDestroy;
 import java.sql.Connection;
 import java.util.*;
 import java.util.function.LongSupplier;
@@ -33,20 +32,20 @@ public class CrudReaderApi {
     private static final int MAX_RECORDS_FETCH_LIMIT = 250000;
 
     private static void preparePkParamValue(final List<Param> params, final Field pkField) {
-        Param pkParam = Paramus.getParam(params, RestParamNames.GETROW_PARAM_PKVAL);
+        Param pkParam = Paramus.getParam(params, Rest2sqlParamNames.GETROW_PARAM_PKVAL);
         if(pkParam != null) {
             Object curValue = pkParam.getValue();
             Object newValue = Converter.toType(curValue, MetaTypeConverter.write(pkField.getMetaType()));
             pkParam.setType(pkField.getMetaType());
             pkParam.setValue(newValue);
         }
-        pkParam = Paramus.getParam(params, RestParamNames.LOCATE_PARAM_PKVAL);
+        pkParam = Paramus.getParam(params, Rest2sqlParamNames.LOCATE_PARAM_PKVAL);
         if(pkParam != null) {
             Object curValue = pkParam.getValue();
             Object newValue = Converter.toType(curValue, MetaTypeConverter.write(pkField.getMetaType()));
             pkParam.setValue(newValue);
         }
-        pkParam = Paramus.getParam(params, RestParamNames.DELETE_PARAM_PKVAL);
+        pkParam = Paramus.getParam(params, Rest2sqlParamNames.DELETE_PARAM_PKVAL);
         if(pkParam != null) {
             Object curValue = pkParam.getValue();
             Object newValue = Converter.toType(curValue, MetaTypeConverter.write(pkField.getMetaType()));
@@ -56,7 +55,7 @@ public class CrudReaderApi {
     private static List<Param> preparePkParamValue(final Object pkValue, final Field pkField) {
         List<Param> params = new ArrayList<>();
         Object newValue = Converter.toType(pkValue, MetaTypeConverter.write(pkField.getMetaType()));
-        Paramus.setParamValue(params, RestParamNames.GETROW_PARAM_PKVAL, newValue);
+        Paramus.setParamValue(params, Rest2sqlParamNames.GETROW_PARAM_PKVAL, newValue);
         return params;
     }
 
@@ -69,9 +68,9 @@ public class CrudReaderApi {
         if(LOG.isDebugEnabled())
             LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
         BeansPage result = new BeansPage();
-        final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, long.class, 0L);
-        result.setTotalCount(Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, long.class, 0L));
-        result.setPaginationOffset(Paramus.paramValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L));
+        final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, long.class, 0L);
+        result.setTotalCount(Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, long.class, 0L));
+        result.setPaginationOffset(Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L));
         if(crudOptions.isAppendMetadata()) result.setMetadata(cursorDef.getFields());
         result.setRows(readStoreDataExt(prepareLoadPageResult.preparedParams, context, cursorDef, crudOptions, beanType));
         result.setTotals(prepareLoadPageResult.preparedTotals);
@@ -80,7 +79,7 @@ public class CrudReaderApi {
         result.setPaginationPage(paginationPagesize > 0 ? (int)Math.floor(result.getPaginationOffset() / paginationPagesize) + 1 : 0);
         if(result.getRows().size() < paginationPagesize) {
             result.setTotalCount(result.getPaginationOffset() + result.getRows().size());
-            Paramus.setParamValue(prepareLoadPageResult.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, result.getTotalCount());
+            Paramus.setParamValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, result.getTotalCount());
         }
         return result;
     }
@@ -100,7 +99,7 @@ public class CrudReaderApi {
 
     private static void _addTotal2Totals(List<Total> totals, Total total) {
         Total foundTotal = totals.stream().filter(f -> {
-            return (total.getAggrigate() == Total.Aggrigate.COUNT && f.getAggrigate() == Total.Aggrigate.COUNT) ||
+            return (total.getAggregate() == Total.Aggregate.COUNT && f.getAggregate() == Total.Aggregate.COUNT) ||
                     Strings.compare(total.getFieldName(), f.getFieldName(), true);
         }).findFirst().orElse(null);
         if(foundTotal != null) {
@@ -124,7 +123,7 @@ public class CrudReaderApi {
             for (Total total : totals) {
                 _addTotal2Totals(totals, total);
                 total.setFact(ABeans.extractAttrFromBean(totalsBean,
-                        total.getAggrigate() == Total.Aggrigate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
+                        total.getAggregate() == Total.Aggregate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
                         total.getFieldType(), null));
             }
         }, user);
@@ -185,7 +184,7 @@ public class CrudReaderApi {
     }
 
     private static <T> void _processCurrentRecordOnTotals(final List<Total> pageTotals, final T bean, final Total total) {
-        if(total.getAggrigate() != Total.Aggrigate.COUNT) {
+        if(total.getAggregate() != Total.Aggregate.COUNT) {
             String field = total.getFieldName();
             double value;
             if (bean instanceof HashMap)
@@ -196,7 +195,7 @@ public class CrudReaderApi {
             if(rsTotal == null) {
                 rsTotal = Total.builder()
                         .fieldName(total.getFieldName())
-                        .aggrigate(total.getAggrigate())
+                        .aggrigate(total.getAggregate())
                         .fieldType(total.getFieldType())
                         .fact(Converter.toType(0D, total.getFieldType()))
                         .build();
@@ -204,9 +203,9 @@ public class CrudReaderApi {
             double newValue = Converter.toType(rsTotal.getFact(), double.class) + value;
             rsTotal.setFact(Converter.toType(newValue, total.getFieldType()));
         } else {
-            Total rsTotal = pageTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(null);
+            Total rsTotal = pageTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(null);
             if(rsTotal == null) {
-                rsTotal = Total.builder().fieldName("*").aggrigate(Total.Aggrigate.COUNT).fieldType(long.class).fact(0L).build();
+                rsTotal = Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).fact(0L).build();
                 pageTotals.add(rsTotal);
             }
             rsTotal.setFact(Converter.toType(rsTotal.getFact(), long.class) + 1L);
@@ -231,7 +230,7 @@ public class CrudReaderApi {
                 _processCurrentRecordOnTotals(preparePageParams.preparedTotals, bean, total);
         }
         page.setTotals(preparePageParams.preparedTotals);
-        Total couner = page.getTotals().stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(null);
+        Total couner = page.getTotals().stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(null);
         page.setTotalCount(couner != null ? Converter.toType(couner.getFact(), long.class) : 0L);
         return page;
     }
@@ -259,120 +258,117 @@ public class CrudReaderApi {
         return _calcTotals(readStoreData(prepareLoadPageResult, context, cursor, beanType), totals);
     }
 
-    private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
-        HSSFCellStyle rslt = wb.createCellStyle();
-        HSSFFont headerFont = wb.createFont();
-        headerFont.setFontHeightInPoints((short)12);
-        headerFont.setBold(true);
-        rslt.setFont(headerFont);
-        rslt.setAlignment(HorizontalAlignment.CENTER);
-        rslt.setVerticalAlignment(VerticalAlignment.CENTER);
-        rslt.setBorderBottom(BorderStyle.THIN);
-        rslt.setBorderLeft(BorderStyle.THIN);
-        rslt.setBorderRight(BorderStyle.THIN);
-        rslt.setBorderTop(BorderStyle.THIN);
-        rslt.setLocked(true);
-        rslt.setWrapText(true);
-        return rslt;
-    }
-
-    private static Map<String, HSSFCellStyle> createRowStyle(HSSFWorkbook wb, SelectSQLDef sqlDef) {
-        Map<String, HSSFCellStyle> rslt = new HashMap<>();
-        HSSFCellStyle style = wb.createCellStyle();
-        HSSFFont cellFont = wb.createFont();
-        cellFont.setFontHeightInPoints((short) 10);
-        style.setFont(cellFont);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setWrapText(true);
-        rslt.put("RNUM", style);
-        for (Field fld : sqlDef.getFields()) {
-            style = wb.createCellStyle();
-            style.setFont(cellFont);
-            style.setAlignment(HorizontalAlignment.CENTER);
-            HorizontalAlignment ha = Enum.valueOf(HorizontalAlignment.class, fld.getAlign().name().toUpperCase());
-            if(ha != null)
-                style.setAlignment(ha);
-            style.setVerticalAlignment(VerticalAlignment.CENTER);
-            style.setBorderBottom(BorderStyle.THIN);
-            style.setBorderLeft(BorderStyle.THIN);
-            style.setBorderRight(BorderStyle.THIN);
-            style.setBorderTop(BorderStyle.THIN);
-            style.setWrapText(true);
-            rslt.put(fld.getName(), style);
-        }
-        return rslt;
-    }
-
-    private static void addHeader(HSSFSheet ws, SelectSQLDef sqlDef) {
-        if(sqlDef != null && sqlDef.getFields()!= null && sqlDef.getFields().size() > 0) {
-            HSSFRow r = ws.createRow(0);
-            int celNum = 0;
-            HSSFCell cellRNUM = r.createCell(celNum);
-            cellRNUM.setCellValue("№ пп");
-            HSSFCellStyle headerStyle = createHeaderStyle(ws.getWorkbook());
-            cellRNUM.setCellStyle(headerStyle);
-            celNum++;
-            for (Field fld : sqlDef.getFields()) {
-                if(fld.getExpEnabled()){
-                    HSSFCell c = r.createCell(celNum);
-                    int colWidth = Converter.toType(fld.getExpWidth(), int.class);
-                    if(colWidth == 0) colWidth = 4700;
-                    ws.setColumnWidth(celNum, colWidth);
-                    c.setCellStyle(headerStyle);
-                    c.setCellValue(Utl.nvl(fld.getTitle(), Utl.nvl(fld.getAttrName(), fld.getName())));
-                    celNum++;
-                }
-            }
-        }
-    }
-
-    private static void addRow(HSSFSheet ws, Map<String, HSSFCellStyle> rowStyles, SelectSQLDef sqlDef, int rowNum, ABean rowData) {
-        HSSFRow r = ws.createRow(rowNum);
-        int celNum = 0;
-        HSSFCell cellRNUM = r.createCell(celNum);
-        cellRNUM.setCellValue(rowNum);
-        cellRNUM.setCellStyle(rowStyles.get("RNUM"));
-        celNum++;
-        for (Field fld : sqlDef.getFields()) {
-            if (fld.getExpEnabled()) {
-                HSSFCell c = r.createCell(celNum);
-                c.setCellStyle(rowStyles.get(fld.getName()));
-                c.setCellValue(ABeans.extractAttrFromBean(rowData, Utl.nvl(fld.getAttrName(), fld.getName()), String.class, null));
-                celNum++;
-            }
-        }
-    }
-
-    public static HSSFWorkbook toExcel(final List<Param> params, final Filter filter, final List<Sort> sort, final SQLContext context, final SQLDefinition cursor) {
-        Connection connTest = context.getCurrentConnection();
-        if (connTest == null)
-            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
-        BeansPage<ABean> page = readStoreData(new PreparePageParams(params), context, cursor, ABean.class);
-
-        HSSFWorkbook wb = null;
-        if(page != null && page.getRows() != null && page.getRows().size() > 0) {
-            wb = new HSSFWorkbook();
-            HSSFSheet ws = wb.createSheet();
-            addHeader(ws, cursor.getSelectSqlDef());
-            Map<String, HSSFCellStyle> rowStyles = createRowStyle(wb, cursor.getSelectSqlDef());
-            int rowNum = 1;
-            for (ABean bean : page.getRows()) {
-                addRow(ws, rowStyles, cursor.getSelectSqlDef(), rowNum, bean);
-                rowNum++;
-            }
-        }
-        return wb;
-    }
+//    private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
+//        HSSFCellStyle rslt = wb.createCellStyle();
+//        HSSFFont headerFont = wb.createFont();
+//        headerFont.setFontHeightInPoints((short)12);
+//        headerFont.setBold(true);
+//        rslt.setFont(headerFont);
+//        rslt.setAlignment(HorizontalAlignment.CENTER);
+//        rslt.setVerticalAlignment(VerticalAlignment.CENTER);
+//        rslt.setBorderBottom(BorderStyle.THIN);
+//        rslt.setBorderLeft(BorderStyle.THIN);
+//        rslt.setBorderRight(BorderStyle.THIN);
+//        rslt.setBorderTop(BorderStyle.THIN);
+//        rslt.setLocked(true);
+//        rslt.setWrapText(true);
+//        return rslt;
+//    }
+//
+//    private static Map<String, HSSFCellStyle> createRowStyle(HSSFWorkbook wb, SelectSQLDef sqlDef) {
+//        Map<String, HSSFCellStyle> rslt = new HashMap<>();
+//        HSSFCellStyle style = wb.createCellStyle();
+//        HSSFFont cellFont = wb.createFont();
+//        cellFont.setFontHeightInPoints((short) 10);
+//        style.setFont(cellFont);
+//        style.setAlignment(HorizontalAlignment.CENTER);
+//        style.setVerticalAlignment(VerticalAlignment.CENTER);
+//        style.setBorderBottom(BorderStyle.THIN);
+//        style.setBorderLeft(BorderStyle.THIN);
+//        style.setBorderRight(BorderStyle.THIN);
+//        style.setBorderTop(BorderStyle.THIN);
+//        style.setWrapText(true);
+//        rslt.put("RNUM", style);
+//        for (Field fld : sqlDef.getFields()) {
+//            style = wb.createCellStyle();
+//            style.setFont(cellFont);
+//            style.setAlignment(HorizontalAlignment.CENTER);
+//            HorizontalAlignment ha = Enum.valueOf(HorizontalAlignment.class, fld.getAlign().name().toUpperCase());
+//            if(ha != null)
+//                style.setAlignment(ha);
+//            style.setVerticalAlignment(VerticalAlignment.CENTER);
+//            style.setBorderBottom(BorderStyle.THIN);
+//            style.setBorderLeft(BorderStyle.THIN);
+//            style.setBorderRight(BorderStyle.THIN);
+//            style.setBorderTop(BorderStyle.THIN);
+//            style.setWrapText(true);
+//            rslt.put(fld.getName(), style);
+//        }
+//        return rslt;
+//    }
+//
+//    private static void addHeader(HSSFSheet ws, SelectSQLDef sqlDef) {
+//        if(sqlDef != null && sqlDef.getFields()!= null && sqlDef.getFields().size() > 0) {
+//            HSSFRow r = ws.createRow(0);
+//            int celNum = 0;
+//            HSSFCell cellRNUM = r.createCell(celNum);
+//            cellRNUM.setCellValue("№ пп");
+//            HSSFCellStyle headerStyle = createHeaderStyle(ws.getWorkbook());
+//            cellRNUM.setCellStyle(headerStyle);
+//            celNum++;
+//            for (Field fld : sqlDef.getFields()) {
+//                if(fld.getExpEnabled()){
+//                    HSSFCell c = r.createCell(celNum);
+//                    int colWidth = Converter.toType(fld.getExpWidth(), int.class);
+//                    if(colWidth == 0) colWidth = 4700;
+//                    ws.setColumnWidth(celNum, colWidth);
+//                    c.setCellStyle(headerStyle);
+//                    c.setCellValue(Utl.nvl(fld.getTitle(), Utl.nvl(fld.getAttrName(), fld.getName())));
+//                    celNum++;
+//                }
+//            }
+//        }
+//    }
+//
+//    private static void addRow(HSSFSheet ws, Map<String, HSSFCellStyle> rowStyles, SelectSQLDef sqlDef, int rowNum, ABean rowData) {
+//        HSSFRow r = ws.createRow(rowNum);
+//        int celNum = 0;
+//        HSSFCell cellRNUM = r.createCell(celNum);
+//        cellRNUM.setCellValue(rowNum);
+//        cellRNUM.setCellStyle(rowStyles.get("RNUM"));
+//        celNum++;
+//        for (Field fld : sqlDef.getFields()) {
+//            if (fld.getExpEnabled()) {
+//                HSSFCell c = r.createCell(celNum);
+//                c.setCellStyle(rowStyles.get(fld.getName()));
+//                c.setCellValue(ABeans.extractAttrFromBean(rowData, Utl.nvl(fld.getAttrName(), fld.getName()), String.class, null));
+//                celNum++;
+//            }
+//        }
+//    }
+//
+//    public static HSSFWorkbook toExcel(final List<Param> params, final Filter filter, final List<Sort> sort, final SQLContext context, final SQLDefinition cursor) {
+//        Connection connTest = context.getCurrentConnection();
+//        if (connTest == null)
+//            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
+//        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
+//        _wrapSqlDefBySorter(sort, cursor, context);
+//        BeansPage<ABean> page = readStoreData(new PreparePageParams(params), context, cursor, ABean.class);
+//
+//        HSSFWorkbook wb = null;
+//        if(page != null && page.getRows() != null && page.getRows().size() > 0) {
+//            wb = new HSSFWorkbook();
+//            HSSFSheet ws = wb.createSheet();
+//            addHeader(ws, cursor.getSelectSqlDef());
+//            Map<String, HSSFCellStyle> rowStyles = createRowStyle(wb, cursor.getSelectSqlDef());
+//            int rowNum = 1;
+//            for (ABean bean : page.getRows()) {
+//                addRow(ws, rowStyles, cursor.getSelectSqlDef(), rowNum, bean);
+//                rowNum++;
+//            }
+//        }
+//        return wb;
+//    }
 
     /***
      * Выпоняет запрос в новой сессии
@@ -509,6 +505,13 @@ public class CrudReaderApi {
         }
     }
 
+    private static void _wrapSqlDefBySorter(final List<Sort> sort, final SQLDefinition cursor, final SQLContext context) {
+        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
+        if (localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
+            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+    }
+
     private static PreparePageParams _prepareLoadPageParams(
             final List<Param> params,
             final Filter filter,
@@ -523,27 +526,28 @@ public class CrudReaderApi {
 
         PreparePageParams result = new PreparePageParams(Paramus.createParams(params));
 
-        final Object location = Paramus.paramValue(result.preparedParams, RestParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
-        final long paginationOffset = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
-        if(Paramus.getParam(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET) == null)
-            Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
-        final long paginationPagesize = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
-        if(Paramus.getParam(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE) == null)
-            Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
+        final Object location = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
+        final long paginationOffset = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
+        if(Paramus.getParam(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET) == null)
+            Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
+        final long paginationPagesize = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
+        if(Paramus.getParam(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE) == null)
+            Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
 
-        final String paginationTotalcountStr = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
+        final String paginationTotalcountStr = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
         final long paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, long.class);
 
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
+
         _initPreparedTotals(result, totals);
-        boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() != Total.Aggrigate.UNDEFINED);
-        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
-            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(paginationTotalcount).build());
+
+        boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggregate() != Total.Aggregate.UNDEFINED);
+        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
+            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(paginationTotalcount).build());
         cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), result.preparedTotals, cursor.getSelectSqlDef().getFields()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if(localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+
+        _wrapSqlDefBySorter(sort, cursor, context);
+
         if (location != null) {
             Field pkField = cursor.getSelectSqlDef().findPk();
             if (pkField == null)
@@ -555,19 +559,19 @@ public class CrudReaderApi {
             cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getPaginationWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
 
         long factOffset = paginationOffset;
-        Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
+        Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
         boolean gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
         if (calcTotals || forceCalcCount || gotoLastPage) {
             result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.getCurrentUser());
-            totalCount = result.preparedTotals.stream().filter(t -> t.getAggrigate() == Total.Aggrigate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
+            totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
             if(gotoLastPage)
                 factOffset = (long) Math.floor((long)totalCount.getFact() / paginationPagesize) * paginationPagesize;
             if(LOG.isDebugEnabled())
                 LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount.getFact());
         }
-        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, factOffset);
-        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount.getFact());
-        long locFactOffset = Paramus.paramValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
+        Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, factOffset);
+        Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount.getFact());
+        long locFactOffset = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
         if (location != null) {
             if(LOG.isDebugEnabled())
                 LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
@@ -583,8 +587,8 @@ public class CrudReaderApi {
                     LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
             }
         }
-        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
-        Paramus.setParamValue(result.preparedParams, RestParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+        Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);
+        Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
         if(params != null) {
             Paramus.applyParams(params, result.preparedParams, false, true);
             result.preparedParams = params;
@@ -602,15 +606,13 @@ public class CrudReaderApi {
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-        List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if (localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+
+        _wrapSqlDefBySorter(sort, cursor, context);
 
         PreparePageParams result = new PreparePageParams();
         _initPreparedTotals(result, totals);
-        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggrigate() == Total.Aggrigate.COUNT))
-            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(0L).build());
+        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
+            result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(0L).build());
         return result;
     }
 

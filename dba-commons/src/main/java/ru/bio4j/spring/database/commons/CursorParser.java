@@ -19,6 +19,7 @@ import ru.bio4j.spring.database.api.SQLDef;
 import ru.bio4j.spring.database.api.SQLType;
 import ru.bio4j.spring.database.api.SelectSQLDef;
 import ru.bio4j.spring.commons.utils.*;
+import ru.bio4j.spring.model.transport.jstore.Total;
 
 import java.io.File;
 import java.io.IOException;
@@ -248,6 +249,7 @@ public class CursorParser {
                 col.setTextLocality(Converter.toType(Doms.getAttribute(paramElem, "textLocality", "UNDEFINED", String.class), Sort.TextLocality.class));
                 col.setTooltip(Doms.getAttribute(paramElem, "tooltip", null, String.class));
                 col.setMandatory(Converter.toType(Doms.getAttribute(paramElem, "mandatory", "false", String.class), boolean.class));
+                col.setAggregate(Converter.toType(Doms.getAttribute(paramElem, "aggregate", "UNDEFINED", String.class), Total.Aggregate.class));
             }
         }
 

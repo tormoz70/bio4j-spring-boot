@@ -5,14 +5,43 @@ import ru.bio4j.spring.model.transport.jstore.Total;
 
 import java.util.List;
 
+/**
+ * Набор данных для возврата клинету
+ * @param <T> - bean описывающий запись
+ */
 public class BeansPage<T> {
+    /**
+     * Строки с данными
+     */
     private List<T> rows;
+    /**
+     * Номер страницы
+     */
     private long paginationPage;
+    /**
+     * Номер первой записи
+     */
     private long paginationOffset;
+    /**
+     * Фактическое кол-во записей на данной странице
+     */
     private long paginationCount;
+    /**
+     * Запрошенный размер страницы
+     */
     private long paginationPageSize;
+    /**
+     * Общее число записей в наборе (если не известно, то здесь будет 999999999)
+     * Реальное значение будет если последняя страница была достигнута, запрошены агрегаты, forceCount=true или запрос вернул все записи
+     */
     private long totalCount;
+    /**
+     * Описание полей
+     */
     private List<Field> metadata;
+    /**
+     * Агрегаты (если запрошено)
+     */
     private List<Total> totals;
 
     public List<T> getRows() {

@@ -6,13 +6,12 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.types.ExcelBuilder;
 import ru.bio4j.spring.commons.types.Paramus;
 //import ru.bio4j.ng.commons.utils.Jsons;
-import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Jecksons;
@@ -33,6 +32,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Адаптер для доступа к базе данных bio4j
+ */
 @Component
 public class DbaAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(DbaAdapter.class);
@@ -40,16 +42,54 @@ public class DbaAdapter {
     @Autowired
     private SQLContext sqlContext;
 
-    private static List<Param>_extractBioParams(final BioQueryParams queryParams) {
+    @Autowired
+    private ExcelBuilder excelBuilder;
+
+    private static List<Param> _extractBioParams(final BioQueryParams queryParams) {
         Paramus.setQueryParamsToBioParams(queryParams);
         return queryParams.bioParams;
     }
 
-    private static List<Param>_extractBioParams(final HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        return _extractBioParams(queryParams);
+    private static FilterAndSorter _createFilterAndSorter(final BioQueryParams queryParams) {
+        FilterAndSorter fs = null;
+        if(!Strings.isNullOrEmpty(queryParams.jsonData)) {
+            try {
+                fs = Jecksons.getInstance().decodeFilterAndSorter(queryParams.jsonData);
+            } catch (Exception e) {
+                if (LOG.isDebugEnabled())
+                    LOG.warn(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
+            }
+        }
+        if(fs == null) {
+            fs = new FilterAndSorter();
+            if(queryParams.sort != null) {
+                fs.setSorter(new ArrayList<>());
+                fs.getSorter().addAll(queryParams.sort);
+            }
+            fs.setFilter(queryParams.filter);
+        }
+        return fs;
     }
-
+    
+    private class  RequestParamsPack {
+        private BioQueryParams queryParams;
+        private List<Param> params;
+        private SQLContext context;
+        private SQLDefinition sqlDefinition;
+        private FilterAndSorter filterAndSorter;
+        private User user;
+    }
+    private RequestParamsPack _parsRequestPack(final String bioCode, final HttpServletRequest request) {
+        RequestParamsPack result = new RequestParamsPack();
+        result.queryParams = ((WrappedRequest)request).getBioQueryParams();
+        result.params = _extractBioParams(result.queryParams);
+        result.context = getSqlContext();
+        result.sqlDefinition = CursorParser.pars(bioCode);
+        result.filterAndSorter = _createFilterAndSorter(result.queryParams);
+        result.user = ((WrappedRequest)request).getUser();
+        return result;
+    }
+    
     private void prepareSQL(SQLDefinition sqlDefinition) {
         SQLContext context = getSqlContext();
         context.execBatch((ctx) -> {
@@ -74,10 +114,16 @@ public class DbaAdapter {
         }, null);
     }
 
+    /**
+     * Возвращает текущий контекст соединения с базой данных
+     */
     public SQLContext getSqlContext() {
         return sqlContext;
     }
 
+    /**
+     * Возвращает оопределение запроса по коду
+     */
     public SQLDefinition getSQLDefinition(String bioCode) {
         SQLDefinition cursor = CursorParser.pars(bioCode);
         if(cursor == null)
@@ -86,6 +132,19 @@ public class DbaAdapter {
         return cursor;
     }
 
+    /**
+     * Выполняет запрос по коду и возвращает структуру @BeansPage
+     * Набор содержит запрошенную страницу.
+     * Параметры пагинации определены в @HttpParamMap
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params параметры запроса
+     * @param user пользователь, для которого будет выполнен запрос (его атрибуты будут переданы в запрос в параметрах p_sys...)
+     * @param filterAndSorter фильтер и сортер
+     * @param totals описание агригатов, которые необходимо вычислить
+     * @param crudOptions доп параметры
+     * @param beanType bean, который описывает запись
+     *
+     */
     public <T> BeansPage<T> loadPage(
             final String bioCode,
             final Object params,
@@ -98,7 +157,7 @@ public class DbaAdapter {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAll(prms,
                     filterAndSorter != null ? filterAndSorter.getFilter() : null,
@@ -112,6 +171,32 @@ public class DbaAdapter {
                     filterAndSorter != null ? filterAndSorter.getSorter() : null,
                     totals, context, sqlDefinition, user, crudOptions, beanType);
     }
+    public <T> BeansPage<T> loadPage(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final List<Total> totals,
+            final Class<T> beanType) {
+        return loadPage(bioCode, params, user, null, totals, CrudOptions.builder().build(), beanType);
+    }
+    public <T> BeansPage<T> loadPage(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final Class<T> beanType) {
+        return loadPage(bioCode, params, user, null, null, CrudOptions.builder().build(), beanType);
+    }
+
+    /**
+     * Выполняет запрос по коду и возвращает структуру @BeansPage
+     * Набор содержит все записи.
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params параметры запроса
+     * @param user пользователь, для которого будет выполнен запрос (его атрибуты будут переданы в запрос в параметрах p_sys...)
+     * @param filterAndSorter фильтер и сортер
+     * @param totals описание агригатов, которые необходимо вычислить
+     * @param beanType bean, который описывает запись
+     */
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
@@ -128,7 +213,6 @@ public class DbaAdapter {
                 filterAndSorter != null ? filterAndSorter.getSorter() : null,
                 totals, context, sqlDefinition, user, beanType);
     }
-
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
@@ -138,7 +222,6 @@ public class DbaAdapter {
     ) {
         return loadAll(bioCode, params, user, filterAndSorter,null, beanType);
     }
-
     public <T> BeansPage<T> loadAll(
             final String bioCode,
             final Object params,
@@ -146,52 +229,55 @@ public class DbaAdapter {
             final Class<T> beanType) {
         return loadAll(bioCode, params, user, null, null, beanType);
     }
+
+
+    /**
+     * Выполняет запрос по коду и возвращает структуру @BeansPage
+     * Набор содержит все записи.
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request запрос
+     * @param totals описание агригатов, которые необходимо вычислить
+     * @param beanType bean, который описывает запись
+     */
     public <T> BeansPage<T> requestAll(
             final String bioCode,
             final HttpServletRequest request,
             final List<Total> totals,
             final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
-        return loadAll(bioCode, params, user, fs, totals, beanType);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return loadAll(bioCode, pax.params, pax.user, pax.filterAndSorter, totals, beanType);
     }
     public <T> BeansPage<T> requestAll(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> beanType) {
-        return loadAll(bioCode, request, null, beanType);
+        return requestAll(bioCode, request, null, beanType);
     }
-
-
-    public <T> BeansPage<T> loadPage(
+    public <T> List<T> requestAllExt(
             final String bioCode,
-            final Object params,
-            final User user,
-            final List<Total> totals,
+            final HttpServletRequest request,
             final Class<T> beanType) {
-        return loadPage(bioCode, params, user, null, totals, CrudOptions.builder().build(), beanType);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return loadAllExt(bioCode, pax.params, pax.user, beanType, pax.filterAndSorter);
     }
 
-    public <T> BeansPage<T> loadPage(
-            final String bioCode,
-            final Object params,
-            final User user,
-            final Class<T> beanType) {
-        return loadPage(bioCode, params, user, null, null, CrudOptions.builder().build(), beanType);
-    }
+
+    /**
+     * Выполняет запрос по коду и возвращает структуру @BeansPage
+     * Набор содержит запрошенную страницу
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request запрос
+     * @param totals описание агригатов, которые необходимо вычислить
+     * @param beanType bean, который описывает запись
+     */
     public <T> BeansPage<T> requestPage(
             final String bioCode,
             final HttpServletRequest request,
             final List<Total> totals,
             final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
-        boolean forceCalcCount = Converter.toType(queryParams.gcount, boolean.class);
-        return loadPage(bioCode, params, user, fs, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        boolean forceCalcCount = Converter.toType(pax.queryParams.gcount, boolean.class);
+        return loadPage(bioCode, pax.params, pax.user, pax.filterAndSorter, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
     }
     public <T> BeansPage<T> requestPage(
             final String bioCode,
@@ -200,36 +286,51 @@ public class DbaAdapter {
         return requestPage(bioCode, request, null, beanType);
     }
 
+    /**
+     * Выполняет запрос по коду
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request запрос
+     * @param beanType тип записи
+     * @param <T>      тип записи
+     * @return один bean типа T
+     */
     public <T> T requestFirstBean(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        return loadFirstBean(bioCode, params, user, beanType);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return loadFirstBean(bioCode, pax.params, pax.user, beanType);
     }
 
+    /**
+     * Подсчитывает общее кол-во записей в наборе данных описанном в запросе bioCode
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request запрос
+     * @return
+     */
     public ABean calcTotalCount(
             final String bioCode,
             final HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        int pageSize = Paramus.paramValue(params, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
         ABean rslt = new ABean();
-        Filter filter = fs != null ? fs.getFilter() : null;
-        sqlDefinition.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(sqlDefinition.getSelectSqlDef().getPreparedSql(), filter, sqlDefinition.getSelectSqlDef().getFields()));
-        Total countDef = Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggrigate.COUNT).fact(0L).build();
-        sqlDefinition.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(sqlDefinition.getSelectSqlDef().getPreparedSql(), Arrays.asList(countDef), sqlDefinition.getSelectSqlDef().getFields()));
-        List<Total> countFact = CrudReaderApi.calcTotalsRemote(Arrays.asList(countDef), params, context, sqlDefinition, user);
+        Filter filter = pax.filterAndSorter != null ? pax.filterAndSorter.getFilter() : null;
+        pax.sqlDefinition.getSelectSqlDef().setPreparedSql(pax.context.getWrappers().getFilteringWrapper().wrap(pax.sqlDefinition.getSelectSqlDef().getPreparedSql(), filter, pax.sqlDefinition.getSelectSqlDef().getFields()));
+        Total countDef = Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(0L).build();
+        pax.sqlDefinition.getSelectSqlDef().setTotalsSql(pax.context.getWrappers().getTotalsWrapper().wrap(pax.sqlDefinition.getSelectSqlDef().getPreparedSql(), Arrays.asList(countDef), pax.sqlDefinition.getSelectSqlDef().getFields()));
+        List<Total> countFact = CrudReaderApi.calcTotalsRemote(Arrays.asList(countDef), pax.params, pax.context, pax.sqlDefinition, pax.user);
         rslt.put("totalCount", countFact.stream().findFirst().get().getFact());
         return rslt;
     }
 
+    /**
+     * Возвращает список бинов
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params параметры SQL-запроса
+     * @param user пользователь
+     * @param beanType тип бина
+     * @param filterAndSorter фильтр и сортер
+     * @return Набор данных содержит запрошенную страницу
+     */
     public <T> List<T> loadPageExt(
             final String bioCode,
             final Object params,
@@ -239,24 +340,12 @@ public class DbaAdapter {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
         else
             return CrudReaderApi.loadPageExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
     }
-    public <T> List<T> loadAllExt(
-            final String bioCode,
-            final Object params,
-            final User user,
-            final Class<T> beanType,
-            final FilterAndSorter filterAndSorter) {
-        final List<Param> prms = DbUtils.decodeParams(params);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
-    }
-
     public <T> List<T> loadPageExt(
             final String bioCode,
             final Object params,
@@ -267,8 +356,42 @@ public class DbaAdapter {
         Param usrParam  = Paramus.getParam(prms, "p_userbean");
         if(usrParam != null)
             user = (User)usrParam.getValue();
-
         return loadPageExt(bioCode, params, user, beanType, filterAndSorter);
+    }
+    public <T> List<T> loadPageExt(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final Class<T> beanType) {
+        return loadPageExt(bioCode, params, user, beanType, null);
+    }
+    public <T> List<T> loadPageExt(
+            final String bioCode,
+            final Object params,
+            final Class<T> beanType) {
+        return loadPageExt(bioCode, params, beanType, null);
+    }
+
+    /**
+     * Возвращает список бинов
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params
+     * @param user
+     * @param beanType
+     * @param filterAndSorter
+     * @param <T>
+     * @return набор содержит все записи
+     */
+    public <T> List<T> loadAllExt(
+            final String bioCode,
+            final Object params,
+            final User user,
+            final Class<T> beanType,
+            final FilterAndSorter filterAndSorter) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
     }
     public <T> List<T> loadAllExt(
             final String bioCode,
@@ -283,27 +406,12 @@ public class DbaAdapter {
 
         return loadAllExt(bioCode, params, user, beanType, filterAndSorter);
     }
-
-    public <T> List<T> loadPageExt(
-            final String bioCode,
-            final Object params,
-            final User user,
-            final Class<T> beanType) {
-        return loadPageExt(bioCode, params, user, beanType, null);
-    }
     public <T> List<T> loadAllExt(
             final String bioCode,
             final Object params,
             final User user,
             final Class<T> beanType) {
         return loadAllExt(bioCode, params, user, beanType, null);
-    }
-
-    public <T> List<T> loadPageExt(
-            final String bioCode,
-            final Object params,
-            final Class<T> beanType) {
-        return loadPageExt(bioCode, params, beanType, null);
     }
     public <T> List<T> loadAllExt(
             final String bioCode,
@@ -312,6 +420,31 @@ public class DbaAdapter {
         return loadAllExt(bioCode, params, beanType, null);
     }
 
+    /**
+     * Возвращает список бинов
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @param beanType
+     * @param <T>
+     * @return набор содержит запрошенную страницу
+     */
+    public <T> List<T> requestPageExt(
+            final String bioCode,
+            final HttpServletRequest request,
+            final Class<T> beanType) {
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return loadPageExt(bioCode, pax.params, pax.user, beanType, pax.filterAndSorter);
+    }
+
+    /**
+     * Возвращает один бин
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params
+     * @param usr
+     * @param beanType
+     * @param <T>
+     * @return первый бин, который вернул запрос к БД
+     */
     public <T> T loadFirstBean(
             final String bioCode,
             final List<Param> params,
@@ -321,7 +454,6 @@ public class DbaAdapter {
         final SQLDefinition cursorDef = CursorParser.pars(bioCode);
         return CrudReaderApi.loadFirstRecordExt(params, context, cursorDef, usr, beanType);
     }
-
     public <T> T loadFirstBean(
             final String bioCode,
             final Filter filter,
@@ -332,66 +464,73 @@ public class DbaAdapter {
         return CrudReaderApi.loadFirstRecordExt(filter, context, cursorDef, usr, beanType);
     }
 
-    public HSSFWorkbook loadToExcel(
+    /**
+     * Возвращает бин по ID
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @param id
+     * @return один бин
+     */
+    public <T> T requestBean(
+            final String bioCode,
+            final HttpServletRequest request,
+            final Object id,
+            final Class<T> beanType) {
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        if(id != null) {
+            Paramus.setParamValue(pax.params, Rest2sqlParamNames.GETROW_PARAM_PKVAL, id, MetaTypeConverter.read(id.getClass()));
+            List<T> rslt = CrudReaderApi.loadRecordExt(pax.params, pax.context, pax.sqlDefinition, pax.user, beanType);
+            if (rslt.size() > 0)
+                return rslt.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * Возвращает все записи по ID
+     * @param bioCode
+     * @param id
+     * @param user
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> loadBean(
+            final String bioCode,
+            final Object id,
+            final User user,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        if(id != null) {
+            return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Выполняет запрос к Бд и экспортирует данные к MSExcel
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @return
+     */
+    public HSSFWorkbook requestExcel(
             final String bioCode,
             final HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDef = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        return context.execBatch((ctx) -> {
-            FilterAndSorter fs = createFilterAndSorter(queryParams);
-            return CrudReaderApi.toExcel(params, fs.getFilter(), fs.getSorter(), ctx, sqlDef);
-        }, user);
-
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        BeansPage<ABean> beansPage = requestAll(bioCode, request, ABean.class);
+        return pax.context.execBatch((ctx) -> {
+            return excelBuilder.toExcel(beansPage.getRows(), bioCode);
+        }, pax.user);
     }
 
-    public <T> List<T> requestPageExt(
-            final String bioCode,
-            final HttpServletRequest request,
-            final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
-        return loadPageExt(bioCode, params, user, beanType, fs);
-    }
 
-    public static FilterAndSorter createFilterAndSorter(final BioQueryParams queryParams) {
-        FilterAndSorter fs = null;
-        if(!Strings.isNullOrEmpty(queryParams.jsonData)) {
-            try {
-                fs = Jecksons.getInstance().decodeFilterAndSorter(queryParams.jsonData);
-            } catch (Exception e) {
-                if (LOG.isDebugEnabled())
-                    LOG.warn(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
-            }
-        }
-        if(fs == null) {
-            fs = new FilterAndSorter();
-            if(queryParams.sort != null) {
-                fs.setSorter(new ArrayList<>());
-                fs.getSorter().addAll(queryParams.sort);
-            }
-            fs.setFilter(queryParams.filter);
-        }
-        return fs;
-    }
-
-    public <T> List<T> requestAllExt(
-            final String bioCode,
-            final HttpServletRequest request,
-            final Class<T> beanType) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
-        final List<Param> params = _extractBioParams(queryParams);
-        final User user = ((WrappedRequest)request).getUser();
-        FilterAndSorter fs = createFilterAndSorter(queryParams);
-        return loadAllExt(bioCode, params, user, beanType, fs);
-    }
-
-    public static ABean getMetadata(
-            final String bioCode) {
+    /**
+     * Возвращает метаданные
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @return
+     */
+    public static ABean getMetadata(final String bioCode) {
         ABean rslt = new ABean();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         StoreMetadata metadata = new StoreMetadata();
@@ -410,79 +549,65 @@ public class DbaAdapter {
         return rslt;
     }
 
-    public static StoreMetadata getMetadataOld(final String bioCode) {
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        StoreMetadata metadata = new StoreMetadata();
-        metadata.setReadonly(sqlDefinition.getReadOnly());
-        metadata.setMultiSelection(sqlDefinition.getMultiSelection());
-        List<Field> fields = sqlDefinition.getFields();
-        metadata.setFields(fields);
-        return metadata;
-    }
-
-    public ABean requestBean(
-            final String bioCode,
-            final HttpServletRequest request,
-            final Object id) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        if(id != null) {
-            Paramus.setParamValue(params, RestParamNames.GETROW_PARAM_PKVAL, id, MetaTypeConverter.read(id.getClass()));
-            List<ABean> rslt = CrudReaderApi.loadRecordExt(params, context, sqlDefinition, user, ABean.class);
-            if (rslt.size() > 0)
-                return rslt.get(0);
-        }
-        return null;
-    }
-
+    /**
+     * Возвращает строку их БД (если json формируется в запросе)
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @return
+     */
     public StringBuilder requestJson(
             final String bioCode,
             final HttpServletRequest request) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        StringBuilder rslt = CrudReaderApi.loadJson(params, context, sqlDefinition, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        StringBuilder rslt = CrudReaderApi.loadJson(pax.params, pax.context, pax.sqlDefinition, pax.user);
         return rslt;
     }
 
+    /**
+     * Сохраняет данные в БД (вызывает процедуру описанную в bioCode для каждой записи)
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @param rows
+     * @return
+     */
     public List<ABean> storeBeans(
             final String bioCode,
             final HttpServletRequest request,
             final List<ABean> rows) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        List<ABean> rslt = CrudWriterApi.saveRecords(params, rows, context, sqlDefinition, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        List<ABean> rslt = CrudWriterApi.saveRecords(pax.params, rows, pax.context, pax.sqlDefinition, pax.user);
         return rslt;
     }
+
+    /**
+     * Удалает записи по списку идентификаторов
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @param ids
+     * @return
+     */
     public ABean deleteBeans(
             final String bioCode,
             final HttpServletRequest request,
             final List<Object> ids) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        int affected = CrudWriterApi.deleteRecords(params, ids, context, sqlDefinition, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        int affected = CrudWriterApi.deleteRecords(pax.params, ids, pax.context, pax.sqlDefinition, pax.user);
         ABean rslt = new ABean();
         rslt.put("deleted", affected);
         return rslt;
     }
 
+    /**
+     * Выполняет процедуру
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     */
     public void exec(
             final String bioCode,
             final HttpServletRequest request) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        CrudWriterApi.execSQL(params, context, sqlDefinition, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        CrudWriterApi.execSQL(pax.params, pax.context, pax.sqlDefinition, pax.user);
     }
-
     public void exec(
             final String bioCode,
             final Object params,
@@ -492,16 +617,22 @@ public class DbaAdapter {
         CrudWriterApi.execSQL(params, context, sqlDefinition, user);
     }
 
+    /**
+     * Выполняет скалярный запрос к БД
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param request
+     * @param clazz
+     * @param defaultValue
+     * @param <T>
+     * @return значние типа T
+     */
     public <T> T requestScalar(
             final String bioCode,
             final HttpServletRequest request,
             final Class<T> clazz,
             final T defaultValue) {
-        final List<Param> params = _extractBioParams(request);
-        final User user = ((WrappedRequest)request).getUser();
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        return CrudReaderApi.selectScalar(params, context, sqlDefinition, clazz, defaultValue, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return CrudReaderApi.selectScalar(pax.params, pax.context, pax.sqlDefinition, clazz, defaultValue, pax.user);
     }
     public <T> T requestScalar(
             final String bioCode,
@@ -509,13 +640,9 @@ public class DbaAdapter {
             final String fieldName,
             final Class<T> clazz,
             final T defaultValue) {
-        final List<Param> params = _extractBioParams(request);
-        final User user = ((WrappedRequest)request).getUser();
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        return CrudReaderApi.selectScalar(params, context, sqlDefinition, fieldName, clazz, defaultValue, user);
+        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
+        return CrudReaderApi.selectScalar(pax.params, pax.context, pax.sqlDefinition, fieldName, clazz, defaultValue, pax.user);
     }
-
     public <T> T selectScalar(
             final String bioCode,
             final Object params,
@@ -538,18 +665,28 @@ public class DbaAdapter {
         return CrudReaderApi.selectScalar(params, context, sqlDefinition, fieldName, clazz, defaultValue, user);
     }
 
+    /**
+     * Выполняет batch
+     * @param context
+     * @param action
+     * @param user
+     */
     public static void execBatch(final SQLContext context, final SQLActionVoid0 action, final User user) {
         context.execBatch(action, user);
     }
-
     public static <T> T execBatch(final SQLContext context, final SQLActionScalar0<T> action, final User user) {
         return context.execBatch(action, user);
     }
-
     public static <P, T> T execBatch(final SQLContext context, final SQLActionScalar1<P, T> action, P param, final User user) {
         return context.execBatch(action, param, user);
     }
 
+    /**
+     * Выполняет запрос в текущей транзакции
+     * @param sqlDefinition
+     * @param params
+     * @param context
+     */
     public static void execLocal(
             final SQLDefinition sqlDefinition,
             final Object params,
@@ -557,6 +694,16 @@ public class DbaAdapter {
         CrudWriterApi.execSQL0(params, context, sqlDefinition);
     }
 
+    /**
+     * Загружает страницу в текущей транзакции
+     * @param sqlDefinition
+     * @param context
+     * @param params
+     * @param beanType
+     * @param filterAndSorter
+     * @param <T>
+     * @return
+     */
     public static <T> List<T> loadPage0Ext(
             final SQLDefinition sqlDefinition,
             final SQLContext context,
@@ -564,12 +711,22 @@ public class DbaAdapter {
             final Class<T> beanType,
             final FilterAndSorter filterAndSorter) {
         final List<Param> prms = DbUtils.decodeParams(params);
-        int pageSize = Paramus.paramValue(prms, RestParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAll0Ext(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, beanType);
         else
             return CrudReaderApi.loadPage0Ext(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, beanType);
     }
+    /**
+     * Загружает все записи в текущей транзакции
+     * @param sqlDefinition
+     * @param context
+     * @param params
+     * @param beanType
+     * @param filterAndSorter
+     * @param <T>
+     * @return
+     */
     public static <T> List<T> loadAll0Ext(
             final SQLDefinition sqlDefinition,
             final SQLContext context,
@@ -580,30 +737,12 @@ public class DbaAdapter {
         return CrudReaderApi.loadAll0Ext(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, beanType);
     }
 
-
-    public void execForEach(
-            final String bioCode,
-            final HttpServletRequest request) {
-        final List<Param> params = _extractBioParams(request);
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        final User user = ((WrappedRequest)request).getUser();
-        CrudWriterApi.execSQL(params, context, sqlDefinition, user);
-    }
-
-    public <T> List<T> loadBean(
-            final String bioCode,
-            final Object id,
-            final User user,
-            final Class<T> beanType) {
-        final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        if(id != null) {
-            return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
-        }
-        return new ArrayList<>();
-    }
-
+    /**
+     * Устанавливает значение параметра в запрос
+     * @param paramName
+     * @param paramValue
+     * @param request
+     */
     public void setBioParamToRequest(String paramName, Object paramValue, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         Class<?> forceType = paramValue != null ? paramValue.getClass() : null;
@@ -614,6 +753,11 @@ public class DbaAdapter {
             Paramus.setParamValue(queryParams.bioParams, paramName, paramValue);
     }
 
+    /**
+     * Устанавливает параметр в запрос
+     * @param param
+     * @param request
+     */
     public void setBioParamToRequest(Param param, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         if(queryParams.bioParams == null)
@@ -621,11 +765,22 @@ public class DbaAdapter {
         Paramus.applyParams(queryParams.bioParams, Arrays.asList(param), false, true);
     }
 
+    /**
+     * Устанавливает параметры в запрос
+     * @param params
+     * @param request
+     */
     public void setBioParamsToRequest(List<Param> params, HttpServletRequest request) {
         for(Param param : params)
             setBioParamToRequest(param, request);
     }
 
+    /**
+     * Устанавливает сортер в запрос
+     * @param fieldName имя поля по которому сортировать
+     * @param direction напрвление сортировки
+     * @param request
+     */
     public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         if(queryParams.sort == null)
@@ -639,6 +794,12 @@ public class DbaAdapter {
         }
     }
 
+    /**
+     * Засовывает значения атрибутов бина в параметры
+     * @param bean
+     * @param params
+     * @return
+     */
     public List<Param> setBeanToBioParams(ABean bean, List<Param> params) {
         if(params == null)
             params = new ArrayList<>();
@@ -649,27 +810,54 @@ public class DbaAdapter {
         return params;
     }
 
+    /**
+     * Засовывает значения атрибутов бина в параметры запроса
+     * @param bean
+     * @param request
+     * @return
+     */
     public void setBeanToRequest(ABean bean, HttpServletRequest request) {
         final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
         setBeanToBioParams(bean, queryParams.bioParams);
     }
 
+    /**
+     * Проверяет существует ли параметр в запросе
+     * @param paramName
+     * @param request
+     * @return
+     */
     public boolean bioParamExistsInRequest(String paramName, HttpServletRequest request) {
         return ((WrappedRequest)request).bioQueryParamExists(paramName);
     }
 
+    /**
+     * Вытаскивает значение параметра из запроса
+     * @param paramName
+     * @param request
+     * @param paramType
+     * @param defaultValue
+     * @param <T>
+     * @return
+     */
     public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType, T defaultValue) {
         return ((WrappedRequest)request).getBioQueryParam(paramName, paramType, defaultValue);
     }
-
     public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType) {
         return  getBioParamFromRequest(paramName, request, paramType, null);
     }
 
+    /**
+     * Запрс к базе данных с помощью драйвера  https://github.com/blynkkk/clickhouse4j
+     * при условии что запрос выполняется в режиме ... FORMAT JSON
+     * @param bioCode
+     * @param request
+     * @param beanType
+     * @param <T>
+     * @return
+     */
     public <T> BeansPage<T> requestByClickhouse4j(String bioCode, HttpServletRequest request, Class<T> beanType) {
         try {
-//            ABean firstBean = requestFirstBean(bioCode, request, ABean.class);
-//            String json = ABeans.extractAttrFromBean(firstBean, "json", String.class, null);
             String json = requestScalar(bioCode, request, "json", String.class, null);
             if(Strings.isNullOrEmpty(json))
                 throw new BioError("Запрос вернул пустую строку!");
@@ -690,7 +878,7 @@ public class DbaAdapter {
                     Iterator keys = totals.keys();
                     while (keys.hasNext()) {
                         String key = (String)keys.next();
-                        rslt.getTotals().add(Total.builder().fieldName(key).fact(totals.get(key)).aggrigate(Total.Aggrigate.UNDEFINED).build());
+                        rslt.getTotals().add(Total.builder().fieldName(key).fact(totals.get(key)).aggrigate(Total.Aggregate.UNDEFINED).build());
                     }
                 }
             }

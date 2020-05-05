@@ -1,26 +1,34 @@
 package ru.bio4j.spring.commons.types;
 
+/**
+ * Имена системных query-параметров, которые обрабатываются автоматически и используются при wrapping'е запросов
+ */
 public interface HttpParamMap {
+    /** Имя пользователя */
     default String username() {
         return "login";
     }
+    /** Пароль */
     default String password() {
         return "passwd";
     }
-
+    /** Кол-во записей на страницу */
     default String pageSize() {
         return "limit";
     }
+    /** Номер страницы */
     default String page() {
         return "page";
     }
+    /** Номер записи */
     default String offset() {
         return "offset";
     }
-
+    /** Токен */
     default String securityToken() {
         return "stoken";
     }
+    /** Уникальный идентификатор устройства (для входа с гостевым логином) */
     default String deviceuuid() {
         return "deviceuuid";
     }
@@ -47,4 +55,7 @@ public interface HttpParamMap {
         return "X-Client-Ver";
     }
 
+    default HttpParamMap getOverride() {
+        return null;
+    }
 }
