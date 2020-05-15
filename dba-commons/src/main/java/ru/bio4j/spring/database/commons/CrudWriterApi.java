@@ -26,16 +26,16 @@ public class CrudWriterApi {
         UpdelexSQLDef sqlDef = cursor.getUpdateSqlDef();
         if(sqlDef == null)
             throw new BioError(String.format("For bio \"%s\" must be defined \"create/update\" sql!", cursor.getBioCode()));
-        context.execBatch((ctx) -> {
-            SQLStoredProc cmd = ctx.createStoredProc();
+        context.execBatch((conn) -> {
+            SQLStoredProc cmd = context.createStoredProc();
             try {
-                cmd.init(ctx.getCurrentConnection(), sqlDef);
+                cmd.init(conn, sqlDef);
                 List<Param> prms = new ArrayList<>();
                 for (ABean row : rows) {
                     prms.clear();
                     Paramus.setParams(prms, params);
                     DbUtils.applayRowToParams(row, prms);
-                    cmd.execSQL(prms, ctx.getCurrentUser(), true);
+                    cmd.execSQL(prms, context.getCurrentUser(), true);
                     try (Paramus paramus = Paramus.set(cmd.getParams())) {
                         for (Param p : paramus.get()) {
                             if (Arrays.asList(Param.Direction.INOUT, Param.Direction.OUT).contains(p.getDirection())) {
@@ -56,7 +56,7 @@ public class CrudWriterApi {
             for(ABean bean : rows){
                 Object pkvalue = ABeans.extractAttrFromBean(bean, pkFieldName, pkClazz, null);
                 Paramus.setParamValue(prms, Rest2sqlParamNames.GETROW_PARAM_PKVAL, pkvalue);
-                BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, ctx, cursor, ABean.class);
+                BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, context, cursor, ABean.class);
                 if(pg.getRows().size() > 0)
                     Utl.applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
             }
@@ -77,11 +77,11 @@ public class CrudWriterApi {
         UpdelexSQLDef sqlDef = cursor.getDeleteSqlDef();
         if (sqlDef == null)
             throw new BioError(String.format("For bio \"%s\" must be defined \"delete\" sql!", cursor.getBioCode()));
-        int affected = context.execBatch((ctx) -> {
+        int affected = context.execBatch((conn) -> {
             int r = 0;
-            SQLStoredProc cmd = ctx.createStoredProc();
+            SQLStoredProc cmd = context.createStoredProc();
             try {
-                cmd.init(ctx.getCurrentConnection(), sqlDef);
+                cmd.init(conn, sqlDef);
                 for (Object id : ids) {
                     Param prm = Paramus.getParam(cmd.getParams(), Rest2sqlParamNames.DELETE_PARAM_PKVAL);
                     if (prm == null)
@@ -122,8 +122,8 @@ public class CrudWriterApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        context.execBatch((ctx) -> {
-            execSQL0(params, ctx, cursor);
+        context.execBatch((conn) -> {
+            execSQL0(params, context, cursor);
         }, user);
     }
 

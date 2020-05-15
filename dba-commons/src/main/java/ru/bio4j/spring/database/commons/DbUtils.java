@@ -2,6 +2,7 @@ package ru.bio4j.spring.database.commons;
 
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.*;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
  * Утилиты для работы с метаданными СУБД
  */
 public class DbUtils {
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbUtils.class);
 
     private SqlTypeConverter converter;
     private RDBMSUtils rdbmsUtils;
@@ -82,19 +84,19 @@ public class DbUtils {
         final UpdelexSQLDef sqlDef = cursor.getExecSqlDef();
         if(sqlDef == null)
             throw new IllegalArgumentException("Cursor definition has no Exec Sql definition!");
-        ctx.execBatch((context) -> {
-            cmd.init(context.getCurrentConnection(), sqlDef.getPreparedSql());
-            cmd.execSQL(params, context.getCurrentUser());
+        ctx.execBatch(conn -> {
+            cmd.init(conn, sqlDef.getPreparedSql());
+            cmd.execSQL(params, ctx.getCurrentUser());
         }, usr);
     }
 
     public static void processSelect(final User usr, final Object params, final SQLContext ctx, final SQLDefinition cursor, final DelegateSQLFetch action) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         final SelectSQLDef sqlDef = cursor.getSelectSqlDef();
-        int r = ctx.execBatch((context) -> {
-            context.createCursor()
-                    .init(context.getCurrentConnection(), sqlDef)
-                    .fetch(prms, context.getCurrentUser(), action);
+        int r = ctx.execBatch((conn) -> {
+            ctx.createCursor()
+                    .init(conn, sqlDef)
+                    .fetch(prms, ctx.getCurrentUser(), action);
             return 0;
         }, usr);
     }
@@ -504,15 +506,49 @@ public class DbUtils {
 
     public static boolean execSQL(Connection conn, String sql, List<Param> params) {
         try {
-            try (CallableStatement cs = conn.prepareCall(sql)) {
-                return cs.execute();
-            }
+            SQLNamedParametersStatement stmnt = DbNamedParametersStatement.prepareStatement(conn, sql, DbNamedParametersStatement.class);
+            SQLParamSetter paramSetter = new DbSelectableParamSetter();
+            paramSetter.setParamsToStatement(stmnt, params);
+            return stmnt.execute();
         } catch(SQLException e) {
             throw BioSQLException.create(e);
         }
     }
     public static boolean execSQL(Connection conn, String sql) {
         return execSQL(conn, sql, null);
+    }
+
+    public static ResultSet openSQL(final Connection conn, final String sql, final List<Param> params) {
+        try {
+            LOG.debug("Try open: {}", getSQL2Execute(sql, params));
+            SQLNamedParametersStatement stmnt = DbNamedParametersStatement.prepareStatement(conn, sql, DbNamedParametersStatement.class);
+            SQLParamSetter paramSetter = new DbSelectableParamSetter();
+            paramSetter.setParamsToStatement(stmnt, params);
+            ResultSet rs = stmnt.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+            throw BioSQLException.create(e);
+        }
+    }
+
+    public static String getSQL2Execute(String sql, String params) {
+        StringBuilder sb = new StringBuilder();
+        if(!Strings.isNullOrEmpty(params)) {
+            sb.append("{DbCommand.Params(before exec): {\n");
+            sb.append(params);
+            sb.append("}}");
+        }
+        return String.format("preparedSQL: %s;\n - %s", sql, sb.toString());
+    }
+
+    protected static String getSQL2Execute(String sql, List<Param> params) {
+        StringBuilder sb = new StringBuilder();
+        if(params != null) {
+            sb.append("{DbCommand.Params(before exec): ");
+            sb.append(Paramus.paramsAsString(params));
+            sb.append("}");
+        }
+        return String.format("preparedSQL: %s;\n - %s", sql, sb.toString());
     }
 
     private static final String CS_EMPTYCASE = "/*empty*/";

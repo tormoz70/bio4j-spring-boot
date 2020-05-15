@@ -96,7 +96,7 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
                     setParamsToStatement(); // Применяем параметры
 
                     if(LOG.isDebugEnabled())
-                        LOG.debug("Try to execute (autocommit: {}) : {}", this.preparedStatement.getConnection().getAutoCommit(), getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
+                        LOG.debug("Try to execute (autocommit: {}) : {}", this.preparedStatement.getConnection().getAutoCommit(), DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
                     preparedStatement.execute();
 
                     getParamsFromStatement(); // Вытаскиваем OUT-параметры
@@ -113,12 +113,12 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
                 } catch (SQLException e) {
                     lastError = DbUtils.getInstance().extractStoredProcAppErrorMessage(e);
                     if(lastError == null)
-                        lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString())), e);
+                        lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString())), e);
                     throw lastError;
                 } catch (Exception e) {
                     lastError = DbUtils.getInstance().extractStoredProcAppErrorMessage(e);
                     if(lastError == null)
-                        lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", getSQL2Execute(this.preparedSQL, this.params)), e);
+                        lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", DbUtils.getSQL2Execute(this.preparedSQL, this.params)), e);
                     throw lastError;
                 }
             } finally {

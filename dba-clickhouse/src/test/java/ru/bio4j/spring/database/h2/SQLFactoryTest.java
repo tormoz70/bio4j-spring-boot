@@ -67,12 +67,9 @@ public class SQLFactoryTest {
     @Test
     public void testCreateSQLConnectionPool() throws Exception {
 //        LOG.debug(Utl.buildBeanStateInfo(context.getStat(), null, null));
-        context.execBatch(new SQLActionScalar0<Object>() {
-            @Override
-            public Object exec(SQLContext context) {
-                Assert.assertNotNull(context.getCurrentConnection());
-                return null;
-            }
+        context.execBatch(conn -> {
+            Assert.assertNotNull(conn);
+            return null;
         }, null);
 
     }
@@ -119,20 +116,17 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor() {
         try {
-            Double dummysum = context.execBatch(new SQLActionScalar0<Double>() {
-                @Override
-                public Double exec(SQLContext context) {
-                    Var var = new Var();
-                    String sql = "select a.*, :dummy as dm from jdbc_test.data0 as a";
-                    List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 1).pop();
-                    context.createCursor()
-                            .init(context.getCurrentConnection(), sql, null)
-                            .fetch(prms, context.getCurrentUser(), rs->{
-                                var.dummy += rs.getValue("DM", Double.class);
-                                return true;
-                            });
-                    return var.dummy;
-                }
+            Double dummysum = context.execBatch(conn -> {
+                Var var = new Var();
+                String sql = "select a.*, :dummy as dm from jdbc_test.data0 as a";
+                List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 1).pop();
+                context.createCursor()
+                        .init(conn, sql, null)
+                        .fetch(prms, context.getCurrentUser(), rs->{
+                            var.dummy += rs.getValue("DM", Double.class);
+                            return true;
+                        });
+                return var.dummy;
             }, null);
             LOG.debug("dummysum: " + dummysum);
             Assert.assertEquals(dummysum, 100.0, 0);

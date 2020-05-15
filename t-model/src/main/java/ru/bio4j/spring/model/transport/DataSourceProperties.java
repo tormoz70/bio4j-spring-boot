@@ -3,8 +3,13 @@ package ru.bio4j.spring.model.transport;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Optional;
+
 @ConfigurationProperties(prefix= "spring.datasource")
 public class DataSourceProperties {
+    @Value("${database-server.port:}")
+    private String dbServerPort;
+
     @Value("${ru.bio4j.jdbc-helper.currentSchema}")
     private String currentSchema;
 
@@ -21,15 +26,8 @@ public class DataSourceProperties {
     private String username;
     private String password;
 
-    public String getDbmsName() {
-        return dbmsName;
-    }
-
-    public void setDbmsName(String dbmsName) {
-        this.dbmsName = dbmsName;
-    }
-
     public static class Builder {
+        private String dbServerPort;
         private String currentSchema;
         private String connectionTimeout;
         private String minimumPoolSize;
@@ -39,6 +37,10 @@ public class DataSourceProperties {
         private String username;
         private String password;
 
+        public Builder dbServerPort(String value) {
+            this.dbServerPort = value;
+            return this;
+        }
         public Builder currentSchema(String value) {
             this.currentSchema = value;
             return this;
@@ -74,6 +76,7 @@ public class DataSourceProperties {
 
         public DataSourceProperties build() {
             DataSourceProperties result = new DataSourceProperties();
+            result.setDbServerPort(dbServerPort);
             result.setCurrentSchema(currentSchema);
             result.setConnectionTimeout(connectionTimeout);
             result.setMinimumPoolSize(minimumPoolSize);
@@ -153,4 +156,22 @@ public class DataSourceProperties {
     public void setCurrentSchema(String currentSchema) {
         this.currentSchema = currentSchema;
     }
+
+
+    public String getDbmsName() {
+        return dbmsName;
+    }
+
+    public void setDbmsName(String dbmsName) {
+        this.dbmsName = dbmsName;
+    }
+
+    public String getDbServerPort() {
+        return dbServerPort;
+    }
+
+    public void setDbServerPort(String dbServerPort) {
+        this.dbServerPort = dbServerPort;
+    }
+
 }

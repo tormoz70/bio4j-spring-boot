@@ -86,6 +86,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-dba-clickhouse-lib</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>bio4j-spring-dba-h2-lib</artifactId>
+        </dependency>
 
     </dependencies>
 

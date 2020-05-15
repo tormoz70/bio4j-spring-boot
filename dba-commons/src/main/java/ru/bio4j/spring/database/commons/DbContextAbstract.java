@@ -129,7 +129,7 @@ public abstract class DbContextAbstract implements SQLContext {
                 setCurrentContext(usr, conn);
                 try {
                     if (batch != null)
-                        result = batch.exec(this, param);
+                        result = batch.exec(this.getCurrentConnection(), param);
                     getCurrentConnection().commit();
                 } catch (SQLException e) {
                     if (getCurrentConnection() != null)

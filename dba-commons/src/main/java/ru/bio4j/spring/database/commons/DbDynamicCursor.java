@@ -64,7 +64,7 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
             setParamsToStatement(); // Применяем параметры
 
             if (LOG.isDebugEnabled())
-                LOG.debug("Try to execute: {}", getSQL2Execute(preparedSQL, preparedStatement.getParamsAsString()));
+                LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(preparedSQL, preparedStatement.getParamsAsString()));
             try (ResultSet result = preparedStatement.executeQuery()) {
                 isActive = true;
                 while (reader.next(result)) {

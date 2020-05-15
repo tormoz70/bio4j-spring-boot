@@ -119,7 +119,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
                 setParamsToStatement(); // Применяем параметры
 
                 if(LOG.isDebugEnabled())
-                    LOG.debug("Try to execute: {}", getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
+                    LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
                 try (ResultSet result = this.preparedStatement.executeQuery()) {
                     this.isActive = true;
                     while (this.reader.next(result)) {
@@ -134,7 +134,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
             } catch (SQLException e) {
                 lastError = DbUtils.getInstance().extractStoredProcAppErrorMessage(e);
                 if(lastError == null)
-                    lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", getSQL2Execute(this.preparedSQL, this.params)), e);
+                    lastError = BioSQLException.create(String.format("%s:\n - %s", "Error on execute command.", DbUtils.getSQL2Execute(this.preparedSQL, this.params)), e);
             }
         } finally {
             if (this.preparedStatement != null)

@@ -112,26 +112,6 @@ public abstract class DbCommand<T extends SQLCommand> implements SQLCommand {
         }
     }
 
-    protected static String getSQL2Execute(String sql, List<Param> params) {
-        StringBuilder sb = new StringBuilder();
-        if(params != null) {
-            sb.append("{DbCommand.Params(before exec): ");
-            sb.append(Paramus.paramsAsString(params));
-            sb.append("}");
-        }
-        return String.format("preparedSQL: %s;\n - %s", sql, sb.toString());
-    }
-
-    protected static String getSQL2Execute(String sql, String params) {
-        StringBuilder sb = new StringBuilder();
-        if(!Strings.isNullOrEmpty(params)) {
-            sb.append("{DbCommand.Params(before exec): {\n");
-            sb.append(params);
-            sb.append("}}");
-        }
-        return String.format("preparedSQL: %s;\n - %s", sql, sb.toString());
-    }
-
 	@Override
 	public void cancel() {
         final SQLNamedParametersStatement stmnt = this.getStatement();

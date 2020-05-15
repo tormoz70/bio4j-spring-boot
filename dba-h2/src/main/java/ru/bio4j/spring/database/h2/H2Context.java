@@ -1,4 +1,4 @@
-package ru.bio4j.spring.database.clickhouse;
+package ru.bio4j.spring.database.h2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +11,15 @@ import ru.bio4j.spring.model.transport.DataSourceProperties;
 import javax.sql.DataSource;
 
 @Component
-public class ChContext extends DbContextAbstract {
-    private static final Logger LOG = LoggerFactory.getLogger(ChContext.class);
+public class H2Context extends DbContextAbstract {
+    private static final Logger LOG = LoggerFactory.getLogger(H2Context.class);
 
-    public ChContext(final DataSource cpool, final DataSourceProperties dataSourceProperties) {
+    private final DbServer dbServer;
+
+    public H2Context(final DataSource cpool, final DataSourceProperties dataSourceProperties) {
         super(cpool, dataSourceProperties);
+
+        dbServer = new H2ServerImpl(dataSourceProperties.getDbServerPort());
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {
             this.innerAfterEvents.add(
@@ -23,33 +27,33 @@ public class ChContext extends DbContextAbstract {
                         @Override
                         public void handle(SQLContext sender, Attributes attrs) {
                             if(attrs.getConnection() != null) {
-//                                String curSchema = sender.getDataSourceProperties().getCurrentSchema().toUpperCase();
-//                                LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
-//                                DbUtils.execSQL(attrs.getConnection(), "alter session set current_schema="+curSchema);
-//                                LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
                             }
                         }
                     }
             );
         }
 
-        wrappers = new ChWrappersImpl(this.getDBMSName());
+        wrappers = new H2WrappersImpl(this.getDBMSName());
         DbUtils.getInstance().init(
-                new ChTypeConverterImpl(),
-                new ChUtilsImpl()
+                new H2TypeConverterImpl(),
+                new H2UtilsImpl()
         );
     }
 
     @Override
     public StatementPreparerer createDbStatementPreparerer(SQLCursor cursor) {
-        return new ChStatementPreparerer(cursor);
+        return new H2StatementPreparerer(cursor);
     }
 
     @Override
     public String getDBMSName() {
-        return "clickhouse";
+        return "h2";
     }
 
+    @Override
+    public DbServer getDbServer() {
+        return dbServer;
+    }
 
 
 }

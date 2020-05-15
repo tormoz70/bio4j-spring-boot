@@ -116,9 +116,9 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        context.execBatch((ctx) -> {
-            SQLCursor c = ctx.createDynamicCursor();
-            c.init(ctx.getCurrentConnection(), cursor.getSelectSqlDef().getTotalsSql());
+        context.execBatch((conn) -> {
+            SQLCursor c = context.createDynamicCursor();
+            c.init(conn, cursor.getSelectSqlDef().getTotalsSql());
             ABean totalsBean = c.firstBean(params, user, ABean.class);
             for (Total total : totals) {
                 _addTotal2Totals(totals, total);
@@ -178,8 +178,8 @@ public class CrudReaderApi {
             final User user,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
-        return context.execBatch((ctx) -> {
-            return loadPage0(params, filter, sort, totals, ctx, cursor, crudOptions, beanType);
+        return context.execBatch((conn) -> {
+            return loadPage0(params, filter, sort, totals, context, cursor, crudOptions, beanType);
         }, user);
     }
 
@@ -390,16 +390,16 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final User user,
             final Class<T> beanType) {
-        BeansPage result = context.execBatch((ctx) -> {
-            return loadAll0(params, filter, sort, totals, ctx, cursor, beanType);
+        BeansPage result = context.execBatch((conn) -> {
+            return loadAll0(params, filter, sort, totals, context, cursor, beanType);
         }, user);
         return result;
     }
 
 
     public static <T> BeansPage<T> loadRecord(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final User user, final Class<T> beanType) {
-        BeansPage result = context.execBatch((ctx) -> {
-            return loadRecord0(params, ctx, cursor, beanType);
+        BeansPage result = context.execBatch((conn) -> {
+            return loadRecord0(params, context, cursor, beanType);
         }, user);
         return result;
     }
@@ -660,8 +660,8 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final User user,
             final Class<T> beanType) {
-        List<T> result = context.execBatch((ctx) -> {
-            return loadPage0Ext(params, filter, sort, ctx, cursor, beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return loadPage0Ext(params, filter, sort, context, cursor, beanType);
         }, user);
         return result;
     }
@@ -710,8 +710,8 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final User user,
             final Class<T> beanType) {
-        List<T> result = context.execBatch((ctx) -> {
-            return loadAll0Ext(params, filter, sort, ctx, cursor, beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return loadAll0Ext(params, filter, sort, context, cursor, beanType);
         }, user);
         return result;
     }
@@ -726,8 +726,8 @@ public class CrudReaderApi {
             throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-        List<T> result = context.execBatch((ctx) -> {
-            return readStoreDataExt(params, ctx, cursor, beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return readStoreDataExt(params, context, cursor, beanType);
         }, user);
         return result;
     }
@@ -742,8 +742,8 @@ public class CrudReaderApi {
             throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         List<Param> params = preparePkParamValue(pkValue, pkField);
-        List<T> result = context.execBatch((ctx) -> {
-            return readStoreDataExt(params, ctx, cursor, beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return readStoreDataExt(params, context, cursor, beanType);
         }, user);
         return result;
     }
@@ -754,8 +754,8 @@ public class CrudReaderApi {
             final User user,
             final Class<T> beanType) {
         cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
-        List<T> result = context.execBatch((ctx) -> {
-            return readStoreDataExt(params, ctx, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return readStoreDataExt(params, context, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
         }, user);
         return result.size() > 0 ? result.get(0) : null;
     }
@@ -765,8 +765,8 @@ public class CrudReaderApi {
             final User user,
             final Class<T> beanType) {
         cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
-        List<T> result = context.execBatch((ctx) -> {
-            return readStoreDataExt(null, ctx, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return readStoreDataExt(null, context, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
         }, user);
         return result.size() > 0 ? result.get(0) : null;
     }
@@ -777,8 +777,8 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final User user,
             final Class<T> beanType) {
-        List<T> result = context.execBatch((ctx) -> {
-            return loadAll0Ext(null, filter, null, ctx, cursor, beanType);
+        List<T> result = context.execBatch((conn) -> {
+            return loadAll0Ext(null, filter, null, context, cursor, beanType);
         }, user);
         return result.stream().findFirst().orElse(null);
     }
@@ -788,11 +788,11 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        StringBuilder result = context.execBatch((ctx) -> {
+        StringBuilder result = context.execBatch((conn) -> {
             final StringBuilder r = new StringBuilder();
 
-            ctx.createDynamicCursor()
-                    .init(ctx.getCurrentConnection(), cursor.getSelectSqlDef().getSql(), cursor.getSelectSqlDef().getParamDeclaration())
+            context.createDynamicCursor()
+                    .init(conn, cursor.getSelectSqlDef().getSql(), cursor.getSelectSqlDef().getParamDeclaration())
                     .fetch(params, user, rs -> {
                         List<Object> values = rs.getValues();
                         for (Object val : values)

@@ -11,10 +11,10 @@ import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.cache.impl.CacheServiceImpl;
 import ru.bio4j.spring.commons.types.*;
 import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.clickhouse.ChContext;
+import ru.bio4j.spring.database.h2.H2Context;
 import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.model.transport.CacheProperties;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
@@ -51,6 +51,8 @@ public class DbaAutoConfiguration {
     public SQLContext sqlContext() {
         if(Strings.compare(dataSourceProperties.getDbmsName(), "clickhouse", true))
             return DbContextFactory.createHikariCP(dataSourceProperties, ChContext.class);
+        else if(Strings.compare(dataSourceProperties.getDbmsName(), "h2", true))
+            return DbContextFactory.createHikariCP(dataSourceProperties, H2Context.class);
         return DbContextFactory.createHikariCP(dataSourceProperties, OraContext.class);
     }
 

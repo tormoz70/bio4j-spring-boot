@@ -33,4 +33,7 @@ public interface SQLContext {
     Wrappers getWrappers();
     SQLReader createReader();
 
+    default DbServer getDbServer() {
+        throw new UnsupportedOperationException();
+    }
 }

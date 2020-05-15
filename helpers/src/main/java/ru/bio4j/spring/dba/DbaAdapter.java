@@ -92,22 +92,22 @@ public class DbaAdapter {
     
     private void prepareSQL(SQLDefinition sqlDefinition) {
         SQLContext context = getSqlContext();
-        context.execBatch((ctx) -> {
+        context.execBatch((conn) -> {
             UpdelexSQLDef def = sqlDefinition.getUpdateSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = ctx.prepareStoredProc(def.getPreparedSql(), ctx.getCurrentConnection(), def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }
             def = sqlDefinition.getDeleteSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = ctx.prepareStoredProc(def.getPreparedSql(), ctx.getCurrentConnection(), def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }
             def = sqlDefinition.getExecSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = ctx.prepareStoredProc(def.getPreparedSql(), ctx.getCurrentConnection(), def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос который фильтрануть
+    -->
+    <template type="filtering"><![CDATA[
+    SELECT fltrng_wrpr.*
+     FROM ( ${QUERY_PLACEHOLDER} ) AS fltrng_wrpr
+      ${WHERECLAUSE_PLACEHOLDER}
+    ]]></template>
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос который сортирнуть
+    -->
+    <template type="sorting"><![CDATA[
+    SELECT srtng_wrpr.*
+     FROM ( ${QUERY_PLACEHOLDER} ) AS srtng_wrpr
+      ${ORDERBYCLAUSE_PLACEHOLDER}
+    ]]></template>
+
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос который небходимо разбить на страницы (т.е. иметь возможность
+                запросить :PAGING_COUNT зaписей с :PAGING_OFFSET )
+      :pagination_offset  - количество пропущенных записей до первой загруженной
+      :pagination_limit    - записей на странице
+    -->
+    <template type="pagination"><![CDATA[
+    SELECT * FROM (
+          ${QUERY_PLACEHOLDER}
+    ) AS pgng_wrpr LIMIT :pagination_limit OFFSET :pagination_offset
+    ]]></template>
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос в котором небходимо вычислить кол-во записей
+    -->
+    <template type="totals"><![CDATA[
+        SELECT ${TOTALS_FIELDS_PLACEHOLDER}
+          FROM ( ${QUERY_PLACEHOLDER} ) AS ttls_wrpr
+    ]]></template>
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос в котором небходимо найти запись
+    -->
+    <template type="locate"><![CDATA[
+          SELECT rnum_num FROM (SELECT innerq.*, ROWNUM as rnum_num
+            FROM (${QUERY_PLACEHOLDER}) as innerq)
+           WHERE ${WHERECLAUSE_PLACEHOLDER}
+    ]]></template>
+
+    <!--
+      ${QUERY_PLACEHOLDER} - запрос в котором небходимо найти запись
+    -->
+    <template type="getrow"><![CDATA[
+          SELECT * FROM (${QUERY_PLACEHOLDER})
+           WHERE ${WHERECLAUSE_PLACEHOLDER}
+    ]]></template>
+
+</templates>
+
