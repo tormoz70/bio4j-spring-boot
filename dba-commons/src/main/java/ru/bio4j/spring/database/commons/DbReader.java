@@ -106,6 +106,8 @@ public class DbReader implements SQLReader {
                             value = currentResultSet.getString(field.getId());
                         } else
                             value = currentResultSet.getObject(field.getId());
+                        if(currentResultSet.wasNull())
+                            value = null;
                         rowValues.set(valueIndex, value);
                     }
                 } else {
