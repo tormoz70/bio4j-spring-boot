@@ -102,14 +102,6 @@ public class WrappedRequest extends HttpServletRequestWrapper {
                 qparams.bioParams.add(Param.builder().name(paramName).type(MetaType.STRING).direction(Param.Direction.IN).value(val).build());
             }
         }
-//        paramNames = ((WrappedRequest)qparams.request).getRequest().getParameterNames();
-//        while(paramNames.hasMoreElements()){
-//            String paramName = paramNames.nextElement();
-//            String val = qparams.request.getParameter(paramName);
-//            if(sysParamNames.indexOf(paramName) == -1){
-//                qparams.bioParams.add(Param.builder().name(paramName).type(MetaType.STRING).direction(Param.Direction.IN).value(val).build());
-//            }
-//        }
 
         if(!Strings.isNullOrEmpty(qparams.jsonData)) {
             List<Param> bioParams = Utl.anjsonToParams(qparams.jsonData);
@@ -117,7 +109,7 @@ public class WrappedRequest extends HttpServletRequestWrapper {
                 qparams.bioParams = Paramus.set(qparams.bioParams).merge(bioParams, true).pop();
             }
         }
-
+        SrvcUtils.applyCurrentRequestParams(qparams, qparams.bioParams);
     }
 
     private static class BasicAutenticationLogin {

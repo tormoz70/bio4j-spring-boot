@@ -1,10 +1,12 @@
 package ru.bio4j.spring.commons.utils;
 
 import ru.bio4j.spring.commons.types.Paramus;
+import ru.bio4j.spring.model.transport.BioQueryParams;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.SsoUser;
 import ru.bio4j.spring.model.transport.User;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -30,6 +32,15 @@ public class SrvcUtils {
                 p.setValue(SrvcUtils.PARAM_CURUSR_GRANTS, usr.getGrants(), Param.Direction.IN, true);
                 p.setValue(SrvcUtils.PARAM_CURUSR_IP, usr.getRemoteIP(), Param.Direction.IN, true);
                 p.setValue(SrvcUtils.PARAM_CURUSR_CLIENT, usr.getRemoteClient(), Param.Direction.IN, true);
+            }
+        }
+    }
+
+    public static void applyCurrentRequestParams(final BioQueryParams qparams, final List<Param> params) {
+        if (qparams != null) {
+            try (Paramus p = Paramus.set(params)) {
+                p.setValue(SrvcUtils.PARAM_CURUSR_IP, qparams.remoteIP, Param.Direction.IN, true);
+                p.setValue(SrvcUtils.PARAM_CURUSR_CLIENT, qparams.remoteClient, Param.Direction.IN, true);
             }
         }
     }
