@@ -862,7 +862,7 @@ public class DbaAdapter {
      * @param newParamName
      * @param oldParamName
      */
-    public void replaceBioParamName(HttpServletRequest request, String newParamName, String oldParamName) {
+    public void replaceBioParamName(HttpServletRequest request, String oldParamName, String newParamName) {
         List<Param> prms = wrappedRequest(request).getBioQueryParams().bioParams;
         if(prms == null){
             prms = new ArrayList<>();
