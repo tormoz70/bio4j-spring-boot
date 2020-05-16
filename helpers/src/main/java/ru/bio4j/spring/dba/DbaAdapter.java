@@ -26,6 +26,7 @@ import ru.bio4j.spring.model.transport.jstore.StoreMetadata;
 import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,7 +71,15 @@ public class DbaAdapter {
         }
         return fs;
     }
-    
+
+    public WrappedRequest wrappedRequest(final HttpServletRequest request) {
+        if(request instanceof WrappedRequest)
+            return (WrappedRequest)request;
+        if(request instanceof ServletRequestWrapper && ((ServletRequestWrapper)request).getRequest() instanceof WrappedRequest)
+            return (WrappedRequest)((ServletRequestWrapper)request).getRequest();
+        throw new BioError("WrappedRequest not found!");
+    }
+
     private class  RequestParamsPack {
         private BioQueryParams queryParams;
         private List<Param> params;
@@ -81,12 +90,12 @@ public class DbaAdapter {
     }
     private RequestParamsPack _parsRequestPack(final String bioCode, final HttpServletRequest request) {
         RequestParamsPack result = new RequestParamsPack();
-        result.queryParams = ((WrappedRequest)request).getBioQueryParams();
+        result.queryParams = wrappedRequest(request).getBioQueryParams();
         result.params = _extractBioParams(result.queryParams);
         result.context = getSqlContext();
         result.sqlDefinition = CursorParser.pars(bioCode);
         result.filterAndSorter = _createFilterAndSorter(result.queryParams);
-        result.user = ((WrappedRequest)request).getUser();
+        result.user = wrappedRequest(request).getUser();
         return result;
     }
     
@@ -744,7 +753,7 @@ public class DbaAdapter {
      * @param request
      */
     public void setBioParamToRequest(String paramName, Object paramValue, HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final BioQueryParams queryParams = wrappedRequest(request).getBioQueryParams();
         Class<?> forceType = paramValue != null ? paramValue.getClass() : null;
         if(forceType != null) {
             MetaType forceMetaType = MetaTypeConverter.read(forceType);
@@ -759,7 +768,7 @@ public class DbaAdapter {
      * @param request
      */
     public void setBioParamToRequest(Param param, HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final BioQueryParams queryParams = wrappedRequest(request).getBioQueryParams();
         if(queryParams.bioParams == null)
             queryParams.bioParams = new ArrayList<>();
         Paramus.applyParams(queryParams.bioParams, Arrays.asList(param), false, true);
@@ -782,7 +791,7 @@ public class DbaAdapter {
      * @param request
      */
     public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final BioQueryParams queryParams = wrappedRequest(request).getBioQueryParams();
         if(queryParams.sort == null)
             queryParams.sort = new ArrayList<>();
         queryParams.sort.clear();
@@ -817,7 +826,7 @@ public class DbaAdapter {
      * @return
      */
     public void setBeanToRequest(ABean bean, HttpServletRequest request) {
-        final BioQueryParams queryParams = ((WrappedRequest)request).getBioQueryParams();
+        final BioQueryParams queryParams = wrappedRequest(request).getBioQueryParams();
         setBeanToBioParams(bean, queryParams.bioParams);
     }
 
@@ -828,7 +837,7 @@ public class DbaAdapter {
      * @return
      */
     public boolean bioParamExistsInRequest(String paramName, HttpServletRequest request) {
-        return ((WrappedRequest)request).bioQueryParamExists(paramName);
+        return wrappedRequest(request).bioQueryParamExists(paramName);
     }
 
     /**
@@ -841,10 +850,26 @@ public class DbaAdapter {
      * @return
      */
     public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType, T defaultValue) {
-        return ((WrappedRequest)request).getBioQueryParam(paramName, paramType, defaultValue);
+        return wrappedRequest(request).getBioQueryParam(paramName, paramType, defaultValue);
     }
     public <T> T getBioParamFromRequest(String paramName, HttpServletRequest request, Class<T> paramType) {
         return  getBioParamFromRequest(paramName, request, paramType, null);
+    }
+
+    /**
+     * Заменяет имя параметра
+     * @param request
+     * @param newParamName
+     * @param oldParamName
+     */
+    public void replaceBioParamName(HttpServletRequest request, String newParamName, String oldParamName) {
+        List<Param> prms = wrappedRequest(request).getBioQueryParams().bioParams;
+        if(prms == null){
+            prms = new ArrayList<>();
+            wrappedRequest(request).getBioQueryParams().bioParams = prms;
+        }
+        Paramus.setParamValue(prms, newParamName, getBioParamFromRequest(oldParamName, request, String.class));
+        prms.remove(oldParamName);
     }
 
     /**
