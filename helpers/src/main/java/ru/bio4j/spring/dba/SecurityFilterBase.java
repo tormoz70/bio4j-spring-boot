@@ -54,7 +54,7 @@ public class SecurityFilterBase {
             rereq = (WrappedRequest)request;
         else
             rereq = new WrappedRequest((HttpServletRequest)request);
-        if(disableAnonymouse && Strings.compare(rereq.getBioQueryParams().stoken, "anonymouse", true)) {
+        if(disableAnonymouse && rereq.getBioQueryParams() != null && Strings.compare(rereq.getBioQueryParams().stoken, "anonymouse", true)) {
             rereq.getBioQueryParams().stoken = null;
         }
         rereq.putHeader("Access-Control-Allow-Origin", "*");

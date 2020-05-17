@@ -50,7 +50,7 @@ public class Jecksons {
 
     private volatile ObjectMapper objectMapper;
 
-    private synchronized ObjectMapper getObjectMapper() {
+    public synchronized ObjectMapper getObjectMapper() {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
