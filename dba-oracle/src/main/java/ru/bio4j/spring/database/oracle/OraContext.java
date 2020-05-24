@@ -11,12 +11,11 @@ import ru.bio4j.spring.model.transport.DataSourceProperties;
 
 import javax.sql.DataSource;
 
-@Component
 public class OraContext extends DbContextAbstract {
     private static final Logger LOG = LoggerFactory.getLogger(OraContext.class);
 
-    public OraContext(final DataSource cpool, final DataSourceProperties dataSourceProperties) {
-        super(cpool, dataSourceProperties);
+    public OraContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
+        super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {
             this.innerAfterEvents.add(

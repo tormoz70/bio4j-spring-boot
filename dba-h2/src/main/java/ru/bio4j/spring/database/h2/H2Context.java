@@ -10,7 +10,6 @@ import ru.bio4j.spring.model.transport.DataSourceProperties;
 
 import javax.sql.DataSource;
 
-@Component
 public class H2Context extends DbContextAbstract {
     private static final Logger LOG = LoggerFactory.getLogger(H2Context.class);
 

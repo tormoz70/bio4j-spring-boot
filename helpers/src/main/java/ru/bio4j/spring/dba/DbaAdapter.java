@@ -5,13 +5,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
 import ru.bio4j.spring.commons.types.Paramus;
 //import ru.bio4j.ng.commons.utils.Jsons;
+import ru.bio4j.spring.commons.utils.SrvcUtils;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Jecksons;
@@ -26,7 +25,6 @@ import ru.bio4j.spring.model.transport.jstore.StoreMetadata;
 import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,15 +34,16 @@ import java.util.List;
 /**
  * Адаптер для доступа к базе данных bio4j
  */
-@Component
 public class DbaAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(DbaAdapter.class);
 
-    @Autowired
-    private SQLContext sqlContext;
+    private final SQLContext sqlContext;
+    private final ExcelBuilder excelBuilder;
 
-    @Autowired
-    private ExcelBuilder excelBuilder;
+    public DbaAdapter(SQLContext sqlContext, ExcelBuilder excelBuilder) {
+        this.sqlContext = sqlContext;
+        this.excelBuilder = excelBuilder;
+    }
 
     private static List<Param> _extractBioParams(final BioQueryParams queryParams) {
         Paramus.setQueryParamsToBioParams(queryParams);
@@ -73,11 +72,7 @@ public class DbaAdapter {
     }
 
     public WrappedRequest wrappedRequest(final HttpServletRequest request) {
-        if(request instanceof WrappedRequest)
-            return (WrappedRequest)request;
-        if(request instanceof ServletRequestWrapper && ((ServletRequestWrapper)request).getRequest() instanceof WrappedRequest)
-            return (WrappedRequest)((ServletRequestWrapper)request).getRequest();
-        throw new BioError("WrappedRequest not found!");
+        return SrvcUtils.wrappedRequest(request);
     }
 
     private class  RequestParamsPack {

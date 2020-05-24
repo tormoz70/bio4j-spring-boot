@@ -10,12 +10,11 @@ import ru.bio4j.spring.model.transport.DataSourceProperties;
 
 import javax.sql.DataSource;
 
-@Component
 public class ChContext extends DbContextAbstract {
     private static final Logger LOG = LoggerFactory.getLogger(ChContext.class);
 
-    public ChContext(final DataSource cpool, final DataSourceProperties dataSourceProperties) {
-        super(cpool, dataSourceProperties);
+    public ChContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
+        super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {
             this.innerAfterEvents.add(

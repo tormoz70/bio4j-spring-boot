@@ -1,11 +1,10 @@
 package ru.bio4j.spring.commons.utils;
 
 import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.model.transport.BioQueryParams;
-import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.model.transport.SsoUser;
-import ru.bio4j.spring.model.transport.User;
+import ru.bio4j.spring.commons.types.WrappedRequest;
+import ru.bio4j.spring.model.transport.*;
 
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -61,6 +60,14 @@ public class SrvcUtils {
             return rslt;
         }
         return null;
+    }
+
+    public static WrappedRequest wrappedRequest(final HttpServletRequest request) {
+        if(request instanceof WrappedRequest)
+            return (WrappedRequest)request;
+        if(request instanceof ServletRequestWrapper && ((ServletRequestWrapper)request).getRequest() instanceof WrappedRequest)
+            return (WrappedRequest)((ServletRequestWrapper)request).getRequest();
+        throw new BioError("WrappedRequest not found!");
     }
 
 }

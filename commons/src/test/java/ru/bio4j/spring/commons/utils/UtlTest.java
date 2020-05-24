@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.model.transport.ABean;
-import ru.bio4j.spring.model.transport.FileSpec;
 import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Sort;
@@ -351,6 +350,7 @@ public class UtlTest {
         Assert.assertEquals(filter.getChildren().get(0).getChildren().get(1).getName(), "contains");
     }
 
+    @Ignore
     @Test
     public void fileNameWithoutExtTest() throws Exception {
         String r = Utl.fileNameWithoutExt("e:\\arch\\20171204\\57\\posted000\\ekb_57_20171021_100012002(31fc455a).xml.pattrs");
@@ -361,33 +361,6 @@ public class UtlTest {
     public void readFileTest() throws Exception {
         long fs = Utl.fileSize("e:\\arch\\20171204\\57\\posted000\\ekb_57_20171021_100012002(31fc455a).xml");
         Assert.assertEquals(fs, 3601);
-    }
-
-    @Test
-    public void JsonsDecodeTest() throws Exception {
-        String json = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("1e1a01b6c2bc4b81b76a08cc16afe951.attrs"));
-//        FileSpec fileSpec = Jsons.decode(json, new ObjectFactory(){
-//            @Override
-//            public Object instantiate(ObjectBinder objectBinder, Object o, Type type, Class aClass) throws Exception {
-//                FileSpec rslt = new FileSpec();
-//                Utl.applyValuesToBeanFromHashMap((HashMap) o, rslt, null, "innerFiles");
-//                Object innerFilesVal = ((HashMap) o).get("innerFiles");
-//                if(innerFilesVal != null) {
-//                    List<HashMap> innerFiles = (List<HashMap>)innerFilesVal;
-//                    rslt.setInnerFiles(new ArrayList<>());
-//                    for(HashMap hf : innerFiles){
-//                        FileSpec ip = new FileSpec();
-//                        Utl.applyValuesToBeanFromHashMap(hf, ip, null, "innerFiles");
-//                        rslt.getInnerFiles().add(ip);
-//                    }
-//                }
-//                return rslt;
-//            }
-//        });
-
-        FileSpec fileSpec = Jecksons.getInstance().decode(json, FileSpec.class);
-
-        Assert.assertTrue(fileSpec != null);
     }
 
     @Test
