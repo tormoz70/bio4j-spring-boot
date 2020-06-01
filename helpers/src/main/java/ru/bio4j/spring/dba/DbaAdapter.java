@@ -912,7 +912,7 @@ public class DbaAdapter {
         }
     }
 
-    private static String getRequestHash(HttpServletRequest request){
+    public String getRequestHash(HttpServletRequest request){
         return request.getRequestURI() + "?" + request.getQueryString();
     }
 
