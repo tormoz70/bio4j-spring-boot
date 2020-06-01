@@ -73,9 +73,10 @@ public class DbaAutoConfiguration {
     @Bean
     public DbaAdapter dbaAdapter(
             SQLContext sqlContext,
-            ExcelBuilder excelBuilder
+            ExcelBuilder excelBuilder,
+            CacheService cacheService
     ) {
-        return new DbaAdapter(sqlContext, excelBuilder);
+        return new DbaAdapter(sqlContext, excelBuilder, cacheService);
     }
 
     @Bean

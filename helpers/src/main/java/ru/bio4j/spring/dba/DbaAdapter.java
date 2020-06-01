@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
@@ -26,6 +27,7 @@ import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -39,10 +41,12 @@ public class DbaAdapter {
 
     private final SQLContext sqlContext;
     private final ExcelBuilder excelBuilder;
+    private final CacheService cacheService;
 
-    public DbaAdapter(SQLContext sqlContext, ExcelBuilder excelBuilder) {
+    public DbaAdapter(SQLContext sqlContext, ExcelBuilder excelBuilder, CacheService cacheService) {
         this.sqlContext = sqlContext;
         this.excelBuilder = excelBuilder;
+        this.cacheService = cacheService;
     }
 
     private static List<Param> _extractBioParams(final BioQueryParams queryParams) {
@@ -906,6 +910,35 @@ public class DbaAdapter {
         } catch(Exception e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
+    }
+
+    private static String getRequestHash(HttpServletRequest request){
+        return request.getRequestURI() + "?" + request.getQueryString();
+    }
+
+    public <T extends Serializable> T getObjectFromCache(String cacheName, HttpServletRequest request) {
+        String requestHash = getRequestHash(request);
+        return cacheService.get(cacheName, requestHash);
+    }
+
+    public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
+        String key = getRequestHash(request);
+        cacheService.put(cacheName, key, value);
+    }
+
+    private static final String CACHE_CONTENT_HOLDER = "cached_list_content";
+    public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
+        String key = getRequestHash(request);
+        ABean contaiter = cacheService.get(cacheName, key);
+        Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
+        return content != null ? (List<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
+    }
+
+    public <T extends Serializable> void putListToCache(String cacheName, HttpServletRequest request, List<T> value) {
+        ABean container = new ABean();
+        container.put(CACHE_CONTENT_HOLDER, value);
+        String key = getRequestHash(request);
+        cacheService.put(cacheName, key, container);
     }
 
 }
