@@ -926,7 +926,7 @@ public class DbaAdapter {
         cacheService.put(cacheName, key, value);
     }
 
-    private static final String CACHE_CONTENT_HOLDER = "cached_list_content";
+    private static final String CACHE_CONTENT_HOLDER = "cached_content_holder";
     public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
         String key = getRequestHash(request);
         ABean contaiter = cacheService.get(cacheName, key);
@@ -941,4 +941,17 @@ public class DbaAdapter {
         cacheService.put(cacheName, key, container);
     }
 
+    public <T extends Serializable> BeansPage<T> getBeansPageFromCache(String cacheName, HttpServletRequest request) {
+        String key = getRequestHash(request);
+        ABean contaiter = cacheService.get(cacheName, key);
+        Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
+        return content != null ? (BeansPage<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
+    }
+
+    public <T extends Serializable> void putBeansPageToCache(String cacheName, HttpServletRequest request, BeansPage<T> value) {
+        ABean container = new ABean();
+        container.put(CACHE_CONTENT_HOLDER, value);
+        String key = getRequestHash(request);
+        cacheService.put(cacheName, key, container);
+    }
 }
