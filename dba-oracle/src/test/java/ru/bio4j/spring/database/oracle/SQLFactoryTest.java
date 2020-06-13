@@ -1,6 +1,8 @@
 package ru.bio4j.spring.database.oracle;
 
 import org.junit.*;
+import ru.bio4j.spring.database.commons.CrudReaderApi;
+import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
@@ -864,6 +866,39 @@ public class SQLFactoryTest {
         }, null);
 
         Assert.assertTrue(rslt.length() > 0);
+    }
+
+    @Test
+    public void testCursorParser() {
+        try {
+            CursorParser.pars("bios.movies1");
+        } catch (Exception e) {
+            Assert.assertTrue(e.getMessage().contains("is not found"));
+        }
+    }
+
+    @Test
+    public void testCrudReaderApi_loadPageExt0() {
+
+        SQLContext context = DbContextFactory.createHikariCP(
+                DataSourceProperties.builder()
+                        .driverClassName(testDBDriverName)
+                        .url(testDBUrl)
+                        .username("GIVCADMIN")
+                        .password("j12")
+                        .build(),
+                OraContext.class);
+
+        SQLDefinition sqlDefinition = CursorParser.pars("bios.movies");
+        List<Param> prms = Paramus.createParams(
+                "searchString", "икс",
+                Rest2sqlParamNames.PAGINATION_PARAM_PAGE, "last",
+                Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, 5
+        );
+
+        List<ABean> rslt = CrudReaderApi.loadPageExt(prms, null, null, context, sqlDefinition, null, ABean.class);
+
+        Assert.assertTrue(rslt.size() > 0);
     }
 
     public static class TestROject {

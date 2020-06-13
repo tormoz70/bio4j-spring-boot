@@ -718,7 +718,7 @@ public class Paramus implements Closeable {
         if(qprms.bioParams == null)
             qprms.bioParams = new ArrayList<>();
         Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGE, qprms.page, MetaType.INTEGER);
-        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, qprms.pageSize, MetaType.INTEGER);
+        Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, qprms.pageSize, MetaType.INTEGER);
         Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, qprms.offset, MetaType.INTEGER);
         Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, qprms.totalCount);
 //        Paramus.setParamValue(qprms.bioParams, RestParamNames.GETROW_PARAM_PKVAL, qprms.id);

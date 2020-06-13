@@ -165,7 +165,7 @@ public class DbaAdapter {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAll(prms,
                     filterAndSorter != null ? filterAndSorter.getFilter() : null,
@@ -348,7 +348,7 @@ public class DbaAdapter {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
         else
@@ -719,7 +719,7 @@ public class DbaAdapter {
             final Class<T> beanType,
             final FilterAndSorter filterAndSorter) {
         final List<Param> prms = DbUtils.decodeParams(params);
-        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 0);
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAll0Ext(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, beanType);
         else

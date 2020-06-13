@@ -129,17 +129,17 @@ public class OraWrapperInterpreter implements WrapperInterpreter {
     public String totalsToSQL(String alias, List<Total> totals, List<Field> fields) {
         if(totals != null) {
             StringBuilder result = new StringBuilder();
-            char comma;
+            String comma;
             Total.Aggregate aggregate;
             for (Total t : totals){
-                comma = (result.length() == 0) ? ' ' : ',';
+                comma = (result.length() == 0) ? " " : ", ";
                 final String fieldName = t.getFieldName();
                 aggregate = t.getAggregate();
                 if(aggregate != Total.Aggregate.UNDEFINED) {
-                    if(aggregate != Total.Aggregate.COUNT)
-                        result.append("COUNT(1)");
+                    if(aggregate == Total.Aggregate.COUNT)
+                        result.append(String.format("%sCOUNT(1) as %s", comma, Total.TOTALCOUNT_FIELD_NAME));
                     else
-                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggregate.name(), alias, fieldName, fieldName));
+                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggregate.name(), alias, fieldName, fieldName.toUpperCase()));
                 }
             }
             return result.toString();

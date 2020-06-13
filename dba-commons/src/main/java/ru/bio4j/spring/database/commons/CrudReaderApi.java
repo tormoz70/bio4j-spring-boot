@@ -1,9 +1,5 @@
 package ru.bio4j.spring.database.commons;
 
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
@@ -68,7 +64,7 @@ public class CrudReaderApi {
         if(LOG.isDebugEnabled())
             LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
         BeansPage result = new BeansPage();
-        final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, long.class, 0L);
+        final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, long.class, 0L);
         result.setTotalCount(Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, long.class, 0L));
         result.setPaginationOffset(Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L));
         if(crudOptions.isAppendMetadata()) result.setMetadata(cursorDef.getFields());
@@ -527,12 +523,20 @@ public class CrudReaderApi {
         PreparePageParams result = new PreparePageParams(Paramus.createParams(params));
 
         final Object location = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
+
+        final long paginationPagesize = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 50);
+        if(Paramus.getParam(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT) == null)
+            Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, paginationPagesize);
+        final long actualPageSize = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, long.class, 0L);
+
+        boolean gotoLastPage = Strings.compare(Paramus.paramValueAsString(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGE), "last", true) ||
+                Strings.compare(Paramus.paramValueAsString(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET), "last", true);
+        if(gotoLastPage)
+            Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, Sqls.UNKNOWN_RECS_TOTAL + 1 - actualPageSize);
+
         final long paginationOffset = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, int.class, 0);
         if(Paramus.getParam(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET) == null)
             Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, paginationOffset);
-        final long paginationPagesize = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, int.class, 50);
-        if(Paramus.getParam(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE) == null)
-            Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_PAGESIZE, paginationPagesize);
 
         final String paginationTotalcountStr = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
         final long paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, long.class);
@@ -560,12 +564,15 @@ public class CrudReaderApi {
 
         long factOffset = paginationOffset;
         Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
-        boolean gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
+        gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
         if (calcTotals || forceCalcCount || gotoLastPage) {
             result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.getCurrentUser());
             totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
-            if(gotoLastPage)
-                factOffset = (long) Math.floor((long)totalCount.getFact() / paginationPagesize) * paginationPagesize;
+            if(gotoLastPage) {
+                factOffset = (long) Math.floor((long) totalCount.getFact() / paginationPagesize) * paginationPagesize;
+                if(factOffset == (long)totalCount.getFact())
+                    factOffset -= paginationPagesize;
+            }
             if(LOG.isDebugEnabled())
                 LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount.getFact());
         }
@@ -636,7 +643,7 @@ public class CrudReaderApi {
             final SQLDefinition cursor,
             final Class<T> beanType) {
         PreparePageParams prepareLoadPageResult = _prepareLoadPageParams(params, filter, sort, null, context, cursor, false);
-        return readStoreDataExt(params, context, cursor, beanType);
+        return readStoreDataExt(prepareLoadPageResult.preparedParams, context, cursor, beanType);
     }
 
     /***

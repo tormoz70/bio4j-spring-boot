@@ -334,14 +334,13 @@ public class Strings {
         if (url != null) {
             return url.openStream();
         }
-        return null;
+        throw new IOException(String.format("File %s not found!", filePath));
     }
 
 
     public static String loadResourceAsString(String filePath) throws IOException {
         try (InputStream inputStream = openResourceAsStream(filePath)) {
-            String document = Utl.readStream(inputStream);
-            return document;
+            return Utl.readStream(inputStream);
         }
     }
 
