@@ -16,6 +16,7 @@ import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.clickhouse.ChContext;
 import ru.bio4j.spring.database.h2.H2Context;
 import ru.bio4j.spring.database.oracle.OraContext;
+import ru.bio4j.spring.database.pgsql.PgSQLContext;
 import ru.bio4j.spring.model.transport.CacheProperties;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Sso2ClientProperties;
@@ -61,6 +62,8 @@ public class DbaAutoConfiguration {
             return DbContextFactory.createHikariCP(dataSourceProperties, ChContext.class);
         else if(Strings.compare(dataSourceProperties.getDbmsName(), "h2", true))
             return DbContextFactory.createHikariCP(dataSourceProperties, H2Context.class);
+        else if(Strings.compare(dataSourceProperties.getDbmsName(), "pgsql", true))
+            return DbContextFactory.createHikariCP(dataSourceProperties, PgSQLContext.class);
         return DbContextFactory.createHikariCP(dataSourceProperties, OraContext.class);
     }
 

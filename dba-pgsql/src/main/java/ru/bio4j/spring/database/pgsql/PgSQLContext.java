@@ -1,20 +1,18 @@
-package ru.bio4j.spring.database.oracle;
+package ru.bio4j.spring.database.pgsql;
 
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
-import ru.bio4j.spring.database.commons.DbStatementPreparerer;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 
 import javax.sql.DataSource;
 
-public class OraContext extends DbContextAbstract {
-    private static final Logger LOG = LoggerFactory.getLogger(OraContext.class);
+public class PgSQLContext extends DbContextAbstract {
+    private static final Logger LOG = LoggerFactory.getLogger(PgSQLContext.class);
 
-    public OraContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
+    public PgSQLContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) throws Exception {
         super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {
@@ -23,28 +21,28 @@ public class OraContext extends DbContextAbstract {
                         if(attrs.getConnection() != null) {
                             String curSchema = sender.getDataSourceProperties().getCurrentSchema().toUpperCase();
                             LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
-                            DbUtils.execSQL(attrs.getConnection(), "alter session set current_schema="+curSchema);
+                            DbUtils.execSQL(attrs.getConnection(), "SET search_path = "+curSchema);
                             LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
                         }
                     }
             );
         }
 
-        wrappers = new OraWrappersImpl(this.getDBMSName());
+        wrappers = new PgSQLWrappersImpl(this.getDBMSName());
         DbUtils.getInstance().init(
-                new OraTypeConverterImpl(),
-                new OraUtilsImpl()
+                new PgSQLTypeConverterImpl(),
+                new PgSQLUtilsImpl()
         );
     }
 
     @Override
     public String getDBMSName() {
-        return "oracle";
+        return "pgsql";
     }
 
     @Override
     public SQLReader createReader(){
-        return new OraReader();
+        return new PgSQLReader();
     }
 
 }

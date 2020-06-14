@@ -55,7 +55,19 @@
                         <xs:sequence>
                             <xs:element name="text" type="xs:string">
                                 <xs:annotation>
-                                    <xs:documentation>Текст SQL-запроса.</xs:documentation>
+                                    <xs:documentation>
+                                        Текст SQL-запроса.
+                                        1. Здесь можкт быть прописан сам текст SQL. Например: <![CDATA[SELECT * FROM DUAL]]>
+                                        2. Здесь может быть прописана ссылка на файл с SQL запросом. Например: <![CDATA[{text-file:movies.sql}]]>
+                                        SQL запрпос может содержать следующие блоки:
+                                        /*@{cutempty}*/and a.pu_num = :id/*{cutempty}@*/ - при этом если значение параметра "id" = null,
+                                            то выражение внутри кометраиев /*@{cutempty}*/....../*{cutempty}@*/ будет вырезано
+                                        /*@{cutnotempty}*/and a.pu_num = :id/*{cutnotempty}@*/ - при этом если значение параметра "id" != null,
+                                            то выражение внутри кометраиев /*@{cutnotempty}*/....../*{cutnotempty}@*/ будет вырезано
+                                        /*@{cutiif}*//*[p_sys_curusr_roles != '3']*/and (a.org_id = to_number(:p_sys_curusr_roles))/*{cutiif}@*/ - при этом если js-выражение /*[...]*/ == true,
+                                            то выражение внутри кометраиев /*@{cutiif}*/....../*{cutiif}@*/ будет вырезано
+                                            при этом внутри js-выражения можно использовать все параметры которые можно использовать в SQL
+                                    </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="param" minOccurs="0" maxOccurs="unbounded">

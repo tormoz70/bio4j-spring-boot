@@ -272,6 +272,11 @@
                 <artifactId>bio4j-spring-dba-h2-lib</artifactId>
                 <version>${bio4j-spring-boot.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>
+                <version>${bio4j-spring-boot.version}</version>
+            </dependency>
 <!--            <dependency>-->
 <!--                <groupId>${project.groupId}</groupId>-->
 <!--                <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>-->
@@ -325,7 +330,7 @@
         <module>dbapi</module>
         <module>dba-commons</module>
         <module>dba-oracle</module>
-<!--        <module>dba-pgsql</module>-->
+        <module>dba-pgsql</module>
 		<module>dba-clickhouse</module>
         <module>dba-h2</module>
         <module>t-model</module>
