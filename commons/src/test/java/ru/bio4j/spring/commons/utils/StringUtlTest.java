@@ -157,4 +157,12 @@ public class StringUtlTest {
         String r = Strings.formatInterval(diffInMillies);
         Assert.assertEquals(r, "1 01:03:51.020");
     }
+
+    @Test
+    public void testFirstNotEmpty() throws Exception {
+        Assert.assertEquals("qwe", Strings.firstNotEmpty("qwe", "", null, "qwe", "asd"));
+        Assert.assertEquals("qwe", Strings.firstNotEmpty("", "qwe", "asd", null));
+        Assert.assertEquals("qwe", Strings.firstNotEmpty("", null, "", "qwe", "asd", null));
+        Assert.assertEquals("qwe", Strings.firstNotEmpty("", null, null, "qwe", "asd", null));
+    }
 }

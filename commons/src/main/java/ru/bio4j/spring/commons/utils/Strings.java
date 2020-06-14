@@ -353,4 +353,11 @@ public class Strings {
         }
     }
 
+    public static String firstNotEmpty(String ... vars) {
+        if ((vars != null) && (vars.length > 0)) {
+            return Arrays.stream(vars).filter(v -> !isNullOrEmpty(v)).findFirst().orElse(null);
+        }
+        return null;
+    }
+
 }
