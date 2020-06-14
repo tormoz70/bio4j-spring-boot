@@ -736,4 +736,28 @@ public class Paramus implements Closeable {
         Paramus.setParamValue(qprms.bioParams, Rest2sqlParamNames.LOCATE_PARAM_STARTFROM, qprms.offset);
     }
 
+    public static class Builder {
+	    List<Param> params = new ArrayList<>();
+
+        public Builder add(String name, Object value, MetaType forceType, Param.Direction direction) {
+            setParamValue(params, name, value, forceType, direction);
+            return this;
+        }
+        public Builder add(String name, Object value, MetaType forceType) {
+            setParamValue(params, name, value, forceType);
+            return this;
+        }
+	    public Builder add(String name, Object value) {
+	        setParamValue(params, name, value);
+	        return this;
+        }
+
+        public List<Param> build() {
+            return params;
+        }
+    }
+
+    public static Builder builder() {
+	    return new Builder();
+    }
 }
