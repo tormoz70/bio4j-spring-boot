@@ -2,6 +2,7 @@ package ru.bio4j.spring.database.pgsql;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
@@ -20,9 +21,11 @@ public class PgSQLContext extends DbContextAbstract {
                     (sender, attrs) -> {
                         if(attrs.getConnection() != null) {
                             String curSchema = sender.getDataSourceProperties().getCurrentSchema().toUpperCase();
-                            LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
-                            DbUtils.execSQL(attrs.getConnection(), "SET search_path = "+curSchema);
-                            LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
+                            if(!Strings.isNullOrEmpty(curSchema)) {
+                                LOG.debug("onAfterGetConnection - start setting current_schema=" + curSchema);
+                                DbUtils.execSQL(attrs.getConnection(), "SET search_path = " + curSchema);
+                                LOG.debug("onAfterGetConnection - OK. current_schema now is " + curSchema);
+                            }
                         }
                     }
             );

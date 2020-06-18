@@ -2,6 +2,7 @@ package ru.bio4j.spring.database.commons;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.BioSQLException;
@@ -21,7 +22,6 @@ import java.util.function.Supplier;
  * Реализует 3 основных вида запроса Query, Exec, Scalar
  */
 public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredProc {
-    private static final Logger LOG = LoggerFactory.getLogger(DbStoredProc.class);
 
     private String storedProcName;
 
@@ -95,8 +95,6 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
 
                     setParamsToStatement(); // Применяем параметры
 
-                    if(LOG.isDebugEnabled())
-                        LOG.debug("Try to execute (autocommit: {}) : {}", this.preparedStatement.getConnection().getAutoCommit(), DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
                     preparedStatement.execute();
 
                     getParamsFromStatement(); // Вытаскиваем OUT-параметры

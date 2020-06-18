@@ -3,6 +3,7 @@ package ru.bio4j.spring.database.oracle;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbStatementPreparerer;
@@ -22,9 +23,11 @@ public class OraContext extends DbContextAbstract {
                     (sender, attrs) -> {
                         if(attrs.getConnection() != null) {
                             String curSchema = sender.getDataSourceProperties().getCurrentSchema().toUpperCase();
-                            LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
-                            DbUtils.execSQL(attrs.getConnection(), "alter session set current_schema="+curSchema);
-                            LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
+                            if(!Strings.isNullOrEmpty(curSchema)) {
+                                LOG.debug("onAfterGetConnection - start setting current_schema=" + curSchema);
+                                DbUtils.execSQL(attrs.getConnection(), "alter session set current_schema=" + curSchema);
+                                LOG.debug("onAfterGetConnection - OK. current_schema now is " + curSchema);
+                            }
                         }
                     }
             );
