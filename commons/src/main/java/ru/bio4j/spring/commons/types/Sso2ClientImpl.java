@@ -15,7 +15,7 @@ import java.io.IOException;
 import static ru.bio4j.spring.commons.utils.Strings.isNullOrEmpty;
 
 public class Sso2ClientImpl implements Sso2Client {
-    private static final Logger LOG = LoggerFactory.getLogger(Sso2ClientImpl.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(Sso2ClientImpl.class);
 
     private static final String SSO2SERVICE_URL_PARAM = "${ss2client.sso2.service.url}";
 

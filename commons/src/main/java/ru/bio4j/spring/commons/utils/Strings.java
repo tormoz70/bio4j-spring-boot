@@ -6,6 +6,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
+import ru.bio4j.spring.commons.types.LogWrapper;
 
 import java.io.*;
 import java.net.URL;
@@ -21,7 +22,7 @@ import java.util.*;
  *
  */
 public class Strings {
-    private static final Logger LOG = LoggerFactory.getLogger(Strings.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(Strings.class);
 
 	/**
 	 * Проверяет строку на null или пустую (length == 0)

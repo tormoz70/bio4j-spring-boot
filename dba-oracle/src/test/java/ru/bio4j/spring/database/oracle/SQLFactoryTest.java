@@ -1,28 +1,30 @@
 package ru.bio4j.spring.database.oracle;
 
 import org.junit.*;
-import ru.bio4j.spring.database.commons.CrudReaderApi;
-import ru.bio4j.spring.database.commons.CursorParser;
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.database.api.SQLContext;
+import ru.bio4j.spring.database.api.SQLDefinition;
+import ru.bio4j.spring.database.api.SQLStoredProc;
+import ru.bio4j.spring.database.commons.CrudReaderApi;
+import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class SQLFactoryTest {
-    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest.class);
     private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
     private static final String testDBUrl = "jdbc:oracle:thin:@192.168.70.30:1521:EKBS02";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.WrapQueryType;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 import static java.util.Collections.unmodifiableMap;
 
 public class WrapperLoader {
-    private static final Logger LOG = LoggerFactory.getLogger(WrapperLoader.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(WrapperLoader.class);
 
     private static DocumentBuilder createDocumentBuilder() {
         try {
@@ -52,8 +53,7 @@ public class WrapperLoader {
                 map.put(WrapQueryType.valueOf(name.toUpperCase()), n.getTextContent());
             }
         }
-        if(LOG.isDebugEnabled())
-            LOG.debug("loaded {} queries for cursor.wrapper", map.size());
+        LOG.debug("loaded {} queries for cursor.wrapper", map.size());
         return unmodifiableMap(map);
     }
 }

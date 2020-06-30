@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
@@ -15,7 +16,7 @@ import ru.bio4j.spring.database.api.*;
 import javax.sql.DataSource;
 
 public abstract class DbContextAbstract implements SQLContext {
-    private static final Logger LOG = LoggerFactory.getLogger(DbContextAbstract.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbContextAbstract.class);
 
     protected Wrappers wrappers;
     protected DataSource dataSource;
@@ -83,29 +84,27 @@ public abstract class DbContextAbstract implements SQLContext {
     }
 
     protected synchronized Connection getConnection(User user) throws SQLException {
-        if(LOG.isDebugEnabled())
-            LOG.debug("Getting connection from pool...");
+        LOG.debug("Getting connection from pool...");
         Connection conn = dataSource.getConnection();
         if(conn.isClosed()) {
             forceCloseConnection(conn);
-            if(LOG.isDebugEnabled())LOG.error("Connection is closed!");
+            LOG.debug("Connection is closed!");
             throw new SQLException("Connection is closed!");
         }
         if(!conn.isValid(5)) {
             forceCloseConnection(conn);
-            if(LOG.isDebugEnabled())LOG.error("Connection is not valid!");
+            LOG.debug("Connection is not valid!");
             throw new SQLException("Connection is not valid!");
         }
 
         if(conn != null) {
             try {
                 doAfterConnect(SQLConnectionConnectedEvent.Attributes.build(conn, user));
-                if(LOG.isDebugEnabled())
-                    LOG.debug("Connection is ok...");
+                LOG.debug("Connection is ok...");
                 return conn;
             } catch (Exception e) {
                 forceCloseConnection(conn);
-                if(LOG.isDebugEnabled())LOG.error(String.format("Unexpected error on execute doAfterConnect event! Message: %s", e.getMessage()), e);
+                LOG.debug(String.format("Unexpected error on execute doAfterConnect event! Message: %s", e.getMessage()), e);
                 throw e;
             }
         }

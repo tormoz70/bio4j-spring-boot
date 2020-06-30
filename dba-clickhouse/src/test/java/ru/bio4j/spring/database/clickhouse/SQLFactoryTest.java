@@ -2,22 +2,26 @@ package ru.bio4j.spring.database.clickhouse;
 
 import org.junit.*;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
+import ru.bio4j.spring.commons.types.LogWrapper;
+import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.ABeans;
+import ru.bio4j.spring.commons.utils.Utl;
+import ru.bio4j.spring.database.api.SQLContext;
+import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
-import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.commons.utils.Utl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.Total;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQLFactoryTest {
 
@@ -25,7 +29,7 @@ public class SQLFactoryTest {
 //    логин: default/j12
 //    таблица jdbc_test.data0
 
-    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest.class);
 //    private static final String testDBDriverName = "cc.blynk.clickhouse.ClickHouseDriver";
     private static final String testDBDriverName = "com.github.housepower.jdbc.ClickHouseDriver";
 //    private static final String testDBDriverName = "ru.yandex.clickhouse.ClickHouseDriver";

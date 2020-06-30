@@ -4,25 +4,21 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.DbServer;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class H2ApiTest {
-    private static final Logger LOG = LoggerFactory.getLogger(H2ApiTest.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(H2ApiTest.class);
 
     private static final String testDBDriverName = "org.h2.Driver";
 

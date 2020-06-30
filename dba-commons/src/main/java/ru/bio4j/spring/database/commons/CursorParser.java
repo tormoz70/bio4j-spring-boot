@@ -1,24 +1,23 @@
 package ru.bio4j.spring.database.commons;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
+import ru.bio4j.spring.commons.utils.*;
+import ru.bio4j.spring.database.api.SQLDef;
 import ru.bio4j.spring.database.api.SQLDefinition;
+import ru.bio4j.spring.database.api.SQLType;
+import ru.bio4j.spring.database.api.SelectSQLDef;
 import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Alignment;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
-import ru.bio4j.spring.database.api.SQLDef;
-import ru.bio4j.spring.database.api.SQLType;
-import ru.bio4j.spring.database.api.SelectSQLDef;
-import ru.bio4j.spring.commons.utils.*;
 import ru.bio4j.spring.model.transport.jstore.Total;
 
 import java.io.File;
@@ -35,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CursorParser {
-    private static final Logger LOG = LoggerFactory.getLogger(CursorParser.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(CursorParser.class);
 
 
     private static final String ATTRS_DELIMITER = ";";

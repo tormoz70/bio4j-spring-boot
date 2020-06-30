@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class JsonUtlTest {
-    private static final Logger LOG = LoggerFactory.getLogger(JsonUtlTest.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(JsonUtlTest.class);
 
 	private final TBox testBox = new TBox();
 

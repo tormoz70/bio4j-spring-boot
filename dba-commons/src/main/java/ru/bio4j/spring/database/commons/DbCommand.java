@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.model.transport.BioSQLException;
@@ -17,7 +18,7 @@ import ru.bio4j.spring.database.api.*;
  * Базовый класс
  */
 public abstract class DbCommand<T extends SQLCommand> implements SQLCommand {
-    private static final Logger LOG = LoggerFactory.getLogger(DbCommand.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbCommand.class);
 
     protected List<Param> params = null;
     protected int timeout = 60;

@@ -2,6 +2,7 @@ package ru.bio4j.spring.database.commons;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.SrvcUtils;
 import ru.bio4j.spring.database.api.*;
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
  * Реализует 3 основных вида запроса Query, Exec, Scalar
  */
 public class DbDynamicCursor extends DbCursor implements SQLCursor {
-    private static final Logger LOG = LoggerFactory.getLogger(DbDynamicCursor.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbDynamicCursor.class);
 
 
     public DbDynamicCursor(SQLContext context) {
@@ -63,7 +64,6 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
                 statementPreparerer.prepare(() -> { return DbUtils.cutFilterConditions(sql, params); });
             setParamsToStatement(); // Применяем параметры
 
-            if (LOG.isDebugEnabled())
             try (ResultSet result = preparedStatement.executeQuery()) {
                 isActive = true;
                 while (reader.next(result)) {

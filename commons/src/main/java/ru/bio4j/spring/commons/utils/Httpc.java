@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.BioError;
 import ru.bio4j.spring.model.transport.Prop;
 
@@ -14,7 +15,7 @@ import java.net.URL;
 import java.util.Enumeration;
 
 public class Httpc {
-    private static final Logger LOG = LoggerFactory.getLogger(Httpc.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(Httpc.class);
 
     public static interface Callback {
         void process(InputStream inputStream) throws Exception;

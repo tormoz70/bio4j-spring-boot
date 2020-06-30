@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.security.MessageDigest;
 //import org.apache.commons.codec.digest.DigestUtils;
 
 public class MD5Checksum {
-    private static final Logger LOG = LoggerFactory.getLogger(MD5Checksum.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(MD5Checksum.class);
 
 //    public static void main(String args[]) {
 //        String file = "C:/temp/abc.txt";
@@ -41,10 +42,10 @@ public class MD5Checksum {
             byte[] hash = md.digest();
             checksum = new BigInteger(1, hash).toString(16); //don't use this, truncates leading zero
         } catch (IOException ex) {
-            if(LOG.isDebugEnabled())LOG.error(null, ex);
+            LOG.debug(null, ex);
             throw ex;
         } catch (NoSuchAlgorithmException ex) {
-            if(LOG.isDebugEnabled())LOG.error(null, ex);
+            LOG.debug(null, ex);
             throw ex;
         }
 

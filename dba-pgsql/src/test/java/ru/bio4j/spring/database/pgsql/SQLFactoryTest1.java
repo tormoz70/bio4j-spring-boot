@@ -1,8 +1,7 @@
 package ru.bio4j.spring.database.pgsql;
 
 import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Ignore
 public class SQLFactoryTest1 {
-    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest1.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest1.class);
     private static final String testDBDriverName = "org.postgresql.Driver";
 //    private static final String testDBUrl = "jdbc:postgresql://192.168.50.47:5432/postgres";
 //    private static final String testDBUrl = "jdbc:postgresql://localhost:5432/postgres";

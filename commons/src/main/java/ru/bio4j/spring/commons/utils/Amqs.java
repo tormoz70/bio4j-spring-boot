@@ -3,12 +3,13 @@ package ru.bio4j.spring.commons.utils;
 import com.rabbitmq.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class Amqs {
-    private static final Logger LOG = LoggerFactory.getLogger(Amqs.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(Amqs.class);
 
 //    private Amqs() { /* hidden constructor */ }
 //

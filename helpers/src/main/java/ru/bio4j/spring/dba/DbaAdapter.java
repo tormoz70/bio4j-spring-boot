@@ -3,22 +3,22 @@ package ru.bio4j.spring.dba;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
-//import ru.bio4j.ng.commons.utils.Jsons;
-import ru.bio4j.spring.commons.utils.SrvcUtils;
-import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Jecksons;
+import ru.bio4j.spring.commons.utils.SrvcUtils;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
-import ru.bio4j.spring.database.commons.*;
+import ru.bio4j.spring.database.commons.CrudReaderApi;
+import ru.bio4j.spring.database.commons.CrudWriterApi;
+import ru.bio4j.spring.database.commons.CursorParser;
+import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
@@ -33,11 +33,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+//import ru.bio4j.ng.commons.utils.Jsons;
+
 /**
  * Адаптер для доступа к базе данных bio4j
  */
 public class DbaAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(DbaAdapter.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbaAdapter.class);
 
     private final SQLContext sqlContext;
     private final ExcelBuilder excelBuilder;
@@ -60,8 +62,7 @@ public class DbaAdapter {
             try {
                 fs = Jecksons.getInstance().decodeFilterAndSorter(queryParams.jsonData);
             } catch (Exception e) {
-                if (LOG.isDebugEnabled())
-                    LOG.warn(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
+                LOG.debug(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
             }
         }
         if(fs == null) {

@@ -1,16 +1,15 @@
 package ru.bio4j.spring.database.commons;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.model.transport.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Sqls;
-import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.model.transport.BioSQLException;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 import ru.bio4j.spring.database.api.SQLParamSetter;
 import ru.bio4j.spring.database.api.SqlTypeConverter;
+import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.Param;
 
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -23,7 +22,7 @@ import java.util.List;
  * Засовывает значения из params в CallableStatement
  */
 public class DbCallableParamSetter implements SQLParamSetter {
-    private static final Logger LOG = LoggerFactory.getLogger(DbCallableParamSetter.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DbCallableParamSetter.class);
 
 //    private DbCommand owner;
     private SqlTypeConverter sqlTypeConverter = new SqlTypeConverterImpl();

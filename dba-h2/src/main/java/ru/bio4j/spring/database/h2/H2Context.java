@@ -1,8 +1,6 @@
 package ru.bio4j.spring.database.h2;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
@@ -11,7 +9,7 @@ import ru.bio4j.spring.model.transport.DataSourceProperties;
 import javax.sql.DataSource;
 
 public class H2Context extends DbContextAbstract {
-    private static final Logger LOG = LoggerFactory.getLogger(H2Context.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(H2Context.class);
 
     private final DbServer dbServer;
 

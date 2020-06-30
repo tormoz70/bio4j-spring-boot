@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.Param;
@@ -23,12 +24,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UtlTest {
-    private final static Logger LOG = LoggerFactory.getLogger(UtlTest.class);
+    private final static LogWrapper LOG = LogWrapper.getLogger(UtlTest.class);
 
     @Test
     public void getClassNamesFromPackageTest() {
-        if(LOG.isDebugEnabled())
-            LOG.debug("Debug logger test!");
+        LOG.debug("Debug logger test!");
     //	  ArrayList<String> clss = getClassNamesFromPackage("");
     //	  Assert.
     }

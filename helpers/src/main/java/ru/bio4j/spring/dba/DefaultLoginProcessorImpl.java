@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class DefaultLoginProcessorImpl implements LoginProcessor {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginProcessorImpl.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(DefaultLoginProcessorImpl.class);
 
     @Autowired
     @Qualifier("default")

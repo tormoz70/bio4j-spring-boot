@@ -1,8 +1,7 @@
 package ru.bio4j.spring.database.pgsql;
 
 import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
@@ -11,22 +10,25 @@ import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.*;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 //@Ignore
 public class SQLFactoryTest {
-    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
-//    private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
+    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest.class);
+    //    private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";
     private static final String testDBDriverName = "org.postgresql.Driver";
-//    private static final String testDBUrl = "jdbc:postgresql://192.168.50.47:5432/postgres";
+    //    private static final String testDBUrl = "jdbc:postgresql://192.168.50.47:5432/postgres";
     private static final String testDBUrl = "jdbc:postgresql://localhost:5432/postgres";
 //    private static final String testDBUrl = "jdbc:postgresql://10.10.0.221:5432/postgres";
 
-//    private static final String testDBUrl = "jdbc:oracle:thin:@cmon-ora-dev:1521:MICEXDB";
+    //    private static final String testDBUrl = "jdbc:oracle:thin:@cmon-ora-dev:1521:MICEXDB";
     //private static final String testDBUrl = "jdbc:oracle:oci:@GIVCDB_EKBS03";
     //private static final String testDBUrl = "jdbc:oracle:thin:@https://databasetrial0901-rugivcmkrftrial07058.db.em1.oraclecloudapps.com/apex:1521:databasetrial0901";
 //    private static final String testDBUsr = "master";
@@ -58,7 +60,7 @@ public class SQLFactoryTest {
         //if(true) return;
         try {
             context.execBatch((conn) -> {
-                try(Statement cs = conn.createStatement()) {
+                try (Statement cs = conn.createStatement()) {
                     String sql = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("ddl_cre_test_table.sql"));
                     cs.execute(sql);
                     sql = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("ddl_cre_prog_simple.sql"));
@@ -116,14 +118,13 @@ public class SQLFactoryTest {
                 List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 101).pop();
                 context.createCursor()
                         .init(conn, sql, null)
-                        .fetch(prms, context.getCurrentUser(), rs->{
+                        .fetch(prms, context.getCurrentUser(), rs -> {
                             var.dummy += rs.getValue("DM", Double.class);
                             return true;
                         });
                 return var.dummy;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("dummysum: " + dummysum);
+            LOG.debug("dummysum: " + dummysum);
             Assert.assertEquals(dummysum, 101.0, 0.0);
         } catch (Exception ex) {
             LOG.error("Error!", ex);
@@ -147,14 +148,13 @@ public class SQLFactoryTest {
                 ).pop();
                 context.createCursor()
                         .init(conn, sql, null)
-                        .fetch(prms, context.getCurrentUser(), rs->{
+                        .fetch(prms, context.getCurrentUser(), rs -> {
                             var.dummy += rs.getValue("fld1", Double.class);
                             return true;
                         });
                 return var.dummy;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("dummysum: " + dummysum);
+            LOG.debug("dummysum: " + dummysum);
             Assert.assertEquals(dummysum, 0.0, 0.0);
         } catch (Exception ex) {
             LOG.error("Error!", ex);
@@ -172,8 +172,8 @@ public class SQLFactoryTest {
                 String sql = "select * from table(givcapi.upld.get_schemas)";
                 context.createCursor()
                         .init(conn, sql, null)
-                        .fetch(context.getCurrentUser(), rs->{
-                            if(var.bummy == null)
+                        .fetch(context.getCurrentUser(), rs -> {
+                            if (var.bummy == null)
                                 var.bummy = rs.getValue("XSD_BODY", byte[].class);
                             return true;
                         });
@@ -192,29 +192,27 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((conn) -> {
                 int leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 String storedProgName = "test_stored_prop";
-                try(Paramus paramus = Paramus.set(new ArrayList<Param>())) {
+                try (Paramus paramus = Paramus.set(new ArrayList<Param>())) {
                     paramus.add("p_param1", "FTW")
-                          .add(Param.builder()
-                                  .name("p_param2")
-                                  .type(MetaType.INTEGER)
-                                  .direction(Param.Direction.OUT)
-                                  .build());
+                            .add(Param.builder()
+                                    .name("p_param2")
+                                    .type(MetaType.INTEGER)
+                                    .direction(Param.Direction.OUT)
+                                    .build());
                     cmd.init(conn, storedProgName);
                     cmd.execSQL(paramus.get(), context.getCurrentUser());
                 }
-                try(Paramus paramus = Paramus.set(cmd.getParams())) {
+                try (Paramus paramus = Paramus.set(cmd.getParams())) {
                     leng1 = Utl.nvl(paramus.getParamValue("p_param2", Integer.class), 0);
                 }
                 conn.rollback();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -227,12 +225,11 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((conn) -> {
                 int leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 List<Param> prms;
-                try(Paramus paramus = Paramus.set(new ArrayList<Param>())) {
+                try (Paramus paramus = Paramus.set(new ArrayList<Param>())) {
                     paramus.add(Param.builder().name("p_param1").type(MetaType.INTEGER).value(null).build())
                             .add("p_param2", "QWE")
                             .add(Param.builder().name("p_param3").type(MetaType.INTEGER).value(1).build())
@@ -245,8 +242,7 @@ public class SQLFactoryTest {
                 conn.rollback();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -259,12 +255,11 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((conn) -> {
                 int leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 List<Param> prms;
-                try(Paramus paramus = Paramus.set(new ArrayList<Param>())) {
+                try (Paramus paramus = Paramus.set(new ArrayList<Param>())) {
                     paramus.add(Param.builder().name("p_param1").value(new BigDecimal(123)).build())
                             .add("p_param2", "QWE")
                             .add(Param.builder().name("p_param3").value(1D).build())
@@ -277,8 +272,7 @@ public class SQLFactoryTest {
                 conn.rollback();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -291,18 +285,15 @@ public class SQLFactoryTest {
         try {
             long leng = context.execBatch((conn) -> {
                 long leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 PgSQLUtilsImpl utl = new PgSQLUtilsImpl();
                 StoredProgMetadata md = utl.detectStoredProcParamsAuto("test_stored_inout", conn, null);
-                if(LOG.isDebugEnabled())
-                    LOG.debug("md: " + md);
+                LOG.debug("md: " + md);
                 leng1 = md.getParamDeclaration().size();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 4);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -322,8 +313,7 @@ public class SQLFactoryTest {
         try {
             long leng = context.execBatch((conn) -> {
                 long leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
 
@@ -340,8 +330,7 @@ public class SQLFactoryTest {
                 conn.rollback();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -354,13 +343,12 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((conn) -> {
                 int leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 String storedProgName = "test_stored_prop";
                 List<Param> prms = new ArrayList<>();
-                try(Paramus paramus = Paramus.set(prms)) {
+                try (Paramus paramus = Paramus.set(prms)) {
                     paramus.add("param1", "FTW")
                             .add(Param.builder()
                                     .name("param2")
@@ -375,8 +363,7 @@ public class SQLFactoryTest {
                 conn.rollback();
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (BioSQLException ex) {
             LOG.error("Error!", ex);
@@ -402,12 +389,11 @@ public class SQLFactoryTest {
     public void testSQLCommandExecError() throws Exception {
         try {
             context.execBatch((SQLActionVoid1<String>) (conn, param) -> {
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn + "; param: " + param);
+                LOG.debug("conn: " + conn + "; param: " + param);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 String storedProgName = "test_stored_error";
-                try(Paramus paramus = Paramus.set(new ArrayList<Param>())) {
+                try (Paramus paramus = Paramus.set(new ArrayList<Param>())) {
                     paramus.add("p_param1", "FTW")
                             .add(Param.builder()
                                     .name("p_param2")
@@ -424,34 +410,32 @@ public class SQLFactoryTest {
             Assert.assertTrue(errMsgOk);
         }
     }
-    
+
     @Test
     public void testSQLCommandExecSQLAutoCommit() throws Exception {
         try {
             int leng = context.execBatch((conn) -> {
                 int leng1 = 0;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 String storedProgName = "test_stored_prop";
                 List<Param> prms = new ArrayList<>();
-                try(Paramus paramus = Paramus.set(prms)) {
+                try (Paramus paramus = Paramus.set(prms)) {
                     paramus.add("param1", "FTW")
-                        .add(Param.builder()
-                                .name("param2")
-                                .type(MetaType.INTEGER)
-                                .direction(Param.Direction.OUT)
-                                .build());
+                            .add(Param.builder()
+                                    .name("param2")
+                                    .type(MetaType.INTEGER)
+                                    .direction(Param.Direction.OUT)
+                                    .build());
                 }
                 cmd.init(conn, storedProgName).execSQL(prms, context.getCurrentUser());
-                try(Paramus paramus = Paramus.set(cmd.getParams())) {
+                try (Paramus paramus = Paramus.set(cmd.getParams())) {
                     leng1 = Utl.nvl(paramus.getParamValue("param2", Integer.class), 0);
                 }
                 return leng1;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("leng: " + leng);
+            LOG.debug("leng: " + leng);
             Assert.assertEquals(leng, 3);
         } catch (Exception ex) {
             LOG.error("Error!", ex);
@@ -489,8 +473,7 @@ public class SQLFactoryTest {
             }, params, null);
             role = getParamValue(params, int.class, "v_role_id");
             org_id = getParamValue(params, int.class, "v_org_id");
-            if(LOG.isDebugEnabled())
-                LOG.debug(String.format("Login: OK; role: %d; org_id: %d", role, org_id));
+            LOG.debug(String.format("Login: OK; role: %d; org_id: %d", role, org_id));
             Assert.assertEquals(role, 6);
         } catch (SQLException ex) {
             LOG.error("Error!!!", ex);
@@ -502,12 +485,11 @@ public class SQLFactoryTest {
         try {
             int c = context.execBatch((conn) -> {
                 ResultSet resultSet = null;
-                if(LOG.isDebugEnabled())
-                    LOG.debug("conn: " + conn);
+                LOG.debug("conn: " + conn);
 
                 SQLStoredProc cmd = context.createStoredProc();
                 String storedProgName = "test_stored_cursor";
-                try(Paramus paramus = Paramus.set(new ArrayList<Param>())) {
+                try (Paramus paramus = Paramus.set(new ArrayList<Param>())) {
                     paramus.add("p_param1", "FTW")
                             .add(Param.builder()
                                     .name("p_param2")
@@ -516,12 +498,11 @@ public class SQLFactoryTest {
                                     .build());
                     cmd.init(conn, storedProgName).execSQL(paramus.get(), context.getCurrentUser());
                 }
-                try(Paramus paramus = Paramus.set(cmd.getParams())) {
+                try (Paramus paramus = Paramus.set(cmd.getParams())) {
                     resultSet = paramus.getParamValue("p_param2", ResultSet.class);
-                    if(resultSet.next()) {
+                    if (resultSet.next()) {
                         String userName = resultSet.getString("ROLNAME");
-                        if(LOG.isDebugEnabled())
-                            LOG.debug("userName: " + userName);
+                        LOG.debug("userName: " + userName);
                         Assert.assertTrue(Arrays.asList("PG_SIGNAL_BACKEND", "PG_MONITOR").contains(userName.toUpperCase()));
                     }
                 }
@@ -544,14 +525,13 @@ public class SQLFactoryTest {
         StringBuilder sb = new StringBuilder();
         sb.append("{Command.Params(before exec): {\n");
         for (Param p : params)
-            sb.append("\t"+p.toString()+",\n");
+            sb.append("\t" + p.toString() + ",\n");
         sb.append("}}");
 
         SQLException e = new SQLException("QWE-TEST");
         BioSQLException r = BioSQLException.create(String.format("%s:\n - sql: %s;\n - %s", "Error on execute command.", "select * from dual", sb.toString()), e);
         String msg = r.getMessage();
-        if(LOG.isDebugEnabled())
-            LOG.debug(msg);
+        LOG.debug(msg);
     }
 
     @Test
@@ -561,13 +541,12 @@ public class SQLFactoryTest {
             Integer dummy = context.execBatch((conn) -> {
                 context.createCursor()
                         .init(conn, sql, null)
-                        .fetch(context.getCurrentUser(), rs->{
-                           return false;
+                        .fetch(context.getCurrentUser(), rs -> {
+                            return false;
                         });
                 return 0;
             }, null);
-            if(LOG.isDebugEnabled())
-                LOG.debug("dummy: " + dummy);
+            LOG.debug("dummy: " + dummy);
             Assert.assertEquals(dummy, new Integer(0));
         } catch (Exception ex) {
             LOG.error("Error!", ex);

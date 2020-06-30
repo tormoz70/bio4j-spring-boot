@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Expression;
@@ -32,7 +33,7 @@ import java.util.regex.Pattern;
 import static ru.bio4j.spring.model.transport.jstore.filter.FilterBuilder.*;
 
 public class Utl {
-    private static final Logger LOG = LoggerFactory.getLogger(Utl.class);
+    private static final LogWrapper LOG = LogWrapper.getLogger(Utl.class);
 
 
     /**
@@ -1149,8 +1150,7 @@ public class Utl {
             rslt.add(rootAnd);
             return rslt;
         } catch (Exception e) {
-            if (LOG.isDebugEnabled())
-                LOG.error("Error parsing simple filter \"{}\". Msg: {}", simpleFilter, e.getMessage());
+            LOG.debug(String.format("Error parsing simple filter \"%s\"!", simpleFilter), e);
             return null;
         }
     }
@@ -1172,8 +1172,7 @@ public class Utl {
                     return null;
             }
         } catch (Exception e) {
-            if (LOG.isDebugEnabled())
-                LOG.error("Error parsing simple sort \"{}\". Msg: {}", simpleSort, e.getMessage());
+            LOG.debug(String.format("Error parsing simple sort \"%s\"!", simpleSort), e);
         }
         return rslt;
     }
