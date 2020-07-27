@@ -51,31 +51,6 @@ public class DbaAdapter {
         this.cacheService = cacheService;
     }
 
-    private static List<Param> _extractBioParams(final BioQueryParams queryParams) {
-        Paramus.setQueryParamsToBioParams(queryParams);
-        return queryParams.bioParams;
-    }
-
-    private static FilterAndSorter _createFilterAndSorter(final BioQueryParams queryParams) {
-        FilterAndSorter fs = null;
-        if(!Strings.isNullOrEmpty(queryParams.jsonData)) {
-            try {
-                fs = Jecksons.getInstance().decodeFilterAndSorter(queryParams.jsonData);
-            } catch (Exception e) {
-                LOG.debug(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
-            }
-        }
-        if(fs == null) {
-            fs = new FilterAndSorter();
-            if(queryParams.sort != null) {
-                fs.setSorter(new ArrayList<>());
-                fs.getSorter().addAll(queryParams.sort);
-            }
-            fs.setFilter(queryParams.filter);
-        }
-        return fs;
-    }
-
     public WrappedRequest wrappedRequest(final HttpServletRequest request) {
         return SrvcUtils.wrappedRequest(request);
     }
@@ -91,10 +66,10 @@ public class DbaAdapter {
     private RequestParamsPack _parsRequestPack(final String bioCode, final HttpServletRequest request) {
         RequestParamsPack result = new RequestParamsPack();
         result.queryParams = wrappedRequest(request).getBioQueryParams();
-        result.params = _extractBioParams(result.queryParams);
+        result.params = UTool.extractBioParams(result.queryParams);
         result.context = getSqlContext();
         result.sqlDefinition = CursorParser.pars(bioCode);
-        result.filterAndSorter = _createFilterAndSorter(result.queryParams);
+        result.filterAndSorter = UTool.createFilterAndSorter(result.queryParams);
         result.user = wrappedRequest(request).getUser();
         return result;
     }
