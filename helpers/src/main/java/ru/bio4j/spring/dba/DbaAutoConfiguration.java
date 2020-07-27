@@ -20,6 +20,7 @@ import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.database.pgsql.PgSQLContext;
 import ru.bio4j.spring.model.transport.CacheProperties;
 import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.transport.DatabaseConnectionsProperties;
 import ru.bio4j.spring.model.transport.Sso2ClientProperties;
 import ru.bio4j.spring.model.transport.serializers.BeanExplorer;
 import ru.bio4j.spring.model.transport.serializers.DateSerializerConfig;
@@ -28,17 +29,16 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 @Configuration
-@Import({ DateSerializerConfig.class })
-@EnableConfigurationProperties({ DataSourceProperties.class, CacheProperties.class, Sso2ClientProperties.class })
+@EnableConfigurationProperties({ DatabaseConnectionsProperties.class, CacheProperties.class, Sso2ClientProperties.class })
 public class DbaAutoConfiguration {
 
-    private final DataSourceProperties dataSourceProperties;
+    private final DatabaseConnectionsProperties dataSourceProperties;
     private final CacheProperties cacheProperties;
     private final Sso2ClientProperties sso2ClientProperties;
     private final ApplicationContext applicationContext;
 
     public DbaAutoConfiguration(
-            DataSourceProperties dataSourceProperties,
+            DatabaseConnectionsProperties dataSourceProperties,
             CacheProperties cacheProperties,
             Sso2ClientProperties sso2ClientProperties,
             ApplicationContext applicationContext) {

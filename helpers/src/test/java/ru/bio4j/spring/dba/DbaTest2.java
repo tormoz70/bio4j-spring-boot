@@ -17,7 +17,7 @@ import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=DbaAutoConfiguration.class)
-@TestPropertySource(locations="classpath:test.properties")
+@TestPropertySource(locations="classpath:test-properties.yml")
 public class DbaTest2 {
     @Autowired
     private ApplicationContext applicationContext;

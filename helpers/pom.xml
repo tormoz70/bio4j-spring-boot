@@ -76,6 +76,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>bio4j-spring-tmodel-lib</artifactId>
+        </dependency>
 
         <!-- for tests -->
         <dependency>

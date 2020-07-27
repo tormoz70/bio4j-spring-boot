@@ -2,33 +2,33 @@
 logging:
   config: "classpath:logging.xml"
 
-spring:
-  datasource:
-    hikari:
-      connectionTimeout: 20000
-      minimumPoolSize: 1
-      maximumPoolSize: 5
-
 # connections
-ekb:
-  datasource:
-    connections:
-      - connection:
-          id: default
-          dbmsName: clickhouse
+database:
+  connections:
+    -
+      id: default
+      dbmsName: clickhouse
+      pool:
+        connectionTimeout: 20000
+        minimumPoolSize: 1
+        maximumPoolSize: 5
 #          driverClassName: cc.blynk.clickhouse.ClickHouseDriver
-          driverClassName: com.github.housepower.jdbc.ClickHouseDriver
-          url: jdbc:clickhouse://192.168.70.101:9000
-          username: default
-          password: j12
-      - connection:
-          id: eais02
-          dbmsName: oracle
-          driverClassName: oracle.jdbc.driver.OracleDriver
-          url: jdbc:oracle:thin:@192.168.70.30:1521:EKBS02
-          username: givcadmin
-          password: j12
-          currentSchema: GIVCADMIN
+      driverClassName: com.github.housepower.jdbc.ClickHouseDriver
+      url: jdbc:clickhouse://192.168.70.101:9000
+      username: default
+      password: j12
+    -
+      id: eais02
+      dbmsName: oracle
+      pool:
+        connectionTimeout: 20000
+        minimumPoolSize: 1
+        maximumPoolSize: 5
+      driverClassName: oracle.jdbc.driver.OracleDriver
+      url: jdbc:oracle:thin:@192.168.70.30:1521:EKBS02
+      username: givcadmin
+      password: j12
+      currentSchema: GIVCADMIN
 
 
 # ecache
