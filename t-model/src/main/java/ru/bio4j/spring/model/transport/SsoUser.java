@@ -1,12 +1,14 @@
 package ru.bio4j.spring.model.transport;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
-import springfox.documentation.annotations.ApiIgnore;
+import ru.bio4j.spring.model.transport.serializers.DateSerializerOpt;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Date;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class SsoUser implements Principal, Serializable {
@@ -15,6 +17,10 @@ public class SsoUser implements Principal, Serializable {
     private String innerUid;
     @ApiModelProperty("Токен безопасности. Передавать в заголовок \"X-SToken\" для всех запросов")
     private String stoken;
+    @ApiModelProperty("Дата/время когда истекает срокдействия токена безопасности")
+    @JsonSerialize(using = DateSerializerOpt.class)
+    @JsonDeserialize
+    private Date stokenExpire;
     @ApiModelProperty("Логин пользователя (уникальное имя пользователя, которое используется при входе в систему)")
     private String login;
     @ApiModelProperty("ФИО пользователя")
@@ -169,5 +175,13 @@ public class SsoUser implements Principal, Serializable {
 
     public void setAnonymouse(Boolean anonymouse) {
         this.anonymouse = anonymouse;
+    }
+
+    public Date getStokenExpire() {
+        return stokenExpire;
+    }
+
+    public void setStokenExpire(Date stokenExpire) {
+        this.stokenExpire = stokenExpire;
     }
 }

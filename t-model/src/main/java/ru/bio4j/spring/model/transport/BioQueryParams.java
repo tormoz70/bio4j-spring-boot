@@ -28,6 +28,9 @@ public class BioQueryParams {
     public String login;
     @Prop(name = CS_UPLOADTYPE)
     public String fcloudUploadType;
+    @Prop(name = "lifetime")
+    public String lifetime;
+
 
     @Prop(name = "page")
     public String pageOrig;
