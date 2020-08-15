@@ -9,7 +9,7 @@ public class DateSerializerConfig {
     @Bean
     @Qualifier("default")
     public DateSerializer dateSerializerDefault() {
-        return new DateSerializer() {};
+        return new DateSerializerDefault() {};
     }
 
 

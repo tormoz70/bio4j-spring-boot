@@ -11,19 +11,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public interface DateSerializer {
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
-    default void serialize (Date value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
-        generator.writeString(formatter.format(value));
-    }
+    void serialize (Date value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException;
 
-    default Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
-        String date = jsonParser.getText();
-        try {
-            return formatter.parse(date);
-        } catch(Exception e) {
-            return null;
-        }
-    }
+    Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException;
 
 }
