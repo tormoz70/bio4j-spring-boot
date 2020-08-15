@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public interface DateSerializer {
-    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd'T'hh:mm:ss");
+    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
 
     default void serialize (Date value, JsonGenerator generator, SerializerProvider provider) throws IOException, JsonProcessingException {
         generator.writeString(formatter.format(value));
