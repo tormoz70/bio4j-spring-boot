@@ -12,6 +12,7 @@ public interface SecuritySsoService {
     SsoUser restoreUser(final String stokenOrUsrUid);
     SsoUser getUser(final BioQueryParams qprms);
     SsoUser login(final BioQueryParams qprms);
+    SsoUser refresh(final BioQueryParams qprms);
     void logout(final BioQueryParams qprms);
     boolean loggedin(final BioQueryParams qprms);
 }

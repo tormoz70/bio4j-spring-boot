@@ -11,6 +11,7 @@ public interface SecurityService {
     User restoreUser(final String stokenOrUsrUid);
     User getUser(final BioQueryParams qprms);
     User login(final BioQueryParams qprms);
+    User refresh(final BioQueryParams qprms);
     void logout(final BioQueryParams qprms);
     boolean loggedin(final BioQueryParams qprms);
 

@@ -2,10 +2,14 @@ package ru.bio4j.spring.model.transport.serializers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import ru.bio4j.spring.model.transport.serializers.DateSerializer;
 import ru.bio4j.spring.model.transport.serializers.DateSerializerHolder;
 
 public class DateSerializerHolderImpl implements DateSerializerHolder {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     @Qualifier("default")
@@ -13,11 +17,10 @@ public class DateSerializerHolderImpl implements DateSerializerHolder {
 
     @Autowired(required = false)
     @Qualifier("override")
-    private DateSerializer dateSerializerOverride;
-
+    private DateSerializer dateSerializer;
 
     @Override
     public DateSerializer dateSerializer() {
-        return dateSerializerOverride != null ? dateSerializerOverride : dateSerializerDefault;
+        return dateSerializer != null ? dateSerializer : dateSerializerDefault;
     }
 }

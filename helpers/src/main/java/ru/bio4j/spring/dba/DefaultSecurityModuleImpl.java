@@ -27,6 +27,11 @@ public class DefaultSecurityModuleImpl implements SecurityService {
     }
 
     @Override
+    public User refresh(BioQueryParams qprms) {
+        return null;
+    }
+
+    @Override
     public User restoreUser(String stokenOrUsrUid) {
         return null;
     }

@@ -70,6 +70,26 @@ public class Sso2ClientImpl implements Sso2Client {
     }
 
     @Override
+    public SsoUser refresh(BioQueryParams qprms) {
+        final String remoteIP = qprms.remoteIP;
+        final String remoteClient = qprms.remoteClient;
+        final String jsonData = qprms.jsonData;
+
+        String requestUrl = String.format("%s/%s", ssoServiceUrl, SecurityRequestType.refresh.path());
+        HttpResponse response = httpSimpleClient.requestPost(requestUrl, qprms.stoken , jsonData, remoteIP, remoteClient);
+        LoginResult lrsp = restoreResponseObject(response);
+        if(lrsp != null) {
+            if (lrsp.isSuccess() && lrsp.getUser() != null)
+                return extractUserFromRsp(lrsp);
+            if (lrsp.isSuccess() && lrsp.getUser() == null)
+                throw new BioError(6021, "Unexpected error on sso server!");
+            if (!lrsp.isSuccess() && lrsp.getException() != null)
+                throw BioError.wrap(lrsp.getException());
+        }
+        throw new BioError(6022, "Unexpected error on sso server!");
+    }
+
+    @Override
     public SsoUser restoreUser(final String stokenOrUsrUid, final String remoteIP, final String remoteClient) {
         String requestUrl = String.format("%s/%s/%s", ssoServiceUrl, SecurityRequestType.restoreUser.path(), stokenOrUsrUid);
         HttpResponse response = httpSimpleClient.requestGet(requestUrl, stokenOrUsrUid, remoteIP, remoteClient);
