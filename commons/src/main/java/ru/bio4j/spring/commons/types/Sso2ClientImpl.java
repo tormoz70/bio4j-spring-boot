@@ -35,7 +35,20 @@ public class Sso2ClientImpl implements Sso2Client {
         return rslt;
     }
 
-    private LoginResult restoreResponseObject(HttpResponse response) {
+    private static SsoUser extractUserFromRsp(HttpResponse response) {
+        LoginResult lrsp = restoreResponseObject(response);
+        if(lrsp != null) {
+            if (lrsp.isSuccess() && lrsp.getUser() != null)
+                return extractUserFromRsp(lrsp);
+            if (lrsp.isSuccess() && lrsp.getUser() == null)
+                throw new BioError(6021, "Unexpected error on sso server!");
+            if (!lrsp.isSuccess() && lrsp.getException() != null)
+                throw BioError.wrap(lrsp.getException());
+        }
+        throw new BioError(6022, "Unexpected error on sso server!");
+    }
+
+    private static LoginResult restoreResponseObject(HttpResponse response) {
         HttpEntity entity = response.getEntity();
         String responseString = null;
         try {
@@ -48,25 +61,17 @@ public class Sso2ClientImpl implements Sso2Client {
 
     @Override
     public SsoUser login(final BioQueryParams qprms) {
+        final String apptoken = qprms.apptoken;
         final String login = qprms.login;
         final String remoteIP = qprms.remoteIP;
         final String remoteClient = qprms.remoteClient;
         if (isNullOrEmpty(login))
             throw new BioError.Login.Unauthorized();
-        String reqstJson = String.format("{\"login\":\"%s\"}", login);
+        String reqstJson = String.format("{\"apptoken\":\"%s\", \"login\":\"%s\"}", apptoken, login);
 
         String requestUrl = String.format("%s/%s", ssoServiceUrl, SecurityRequestType.login.path());
         HttpResponse response = httpSimpleClient.requestPost(requestUrl, null, reqstJson, remoteIP, remoteClient);
-        LoginResult lrsp = restoreResponseObject(response);
-        if(lrsp != null) {
-            if (lrsp.isSuccess() && lrsp.getUser() != null)
-                return extractUserFromRsp(lrsp);
-            if (lrsp.isSuccess() && lrsp.getUser() == null)
-                throw new BioError(6021, "Unexpected error on sso server!");
-            if (!lrsp.isSuccess() && lrsp.getException() != null)
-                throw BioError.wrap(lrsp.getException());
-        }
-        throw new BioError(6022, "Unexpected error on sso server!");
+        return extractUserFromRsp(response);
     }
 
     @Override
@@ -77,33 +82,14 @@ public class Sso2ClientImpl implements Sso2Client {
 
         String requestUrl = String.format("%s/%s", ssoServiceUrl, SecurityRequestType.refresh.path());
         HttpResponse response = httpSimpleClient.requestPost(requestUrl, qprms.stoken , jsonData, remoteIP, remoteClient);
-        LoginResult lrsp = restoreResponseObject(response);
-        if(lrsp != null) {
-            if (lrsp.isSuccess() && lrsp.getUser() != null)
-                return extractUserFromRsp(lrsp);
-            if (lrsp.isSuccess() && lrsp.getUser() == null)
-                throw new BioError(6021, "Unexpected error on sso server!");
-            if (!lrsp.isSuccess() && lrsp.getException() != null)
-                throw BioError.wrap(lrsp.getException());
-        }
-        throw new BioError(6022, "Unexpected error on sso server!");
+        return extractUserFromRsp(response);
     }
 
     @Override
     public SsoUser restoreUser(final String stokenOrUsrUid, final String remoteIP, final String remoteClient) {
         String requestUrl = String.format("%s/%s/%s", ssoServiceUrl, SecurityRequestType.restoreUser.path(), stokenOrUsrUid);
         HttpResponse response = httpSimpleClient.requestGet(requestUrl, stokenOrUsrUid, remoteIP, remoteClient);
-        LoginResult lrsp = restoreResponseObject(response);
-        if(lrsp != null) {
-            if (lrsp.isSuccess() && lrsp.getUser() != null) {
-                return extractUserFromRsp(lrsp);
-            }
-            if (lrsp.isSuccess() && lrsp.getUser() == null)
-                throw new BioError(6021, "Unexpected error on sso server!");
-            if (!lrsp.isSuccess() && lrsp.getException() != null)
-                throw BioError.wrap(lrsp.getException());
-        }
-        throw new BioError(6022, "Unexpected error on sso server!");
+        return extractUserFromRsp(response);
     }
 
     @Override
@@ -113,16 +99,7 @@ public class Sso2ClientImpl implements Sso2Client {
         final String remoteClient = qprms.remoteClient;
         String requestUrl = String.format("%s/%s", ssoServiceUrl, SecurityRequestType.curuser.path());
         HttpResponse response = httpSimpleClient.requestGet(requestUrl, stoken, remoteIP, remoteClient);
-        LoginResult lrsp = restoreResponseObject(response);
-        if(lrsp != null) {
-            if (lrsp.isSuccess() && lrsp.getUser() != null)
-                return extractUserFromRsp(lrsp);
-            if (lrsp.isSuccess() && lrsp.getUser() == null)
-                throw new BioError("Unexpected error with code 11!");
-            if (!lrsp.isSuccess() && lrsp.getException() != null)
-                throw BioError.wrap(lrsp.getException());
-        }
-        throw new BioError("Unexpected error with code 22!");
+        return extractUserFromRsp(response);
     }
 
     @Override
@@ -157,19 +134,7 @@ public class Sso2ClientImpl implements Sso2Client {
     }
 
     public Boolean status(final BioQueryParams qprms) {
-        final String stoken = qprms.stoken;
-        final String remoteIP = qprms.remoteIP;
-        final String remoteClient = qprms.remoteClient;
-        String requestUrl = String.format("%s/%s", ssoServiceUrl, SecurityRequestType.status.path());
-        HttpResponse response = httpSimpleClient.requestGet(requestUrl, stoken, remoteIP, remoteClient);
-        LoginResult lrsp = restoreResponseObject(response);
-        if(lrsp != null) {
-            if (lrsp.isSuccess())
-                return true;
-            if (!lrsp.isSuccess())
-                throw BioError.wrap(lrsp.getException());
-        }
-        throw new BioError("Unexpected error with code 22!");
+        return loggedin(qprms);
     }
 
 

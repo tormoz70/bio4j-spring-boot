@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 
 public class WrappedRequest extends HttpServletRequestWrapper {
 
+    private static final String UNKNOWN_APPLICATION_TOKEN = "fk-inner-system-unknown-application";
+
     private final Map<String, String[]> modParameters;
     private final HashMap<String, String> modHeaders;
 
@@ -160,6 +162,13 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         BioQueryParams result = Httpc.createBeanFromHttpRequest(request, BioQueryParams.class);
         result.jsonData = uploadedJson;
 
+        ABean jsonDataObject = null;
+        try {
+            jsonDataObject = Jecksons.getInstance().decodeABean(result.jsonData);
+        } catch (Exception e) {
+            jsonDataObject = null;
+        }
+
         result.request = request;
         result.method = request.getMethod();
         result.remoteIP = Httpc.extractRealRemoteAddr(request);
@@ -187,16 +196,37 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 
         }
 
+        if(Strings.isNullOrEmpty(result.apptoken)) {
+            // get apptoken from header
+            final String appTokenHeader = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.appTokenHeader()) ? httpParamMap.appTokenHeader() : "X-AppToken";
+            final String bioHeaderAppToken = request.getHeader(appTokenHeader);
+            if (!Strings.isNullOrEmpty(bioHeaderAppToken))
+                result.apptoken = bioHeaderAppToken;
+            // get apptoken from query params
+            final String appTokenParam = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.appToken()) ? httpParamMap.appToken() : "apptoken";
+            if(Strings.isNullOrEmpty(result.apptoken) && request.getParameterMap() != null && request.getParameterMap().containsKey(appTokenParam)){
+                result.apptoken = request.getParameter(appTokenParam);
+            }
+            // get apptoken from json
+            if(Strings.isNullOrEmpty(result.apptoken) && jsonDataObject != null && jsonDataObject.containsKey(appTokenParam)){
+                result.apptoken = (String)jsonDataObject.get(appTokenParam);
+            }
+            if(Strings.isNullOrEmpty(result.apptoken)){
+                result.apptoken = UNKNOWN_APPLICATION_TOKEN;
+            }
+        }
+
         if(Strings.isNullOrEmpty(result.stoken)) {
+            // get stoken from header
             final String securityTokenHeader = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.securityTokenHeader()) ? httpParamMap.securityTokenHeader() : "X-SToken";
             final String bioHeaderSToken = request.getHeader(securityTokenHeader);
             if (!Strings.isNullOrEmpty(bioHeaderSToken))
                 result.stoken = bioHeaderSToken;
+            // get stoken from query param
             final String securityTokenParam = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.securityToken()) ? httpParamMap.securityToken() : "stoken";
             if(Strings.isNullOrEmpty(result.stoken) && !Strings.isNullOrEmpty(securityTokenParam)){
                 result.stoken = request.getParameter(securityTokenParam);
             }
-
         }
         if(Strings.isNullOrEmpty(result.stoken)) result.stoken = "anonymouse";
 
@@ -261,16 +291,11 @@ public class WrappedRequest extends HttpServletRequestWrapper {
 
 
         if(Strings.isNullOrEmpty(result.login) && !Strings.isNullOrEmpty(result.jsonData)) {
-            ABean obj = null;
-            try {
-                obj = Jecksons.getInstance().decodeABean(result.jsonData);
-            } catch (Exception e) {
-            }
-            if (obj != null && obj.containsKey("login"))
-                result.login = (String)obj.get("login");
+            if (jsonDataObject != null && jsonDataObject.containsKey("login"))
+                result.login = (String)jsonDataObject.get("login");
             if(Strings.isNullOrEmpty(result.login) && !Strings.isNullOrEmpty(userNameParam) && !Strings.isNullOrEmpty(passwordParam)){
-                if (obj != null && obj.containsKey(userNameParam) && obj.containsKey(passwordParam))
-                    result.login = obj.get(userNameParam) + "/" + obj.get(passwordParam);
+                if (jsonDataObject != null && jsonDataObject.containsKey(userNameParam) && jsonDataObject.containsKey(passwordParam))
+                    result.login = jsonDataObject.get(userNameParam) + "/" + jsonDataObject.get(passwordParam);
             }
         }
 

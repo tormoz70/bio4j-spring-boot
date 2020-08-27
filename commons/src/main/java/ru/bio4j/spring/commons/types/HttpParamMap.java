@@ -24,6 +24,10 @@ public interface HttpParamMap {
     default String offset() {
         return "offset";
     }
+    /** Токен приложения */
+    default String appToken() {
+        return "apptoken";
+    }
     /** Токен */
     default String securityToken() {
         return "stoken";
@@ -44,6 +48,9 @@ public interface HttpParamMap {
     }
     default String deviceuuidHeader() {
         return "X-DEVICEUUID";
+    }
+    default String appTokenHeader() {
+        return "X-AppToken";
     }
     default String securityTokenHeader() {
         return "X-SToken";
