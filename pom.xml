@@ -44,11 +44,12 @@
         <dependency-plugin-version>2.7</dependency-plugin-version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-        <spring-rubbit.version>2.2.5.RELEASE</spring-rubbit.version>
-        <org.apache.poi.version>4.1.0</org.apache.poi.version>
-        <hikaricp.version>3.4.1</hikaricp.version>
-        <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
+        <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
+        <spring-rubbit.version>2.2.10.RELEASE</spring-rubbit.version>
+        <org.apache.poi.version>4.1.2</org.apache.poi.version>
+        <hikaricp.version>3.4.5</hikaricp.version>
+        <org.apache.httpcomponents.core.version>4.4.13</org.apache.httpcomponents.core.version>
+        <org.apache.httpcomponents.client.version>4.5.12</org.apache.httpcomponents.client.version>
         <swagger.version>2.9.2</swagger.version>
         <ehcache.version>2.6.11</ehcache.version>
 
@@ -180,17 +181,17 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>${org.apache.httpcomponents.version}</version>
+                <version>${org.apache.httpcomponents.client.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>${org.apache.httpcomponents.version}</version>
+                <version>${org.apache.httpcomponents.core.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
-                <version>${org.apache.httpcomponents.version}</version>
+                <version>${org.apache.httpcomponents.client.version}</version>
             </dependency>
 
             <dependency>
