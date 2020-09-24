@@ -20,6 +20,18 @@
         <ehcache.version>2.6.11</ehcache.version>
 	</properties>
 
+    <distributionManagement>
+        <repository>
+            <id>nexus-deployment</id>
+            <name>Releases</name>
+            <url>http://192.168.70.190:8081/repository/fk-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus-deployment</id>
+            <name>Snapshots</name>
+            <url>http://192.168.70.190:8081/repository/fk-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <scm>
         <connection>scm:git:http://192.168.70.200/bio4j-spring/bio4j-spring-boot-starters.git</connection>

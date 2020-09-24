@@ -282,20 +282,6 @@ under the License.
 				</snapshots>
 			</repository>
 		</repositories>
-<!--
-		<distributionManagement>
-			<repository>
-				<id>nexus-deployment</id>
-				<name>Releases</name>
-				<url>http://192.168.70.190:8081/repository/fk-releases/</url>
-			</repository>
-			<snapshotRepository>
-				<id>nexus-deployment</id>
-				<name>Snapshots</name>
-				<url>http://192.168.70.190:8081/repository/fk-snapshots/</url>
-			</snapshotRepository>
-		</distributionManagement>
--->
 	  </profile>
 
   </profiles>
