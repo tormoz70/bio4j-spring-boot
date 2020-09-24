@@ -12,32 +12,6 @@
     <version>2.3.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <repositories>
-        <repository>
-            <id>maven-group</id>
-            <name>Maven Repo Group</name>
-            <url>http://192.168.70.190:8081/repository/maven-group/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <distributionManagement>
-        <repository>
-            <id>nexus-deployment</id>
-            <name>Releases</name>
-            <url>http://192.168.70.190:8081/repository/fk-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-deployment</id>
-            <name>Snapshots</name>
-            <url>http://192.168.70.190:8081/repository/fk-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <dependency-plugin-version>2.7</dependency-plugin-version>
 
