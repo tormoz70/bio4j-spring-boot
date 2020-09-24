@@ -282,6 +282,7 @@ under the License.
 				</snapshots>
 			</repository>
 		</repositories>
+<!--
 		<distributionManagement>
 			<repository>
 				<id>nexus-deployment</id>
@@ -294,6 +295,7 @@ under the License.
 				<url>http://192.168.70.190:8081/repository/fk-snapshots/</url>
 			</snapshotRepository>
 		</distributionManagement>
+-->
 	  </profile>
 
   </profiles>
