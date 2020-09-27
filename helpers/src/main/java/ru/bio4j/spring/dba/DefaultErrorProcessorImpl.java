@@ -6,8 +6,8 @@ import ru.bio4j.spring.commons.types.ErrorProcessor;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.BioError;
-import ru.bio4j.spring.model.transport.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.errors.BioError;
+import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
 import ru.bio4j.spring.model.transport.LoginResult;
 
 import javax.servlet.ServletResponse;

@@ -7,6 +7,9 @@ import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
+import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.jstore.StoreRow;
 import ru.bio4j.spring.commons.utils.*;
 

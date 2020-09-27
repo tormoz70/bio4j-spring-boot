@@ -1,7 +1,5 @@
 package ru.bio4j.spring.database.commons;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.LogWrapper;
@@ -12,6 +10,8 @@ import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioError;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.Total;

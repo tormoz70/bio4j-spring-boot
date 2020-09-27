@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.converter.Types;

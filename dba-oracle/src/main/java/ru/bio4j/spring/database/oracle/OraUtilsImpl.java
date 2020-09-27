@@ -8,8 +8,8 @@ import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbNamedParametersStatement;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.BioSQLApplicationError;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 

@@ -1,13 +1,11 @@
 package ru.bio4j.spring.database.commons;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
 import ru.bio4j.spring.commons.utils.SrvcUtils;
@@ -16,7 +14,6 @@ import ru.bio4j.spring.database.api.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar

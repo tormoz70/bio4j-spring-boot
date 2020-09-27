@@ -12,7 +12,7 @@ import ru.bio4j.spring.database.api.SQLDef;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.SQLType;
 import ru.bio4j.spring.database.api.SelectSQLDef;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.jstore.Alignment;

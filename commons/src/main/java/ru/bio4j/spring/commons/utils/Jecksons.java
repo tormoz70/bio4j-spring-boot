@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import ru.bio4j.spring.model.transport.DateParseException;
+import ru.bio4j.spring.model.transport.errors.DateParseException;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.FilterAndSorter;

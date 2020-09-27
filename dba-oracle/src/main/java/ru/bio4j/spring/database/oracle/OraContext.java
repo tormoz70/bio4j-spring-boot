@@ -1,15 +1,11 @@
 package ru.bio4j.spring.database.oracle;
 
-import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
-import ru.bio4j.spring.database.commons.DbStatementPreparerer;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
 
 import javax.sql.DataSource;
 

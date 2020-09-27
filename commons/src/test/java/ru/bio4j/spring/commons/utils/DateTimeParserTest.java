@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.bio4j.spring.model.transport.DateParseException;
+import ru.bio4j.spring.model.transport.errors.DateParseException;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
 
 public class DateTimeParserTest {

@@ -12,7 +12,7 @@ import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.LoginRec;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.ABean;
-import ru.bio4j.spring.model.transport.BioError;
+import ru.bio4j.spring.model.transport.errors.BioError;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

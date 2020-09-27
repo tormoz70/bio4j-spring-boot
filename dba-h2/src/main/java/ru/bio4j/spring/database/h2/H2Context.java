@@ -4,7 +4,7 @@ import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
 
 import javax.sql.DataSource;
 

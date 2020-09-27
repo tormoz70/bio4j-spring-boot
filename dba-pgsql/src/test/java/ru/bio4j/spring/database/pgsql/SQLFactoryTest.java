@@ -7,7 +7,10 @@ import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 
 import java.math.BigDecimal;
 import java.sql.Connection;

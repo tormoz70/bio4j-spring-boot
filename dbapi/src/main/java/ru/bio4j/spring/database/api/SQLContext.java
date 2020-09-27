@@ -1,6 +1,6 @@
 package ru.bio4j.spring.database.api;
 
-import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
 

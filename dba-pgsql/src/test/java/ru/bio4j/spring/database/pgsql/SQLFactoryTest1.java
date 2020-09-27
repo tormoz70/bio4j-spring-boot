@@ -4,7 +4,7 @@ import org.junit.*;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 

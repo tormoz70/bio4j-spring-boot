@@ -11,7 +11,11 @@ import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 
 import java.sql.ResultSet;

@@ -18,11 +18,10 @@ import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.h2.H2Context;
 import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.database.pgsql.PgSQLContext;
-import ru.bio4j.spring.model.transport.CacheProperties;
-import ru.bio4j.spring.model.transport.DataSourceProperties;
-import ru.bio4j.spring.model.transport.Sso2ClientProperties;
-import ru.bio4j.spring.model.transport.serializers.BeanExplorer;
-import ru.bio4j.spring.model.transport.serializers.DateSerializerConfig;
+import ru.bio4j.spring.model.CacheProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.Sso2ClientProperties;
+import ru.bio4j.spring.model.serializers.DateSerializerConfig;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;

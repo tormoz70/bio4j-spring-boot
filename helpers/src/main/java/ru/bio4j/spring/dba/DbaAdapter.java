@@ -20,6 +20,7 @@ import ru.bio4j.spring.database.commons.CrudWriterApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.StoreMetadata;

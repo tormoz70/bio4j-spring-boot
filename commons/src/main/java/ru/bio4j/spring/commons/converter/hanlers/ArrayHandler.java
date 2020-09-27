@@ -2,7 +2,7 @@ package ru.bio4j.spring.commons.converter.hanlers;
 
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.converter.*;
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 
 import java.lang.reflect.Array;
 

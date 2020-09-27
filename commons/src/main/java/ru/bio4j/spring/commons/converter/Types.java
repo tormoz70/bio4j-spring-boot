@@ -1,8 +1,8 @@
 package ru.bio4j.spring.commons.converter;
 
 import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.model.transport.ConvertValueException;
-import ru.bio4j.spring.model.transport.DateParseException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.DateParseException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

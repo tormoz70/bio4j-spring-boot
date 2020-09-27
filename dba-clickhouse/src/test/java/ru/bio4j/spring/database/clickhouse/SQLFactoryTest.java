@@ -11,6 +11,7 @@ import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.Total;

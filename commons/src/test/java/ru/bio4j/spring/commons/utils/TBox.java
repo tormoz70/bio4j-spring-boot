@@ -2,7 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 //import flexjson.JSON;
-import ru.bio4j.spring.model.transport.BioError;
+import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.MetaType;
 
 import java.util.Date;

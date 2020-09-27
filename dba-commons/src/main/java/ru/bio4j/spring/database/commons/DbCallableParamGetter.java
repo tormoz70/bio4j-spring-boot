@@ -1,7 +1,7 @@
 package ru.bio4j.spring.database.commons;
 
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 import ru.bio4j.spring.database.api.SQLParamGetter;
 import ru.bio4j.spring.model.transport.Param;

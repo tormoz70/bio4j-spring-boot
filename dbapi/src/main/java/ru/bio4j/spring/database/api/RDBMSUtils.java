@@ -1,6 +1,6 @@
 package ru.bio4j.spring.database.api;
 
-import ru.bio4j.spring.model.transport.BioSQLApplicationError;
+import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.sql.Connection;

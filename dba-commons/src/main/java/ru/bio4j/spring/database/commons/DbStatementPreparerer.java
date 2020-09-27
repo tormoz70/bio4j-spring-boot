@@ -2,7 +2,7 @@ package ru.bio4j.spring.database.commons;
 
 import ru.bio4j.spring.database.api.SQLCursor;
 import ru.bio4j.spring.database.api.StatementPreparerer;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 
 import java.sql.SQLException;
 import java.util.function.Supplier;

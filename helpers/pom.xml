@@ -47,31 +47,31 @@
 
         <!-- bio4j -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-commons-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-commons-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dbapi-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-oracle-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-clickhouse-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-h2-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-pgsql-lib</artifactId>
         </dependency>
 

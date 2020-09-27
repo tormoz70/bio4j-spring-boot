@@ -11,7 +11,7 @@ import ru.bio4j.spring.database.api.DbServer;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.transport.DataSourceProperties;
+import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.util.ArrayList;

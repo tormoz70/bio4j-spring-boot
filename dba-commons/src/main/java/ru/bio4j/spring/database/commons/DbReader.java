@@ -3,7 +3,7 @@ package ru.bio4j.spring.database.commons;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.DBField;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.database.api.SQLReader;
 
 import java.io.IOException;

@@ -7,6 +7,8 @@ import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.model.transport.errors.BioError;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.jstore.Field;
 
 import java.sql.Connection;

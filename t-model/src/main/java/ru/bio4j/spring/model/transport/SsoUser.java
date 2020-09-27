@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
-import ru.bio4j.spring.model.transport.serializers.DateSerializerOpt;
+import ru.bio4j.spring.model.serializers.DateSerializerOpt;
 
 import java.io.Serializable;
 import java.security.Principal;

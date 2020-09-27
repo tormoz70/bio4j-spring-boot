@@ -3,6 +3,7 @@ package ru.bio4j.spring.commons.utils;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioError;
 
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;

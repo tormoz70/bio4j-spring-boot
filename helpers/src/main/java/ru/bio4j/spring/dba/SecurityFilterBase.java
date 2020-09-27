@@ -1,16 +1,13 @@
 package ru.bio4j.spring.dba;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import ru.bio4j.spring.commons.types.ApplicationContextProvider;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.LoginProcessor;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.model.transport.BioError;
-import ru.bio4j.spring.model.transport.BioQueryParams;
+import ru.bio4j.spring.model.transport.errors.BioError;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

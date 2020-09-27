@@ -1,6 +1,6 @@
 package ru.bio4j.spring.commons.converter.hanlers;
 
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.commons.converter.*;
 

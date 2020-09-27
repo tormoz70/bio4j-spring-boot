@@ -1,4 +1,4 @@
-package ru.bio4j.spring.model.transport;
+package ru.bio4j.spring.model.transport.errors;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;

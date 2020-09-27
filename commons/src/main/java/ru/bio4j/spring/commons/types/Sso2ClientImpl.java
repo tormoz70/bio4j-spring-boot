@@ -3,12 +3,12 @@ package ru.bio4j.spring.commons.types;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
+import ru.bio4j.spring.model.Sso2ClientProperties;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.BioError;
 
 import java.io.IOException;
 

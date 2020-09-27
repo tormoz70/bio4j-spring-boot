@@ -1,4 +1,4 @@
-package ru.bio4j.spring.model.transport;
+package ru.bio4j.spring.model.transport.errors;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

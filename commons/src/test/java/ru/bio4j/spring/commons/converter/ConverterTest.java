@@ -2,7 +2,7 @@ package ru.bio4j.spring.commons.converter;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.math.BigDecimal;

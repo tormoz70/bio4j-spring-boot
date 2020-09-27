@@ -46,11 +46,11 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-tmodel-lib</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dbapi-lib</artifactId>
         </dependency>
     </dependencies>

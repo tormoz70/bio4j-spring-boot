@@ -4,7 +4,7 @@ import org.h2.tools.Server;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.DbServer;
-import ru.bio4j.spring.model.transport.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 
 import java.sql.SQLException;
 

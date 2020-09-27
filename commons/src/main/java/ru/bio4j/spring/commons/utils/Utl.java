@@ -2,13 +2,13 @@ package ru.bio4j.spring.commons.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.LogWrapper;
+import ru.bio4j.spring.model.transport.errors.AccessToBeanFieldException;
 import ru.bio4j.spring.model.transport.*;
+import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Expression;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;

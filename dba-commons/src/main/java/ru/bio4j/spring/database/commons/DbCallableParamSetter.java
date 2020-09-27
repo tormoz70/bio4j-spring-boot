@@ -7,8 +7,8 @@ import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 import ru.bio4j.spring.database.api.SQLParamSetter;
 import ru.bio4j.spring.database.api.SqlTypeConverter;
-import ru.bio4j.spring.model.transport.BioSQLException;
-import ru.bio4j.spring.model.transport.ConvertValueException;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
+import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.io.InputStream;
