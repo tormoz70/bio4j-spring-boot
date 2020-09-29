@@ -20,6 +20,19 @@
         <ehcache.version>2.6.11</ehcache.version>
 	</properties>
 
+    <repositories>
+        <repository>
+            <id>maven-group</id>
+            <name>Maven Repo Group</name>
+            <url>http://192.168.70.190:8081/repository/maven-group/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <distributionManagement>
         <repository>
             <id>nexus-deployment</id>
