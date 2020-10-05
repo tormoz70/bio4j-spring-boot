@@ -857,6 +857,15 @@ public class DbaAdapter {
         return  getBioParamFromRequest(paramName, request, paramType, null);
     }
 
+    private List<Param> getBioParams(HttpServletRequest request) {
+        List<Param> prms = wrappedRequest(request).getBioQueryParams().bioParams;
+        if(prms == null){
+            prms = new ArrayList<>();
+            wrappedRequest(request).getBioQueryParams().bioParams = prms;
+        }
+        return prms;
+    }
+
     /**
      * Заменяет имя параметра
      * @param request
@@ -864,12 +873,20 @@ public class DbaAdapter {
      * @param oldParamName
      */
     public void replaceBioParamName(HttpServletRequest request, String oldParamName, String newParamName) {
-        List<Param> prms = wrappedRequest(request).getBioQueryParams().bioParams;
-        if(prms == null){
-            prms = new ArrayList<>();
-            wrappedRequest(request).getBioQueryParams().bioParams = prms;
-        }
+        List<Param> prms = getBioParams(request);
         Paramus.setParamValue(prms, newParamName, getBioParamFromRequest(oldParamName, request, String.class));
+        prms.remove(oldParamName);
+    }
+
+    /**
+     * Заменяет имя и значение параметра
+     * @param request
+     * @param newParamName
+     * @param oldParamName
+     */
+    public void replaceBioParam(HttpServletRequest request, String oldParamName, String newParamName, Object newParamValue) {
+        List<Param> prms = getBioParams(request);
+        Paramus.setParamValue(prms, newParamName, newParamValue);
         prms.remove(oldParamName);
     }
 
