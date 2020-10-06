@@ -751,6 +751,10 @@ public class Paramus implements Closeable {
 	        setParamValue(params, name, value);
 	        return this;
         }
+        public Builder addAll(List<Param> params2Add) {
+            params.addAll(params2Add);
+            return this;
+        }
 
         public List<Param> build() {
             return params;
