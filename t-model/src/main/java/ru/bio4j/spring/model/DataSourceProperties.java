@@ -1,9 +1,7 @@
 package ru.bio4j.spring.model;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix= "spring.datasource")
 public class DataSourceProperties {
     @Value("${database-server.port:}")
     private String dbServerPort;

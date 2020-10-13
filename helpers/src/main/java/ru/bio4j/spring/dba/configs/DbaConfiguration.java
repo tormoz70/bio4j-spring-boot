@@ -1,12 +1,10 @@
-package ru.bio4j.spring.dba;
+package ru.bio4j.spring.dba.configs;
 
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.cache.impl.CacheServiceImpl;
@@ -18,25 +16,25 @@ import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.h2.H2Context;
 import ru.bio4j.spring.database.oracle.OraContext;
 import ru.bio4j.spring.database.pgsql.PgSQLContext;
+import ru.bio4j.spring.dba.*;
 import ru.bio4j.spring.model.CacheProperties;
 import ru.bio4j.spring.model.DataSourceProperties;
 import ru.bio4j.spring.model.Sso2ClientProperties;
-import ru.bio4j.spring.model.serializers.DateSerializerConfig;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 @Configuration
-@Import({ DateSerializerConfig.class })
-@EnableConfigurationProperties({ DataSourceProperties.class, CacheProperties.class, Sso2ClientProperties.class })
-public class DbaAutoConfiguration {
+//@Import({ DateSerializerConfig.class })
+//@EnableConfigurationProperties({ DataSourceProperties.class, CacheProperties.class, Sso2ClientProperties.class })
+public class DbaConfiguration {
 
     private final DataSourceProperties dataSourceProperties;
     private final CacheProperties cacheProperties;
     private final Sso2ClientProperties sso2ClientProperties;
     private final ApplicationContext applicationContext;
 
-    public DbaAutoConfiguration(
+    public DbaConfiguration(
             DataSourceProperties dataSourceProperties,
             CacheProperties cacheProperties,
             Sso2ClientProperties sso2ClientProperties,

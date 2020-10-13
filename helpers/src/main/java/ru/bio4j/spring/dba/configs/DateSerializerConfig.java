@@ -1,8 +1,9 @@
-package ru.bio4j.spring.model.serializers;
+package ru.bio4j.spring.dba.configs;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.bio4j.spring.model.serializers.*;
 
 @Configuration
 public class DateSerializerConfig {

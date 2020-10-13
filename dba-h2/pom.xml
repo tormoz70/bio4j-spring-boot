@@ -4,7 +4,7 @@
     <parent>
         <groupId>ru.bio4j.spring</groupId>
         <artifactId>bio4j-spring-boot</artifactId>
-        <version>2.3.6-SNAPSHOT</version>
+        <version>2.4.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>bio4j-spring-dba-h2-lib</artifactId>
@@ -38,6 +38,21 @@
 <!--            <version>0.2</version>-->
 <!--            <scope>provided</scope>-->
 <!--        </dependency>-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -45,6 +60,18 @@
             <version>1.4.197</version>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ru.bio4j.spring -->
         <dependency>
             <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-tmodel-lib</artifactId>

@@ -2,9 +2,7 @@ package ru.bio4j.spring.model;
 
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix= "ehcache")
 public class CacheProperties {
     @Value("${ehcache.persistent.path}")
     private String cachePersistentPath;

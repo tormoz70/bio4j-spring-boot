@@ -1,6 +1,5 @@
 package ru.bio4j.spring.commons.types;
 
-import org.apache.coyote.Request;
 import org.apache.poi.util.IOUtils;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.model.transport.*;
