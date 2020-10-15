@@ -1,17 +1,17 @@
 package ru.bio4j.spring.database.commons;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.bio4j.spring.commons.types.LogWrapper;
-import ru.bio4j.spring.model.transport.errors.BioSQLException;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
-import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.model.transport.errors.BioSQLException;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class DbContextAbstract implements SQLContext {
     private static final LogWrapper LOG = LogWrapper.getLogger(DbContextAbstract.class);
@@ -22,9 +22,9 @@ public abstract class DbContextAbstract implements SQLContext {
     protected final List<SQLConnectionConnectedEvent> afterEvents = new ArrayList<>();
     protected final List<SQLConnectionConnectedEvent> innerAfterEvents = new ArrayList<>();
 
-    protected final DataSourceProperties dataSourceProperties;
+    protected final BaseDataSourceProperties dataSourceProperties;
 
-    protected DbContextAbstract(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
+    protected DbContextAbstract(final DataSource dataSource, final BaseDataSourceProperties dataSourceProperties) {
         this.dataSource = dataSource;
         this.dataSourceProperties = dataSourceProperties;
     }
@@ -202,7 +202,7 @@ public abstract class DbContextAbstract implements SQLContext {
     }
 
     @Override
-    public DataSourceProperties getDataSourceProperties() {
+    public BaseDataSourceProperties getDataSourceProperties() {
         return dataSourceProperties;
     }
 

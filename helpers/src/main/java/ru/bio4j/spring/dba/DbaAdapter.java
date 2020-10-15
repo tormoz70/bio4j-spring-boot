@@ -527,6 +527,8 @@ public class DbaAdapter {
     public HSSFWorkbook requestExcel(
             final String bioCode,
             final HttpServletRequest request) {
+        if(excelBuilder == null)
+            throw new IllegalArgumentException("excelBuilder not defined!");
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
         BeansPage<ABean> beansPage = requestAll(bioCode, request, ABean.class);
         return pax.context.execBatch((ctx) -> {
@@ -936,17 +938,23 @@ public class DbaAdapter {
     }
 
     public <T extends Serializable> T getObjectFromCache(String cacheName, HttpServletRequest request) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         String requestHash = getRequestHash(request);
         return cacheService.get(cacheName, requestHash);
     }
 
     public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         String key = getRequestHash(request);
         cacheService.put(cacheName, key, value);
     }
 
     private static final String CACHE_CONTENT_HOLDER = "cached_content_holder";
     public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         String key = getRequestHash(request);
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
@@ -954,6 +962,8 @@ public class DbaAdapter {
     }
 
     public <T extends Serializable> void putListToCache(String cacheName, HttpServletRequest request, List<T> value) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         ABean container = new ABean();
         container.put(CACHE_CONTENT_HOLDER, value);
         String key = getRequestHash(request);
@@ -961,6 +971,8 @@ public class DbaAdapter {
     }
 
     public <T extends Serializable> BeansPage<T> getBeansPageFromCache(String cacheName, HttpServletRequest request) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         String key = getRequestHash(request);
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
@@ -968,6 +980,8 @@ public class DbaAdapter {
     }
 
     public <T extends Serializable> void putBeansPageToCache(String cacheName, HttpServletRequest request, BeansPage<T> value) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
         ABean container = new ABean();
         container.put(CACHE_CONTENT_HOLDER, value);
         String key = getRequestHash(request);

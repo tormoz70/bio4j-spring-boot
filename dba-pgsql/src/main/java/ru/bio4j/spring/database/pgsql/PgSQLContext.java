@@ -5,14 +5,14 @@ import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 
 import javax.sql.DataSource;
 
 public class PgSQLContext extends DbContextAbstract {
     private static final LogWrapper LOG = LogWrapper.getLogger(PgSQLContext.class);
 
-    public PgSQLContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) throws Exception {
+    public PgSQLContext(final DataSource dataSource, final BaseDataSourceProperties dataSourceProperties) throws Exception {
         super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {

@@ -4,7 +4,7 @@ import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 
 import javax.sql.DataSource;
 
@@ -13,7 +13,7 @@ public class H2Context extends DbContextAbstract {
 
     private final DbServer dbServer;
 
-    public H2Context(final DataSource cpool, final DataSourceProperties dataSourceProperties) {
+    public H2Context(final DataSource cpool, final BaseDataSourceProperties dataSourceProperties) {
         super(cpool, dataSourceProperties);
 
         dbServer = new H2ServerImpl(dataSourceProperties.getDbServerPort());

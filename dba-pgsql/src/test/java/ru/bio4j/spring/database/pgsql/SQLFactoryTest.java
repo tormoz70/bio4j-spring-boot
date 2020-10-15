@@ -7,7 +7,7 @@ import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.errors.ConvertValueException;
@@ -51,7 +51,7 @@ public class SQLFactoryTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)

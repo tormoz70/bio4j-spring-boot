@@ -8,7 +8,7 @@ import org.junit.Test;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 
 public class SQLFactoryTest1 extends TestCase {
     private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest1.class);
@@ -27,13 +27,13 @@ public class SQLFactoryTest1 extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         context = DbContextFactory.createHikariCP(
-            DataSourceProperties.builder()
+            BaseDataSourceProperties.builder()
                 .driverClassName(testDBDriverName)
                 .url(testDBUrl)
                 .username(testDBUsr)
                 .password(testDBPwd)
                 .build(),
-            OraContext.class);
+            OracleContext.class);
     }
 
     @Ignore

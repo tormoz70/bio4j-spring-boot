@@ -1,8 +1,10 @@
 package ru.bio4j.spring.model;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-public class DataSourceProperties {
+@ConfigurationProperties(prefix= "spring.datasource")
+public class BaseDataSourceProperties {
     @Value("${database-server.port:}")
     private String dbServerPort;
 
@@ -70,8 +72,8 @@ public class DataSourceProperties {
             return this;
         }
 
-        public DataSourceProperties build() {
-            DataSourceProperties result = new DataSourceProperties();
+        public BaseDataSourceProperties build() {
+            BaseDataSourceProperties result = new BaseDataSourceProperties();
             result.setDbServerPort(dbServerPort);
             result.setCurrentSchema(currentSchema);
             result.setConnectionTimeout(connectionTimeout);

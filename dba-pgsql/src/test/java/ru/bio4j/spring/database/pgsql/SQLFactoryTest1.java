@@ -4,7 +4,7 @@ import org.junit.*;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 
@@ -31,7 +31,7 @@ public class SQLFactoryTest1 {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)

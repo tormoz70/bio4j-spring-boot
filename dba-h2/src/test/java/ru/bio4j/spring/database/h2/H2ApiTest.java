@@ -11,7 +11,7 @@ import ru.bio4j.spring.database.api.DbServer;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class H2ApiTest {
     public static void initTests() {
         dbServer.startServer();
         context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)

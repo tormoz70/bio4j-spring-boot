@@ -11,7 +11,7 @@ import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
@@ -50,13 +50,13 @@ public class SQLFactoryTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)
                         .password(testDBPwd)
                         .build(),
-                OraContext.class);
+                OracleContext.class);
         //if(true) return;
 
         try {
@@ -566,13 +566,13 @@ public class SQLFactoryTest {
         try {
 
             SQLContext contextLocal = DbContextFactory.createHikariCP(
-                    DataSourceProperties.builder()
+                    BaseDataSourceProperties.builder()
                             .driverClassName(testDBDriverName)
                             .url(testDBUrl)
                             .username("GIVCADMIN")
                             .password("j12")
                             .build(),
-                    OraContext.class);
+                    OracleContext.class);
 
             String rslt = contextLocal.execBatch(conn -> {
                 String sql = "SELECT * FROM (\n" +
@@ -728,13 +728,13 @@ public class SQLFactoryTest {
         try {
 
             SQLContext contextLocal = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                     .driverClassName(testDBDriverName)
                     .url(testDBUrl)
                     .username("GIVCADMIN")
                     .password("j12")
                     .build(),
-                OraContext.class);
+                OracleContext.class);
 
             String rslt = contextLocal.execBatch(conn -> {
                 String sql = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("111.sql"));
@@ -789,13 +789,13 @@ public class SQLFactoryTest {
     public void testSQLCommandOpenCursor4() throws Exception {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
                         .password("j12")
                         .build(),
-                OraContext.class);
+                OracleContext.class);
 
 
         String rslt = context.execBatch((conn) -> {
@@ -850,13 +850,13 @@ public class SQLFactoryTest {
     public void testSQLCommandOpenCursor5() throws Exception {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
                         .password("j12")
                         .build(),
-                OraContext.class);
+                OracleContext.class);
 
         String rslt = context.execBatch((conn) -> {
 
@@ -887,13 +887,13 @@ public class SQLFactoryTest {
     public void testCrudReaderApi_loadPageExt0() {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
                         .password("j12")
                         .build(),
-                OraContext.class);
+                OracleContext.class);
 
         SQLDefinition sqlDefinition = CursorParser.pars("bios.movies");
         List<Param> prms = Paramus.createParams(
@@ -918,13 +918,13 @@ public class SQLFactoryTest {
     public void test67() throws Exception {
 
         SQLContext ctx = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
                         .password("j12")
                         .build(),
-                OraContext.class);
+                OracleContext.class);
 
 
         String rslt = ctx.execBatch((conn) -> {
@@ -944,13 +944,13 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor888() throws Exception {
         SQLContext context = DbContextFactory.createHikariCP(
-                DataSourceProperties.builder()
+                BaseDataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
                         .password("j12")
                         .build(),
-                OraContext.class);
+                OracleContext.class);
 
         final User usr = new User();
         usr.setOrgId("1009686");

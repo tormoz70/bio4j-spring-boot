@@ -1,4 +1,4 @@
-package ru.bio4j.spring.dba;
+package ru.bio4j.spring.dba.defaults;
 
 //import ru.bio4j.ng.commons.utils.Jsons;
 

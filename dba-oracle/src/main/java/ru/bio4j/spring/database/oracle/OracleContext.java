@@ -2,17 +2,17 @@ package ru.bio4j.spring.database.oracle;
 
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.database.api.*;
+import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 
 import javax.sql.DataSource;
 
-public class OraContext extends DbContextAbstract {
-    private static final LogWrapper LOG = LogWrapper.getLogger(OraContext.class);
+public class OracleContext extends DbContextAbstract {
+    private static final LogWrapper LOG = LogWrapper.getLogger(OracleContext.class);
 
-    public OraContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
+    public OracleContext(final DataSource dataSource, final BaseDataSourceProperties dataSourceProperties) {
         super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {

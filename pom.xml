@@ -11,7 +11,7 @@
         <dependency-plugin-version>2.7</dependency-plugin-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-framewoek.version>5.2.9.RELEASE</spring-framewoek.version>
-        <spring-boot-test.version>2.3.3.RELEASE</spring-boot-test.version>
+        <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
         <spring-rubbit.version>2.2.10.RELEASE</spring-rubbit.version>
         <org.apache.poi.version>4.1.2</org.apache.poi.version>
         <hikaricp.version>3.4.5</hikaricp.version>
@@ -160,11 +160,11 @@
 
     <dependencyManagement>
         <dependencies>
-<!--            <dependency>-->
-<!--                <groupId>org.springframework.boot</groupId>-->
-<!--                <artifactId>spring-boot</artifactId>-->
-<!--                <version>${spring-boot.version}</version>-->
-<!--            </dependency>-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
 <!--            <dependency>-->
 <!--                <groupId>org.springframework.boot</groupId>-->
 <!--                <artifactId>spring-boot-starter</artifactId>-->

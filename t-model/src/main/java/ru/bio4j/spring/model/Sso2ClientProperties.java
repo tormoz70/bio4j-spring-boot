@@ -2,7 +2,9 @@ package ru.bio4j.spring.model;
 
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@ConfigurationProperties(prefix= "ss2client")
 public class Sso2ClientProperties {
     @Value("${ss2client.sso2.service.url}")
     private String sso2ServiceUrl;

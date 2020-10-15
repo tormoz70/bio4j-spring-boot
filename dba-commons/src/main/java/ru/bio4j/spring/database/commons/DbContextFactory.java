@@ -2,11 +2,12 @@ package ru.bio4j.spring.database.commons;
 
 import com.zaxxer.hikari.HikariConfig;
 import ru.bio4j.spring.commons.types.LogWrapper;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.model.transport.errors.BioError;
 
@@ -23,7 +24,7 @@ public class DbContextFactory {
         return Converter.toType(str, type);
     }
 
-    public static <T extends DbContextAbstract> SQLContext createHikariCP(DataSourceProperties dataSourceProperties, Class<T> clazz) {
+    public static <T extends DbContextAbstract> SQLContext createHikariCP(BaseDataSourceProperties dataSourceProperties, Class<T> clazz) {
         LOG.debug("Creating SQLContext with:\n" + Utl.buildBeanStateInfo(dataSourceProperties, null, "\t"));
         final Properties properties = new Properties();
         properties.setProperty("dataSource.cachePrepStmts", "true");
@@ -42,7 +43,7 @@ public class DbContextFactory {
 
         DataSource dataSource = new com.zaxxer.hikari.HikariDataSource(cfg);
         try {
-            Constructor<T> constructor = clazz.getConstructor(DataSource.class, DataSourceProperties.class);
+            Constructor<T> constructor = clazz.getConstructor(DataSource.class, BaseDataSourceProperties.class);
             return constructor.newInstance(new Object[]{dataSource, dataSourceProperties});
         } catch (Exception e) {
             throw BioError.wrap(e);

@@ -10,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.dba.configs.DbaConfiguration;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.Param;
 
@@ -20,18 +19,17 @@ import java.util.List;
 @ContextConfiguration(classes=DbaTestAutoConfiguration.class)
 @TestPropertySource(locations="classpath:test.properties")
 public class DbaTest {
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Autowired
-    private DbaAdapter dbaAdapter;
+    private DbaAdapter chAdapter;
 
     @Test
     public void doTest1() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
-        ABean d = dbaAdapter.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
+        ABean d = chAdapter.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
         Assert.assertTrue(d != null);
     }
+
     @Ignore
     @Test
     public void doTest2() {
@@ -44,7 +42,7 @@ public class DbaTest {
             "userRole", "6",
             "nationId", 0
         );
-        ABean d = dbaAdapter.loadFirstBean("bios.curTopAll", params, null, ABean.class);
+        ABean d = chAdapter.loadFirstBean("bios.curTopAll", params, null, ABean.class);
         Assert.assertTrue(d != null);
     }
 }

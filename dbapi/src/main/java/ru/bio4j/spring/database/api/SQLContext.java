@@ -1,10 +1,10 @@
 package ru.bio4j.spring.database.api;
 
-import ru.bio4j.spring.model.DataSourceProperties;
+import ru.bio4j.spring.model.BaseDataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
 
-import java.sql.*;
+import java.sql.Connection;
 import java.util.List;
 
 public interface SQLContext {
@@ -29,7 +29,7 @@ public interface SQLContext {
 
     String getDBMSName();
 
-    DataSourceProperties getDataSourceProperties();
+    BaseDataSourceProperties getDataSourceProperties();
     Wrappers getWrappers();
     SQLReader createReader();
 
