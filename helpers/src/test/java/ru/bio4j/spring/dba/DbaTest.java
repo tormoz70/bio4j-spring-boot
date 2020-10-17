@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,13 +21,20 @@ import java.util.List;
 public class DbaTest {
 
     @Autowired
-    private DbaAdapter chAdapter;
+    @Qualifier("clickhouseDbaHelper")
+    private DbaHelper chHelper;
+
+    @Autowired
+    @Qualifier("pgsqlDbaHelper")
+    private DbaHelper pgsqlHelper;
 
     @Test
     public void doTest1() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
-        ABean d = chAdapter.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
-        Assert.assertTrue(d != null);
+        ABean d1 = chHelper.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
+        Assert.assertTrue(d1 != null);
+        ABean d2 = pgsqlHelper.loadFirstBean("pgtest", (List<Param>) null, null, ABean.class);
+        Assert.assertTrue(d2 != null);
     }
 
     @Ignore
@@ -42,7 +49,7 @@ public class DbaTest {
             "userRole", "6",
             "nationId", 0
         );
-        ABean d = chAdapter.loadFirstBean("bios.curTopAll", params, null, ABean.class);
+        ABean d = chHelper.loadFirstBean("bios.curTopAll", params, null, ABean.class);
         Assert.assertTrue(d != null);
     }
 }

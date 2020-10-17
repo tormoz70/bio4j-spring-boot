@@ -5,14 +5,14 @@ import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 
 import javax.sql.DataSource;
 
 public class OracleContext extends DbContextAbstract {
     private static final LogWrapper LOG = LogWrapper.getLogger(OracleContext.class);
 
-    public OracleContext(final DataSource dataSource, final BaseDataSourceProperties dataSourceProperties) {
+    public OracleContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
         super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {

@@ -11,7 +11,7 @@ import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.Total;
@@ -56,13 +56,13 @@ public class SQLFactoryTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)
                         .password(testDBPwd)
                         .build(),
-                ChContext.class);
+                ClickhouseContext.class);
     }
 
     @AfterClass

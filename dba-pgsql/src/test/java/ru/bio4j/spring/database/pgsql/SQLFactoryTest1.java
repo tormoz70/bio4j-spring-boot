@@ -4,21 +4,21 @@ import org.junit.*;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore
+//@Ignore
 public class SQLFactoryTest1 {
     private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest1.class);
     private static final String testDBDriverName = "org.postgresql.Driver";
 //    private static final String testDBUrl = "jdbc:postgresql://192.168.50.47:5432/postgres";
-//    private static final String testDBUrl = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String testDBUrl = "jdbc:postgresql://localhost:5432/postgres";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@cmon-ora-dev:1521:MICEXDB";
-    private static final String testDBUrl = "jdbc:postgresql://10.10.0.221:5432/postgres";
+//    private static final String testDBUrl = "jdbc:postgresql://10.10.0.221:5432/postgres";
     //private static final String testDBUrl = "jdbc:oracle:oci:@GIVCDB_EKBS03";
     //private static final String testDBUrl = "jdbc:oracle:thin:@https://databasetrial0901-rugivcmkrftrial07058.db.em1.oraclecloudapps.com/apex:1521:databasetrial0901";
 //    private static final String testDBUsr = "SCOTT";
@@ -31,7 +31,7 @@ public class SQLFactoryTest1 {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)

@@ -4,14 +4,14 @@ import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 
 import javax.sql.DataSource;
 
-public class ChContext extends DbContextAbstract {
-    private static final LogWrapper LOG = LogWrapper.getLogger(ChContext.class);
+public class ClickhouseContext extends DbContextAbstract {
+    private static final LogWrapper LOG = LogWrapper.getLogger(ClickhouseContext.class);
 
-    public ChContext(final DataSource dataSource, final BaseDataSourceProperties dataSourceProperties) {
+    public ClickhouseContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
         super(dataSource, dataSourceProperties);
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {

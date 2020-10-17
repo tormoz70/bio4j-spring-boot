@@ -1,6 +1,6 @@
 package ru.bio4j.spring.database.api;
 
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
 
@@ -29,7 +29,7 @@ public interface SQLContext {
 
     String getDBMSName();
 
-    BaseDataSourceProperties getDataSourceProperties();
+    DataSourceProperties getDataSourceProperties();
     Wrappers getWrappers();
     SQLReader createReader();
 

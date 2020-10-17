@@ -11,7 +11,7 @@ import ru.bio4j.spring.database.commons.CrudReaderApi;
 import ru.bio4j.spring.database.commons.CursorParser;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.database.commons.DbUtils;
-import ru.bio4j.spring.model.BaseDataSourceProperties;
+import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioSQLApplicationError;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
@@ -50,7 +50,7 @@ public class SQLFactoryTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username(testDBUsr)
@@ -566,7 +566,7 @@ public class SQLFactoryTest {
         try {
 
             SQLContext contextLocal = DbContextFactory.createHikariCP(
-                    BaseDataSourceProperties.builder()
+                    DataSourceProperties.builder()
                             .driverClassName(testDBDriverName)
                             .url(testDBUrl)
                             .username("GIVCADMIN")
@@ -728,7 +728,7 @@ public class SQLFactoryTest {
         try {
 
             SQLContext contextLocal = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                     .driverClassName(testDBDriverName)
                     .url(testDBUrl)
                     .username("GIVCADMIN")
@@ -789,7 +789,7 @@ public class SQLFactoryTest {
     public void testSQLCommandOpenCursor4() throws Exception {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
@@ -850,7 +850,7 @@ public class SQLFactoryTest {
     public void testSQLCommandOpenCursor5() throws Exception {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
@@ -887,7 +887,7 @@ public class SQLFactoryTest {
     public void testCrudReaderApi_loadPageExt0() {
 
         SQLContext context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
@@ -918,7 +918,7 @@ public class SQLFactoryTest {
     public void test67() throws Exception {
 
         SQLContext ctx = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")
@@ -944,7 +944,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor888() throws Exception {
         SQLContext context = DbContextFactory.createHikariCP(
-                BaseDataSourceProperties.builder()
+                DataSourceProperties.builder()
                         .driverClassName(testDBDriverName)
                         .url(testDBUrl)
                         .username("GIVCADMIN")

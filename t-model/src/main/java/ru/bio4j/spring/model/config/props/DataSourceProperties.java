@@ -1,30 +1,20 @@
-package ru.bio4j.spring.model;
+package ru.bio4j.spring.model.config.props;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix= "spring.datasource")
-public class BaseDataSourceProperties {
-    @Value("${database-server.port:}")
-    private String dbServerPort;
-
-    @Value("${ru.bio4j.jdbc-helper.currentSchema}")
-    private String currentSchema;
-
-    @Value("${spring.datasource.hikari.connectionTimeout}")
-    private String connectionTimeout;
-    @Value("${spring.datasource.hikari.minimumPoolSize}")
-    private String minimumPoolSize;
-    @Value("${spring.datasource.hikari.maximumPoolSize}")
-    private String maximumPoolSize;
+public class DataSourceProperties {
 
     private String dbmsName;
+    private String dbServerPort;
+    private String currentSchema;
+    private String connectionTimeout;
+    private String minimumPoolSize;
+    private String maximumPoolSize;
     private String driverClassName;
     private String url;
     private String username;
     private String password;
 
     public static class Builder {
+        private String dbmsName;
         private String dbServerPort;
         private String currentSchema;
         private String connectionTimeout;
@@ -35,6 +25,10 @@ public class BaseDataSourceProperties {
         private String username;
         private String password;
 
+        public Builder dbmsName(String value) {
+            this.dbmsName = value;
+            return this;
+        }
         public Builder dbServerPort(String value) {
             this.dbServerPort = value;
             return this;
@@ -72,8 +66,9 @@ public class BaseDataSourceProperties {
             return this;
         }
 
-        public BaseDataSourceProperties build() {
-            BaseDataSourceProperties result = new BaseDataSourceProperties();
+        public DataSourceProperties build() {
+            DataSourceProperties result = new DataSourceProperties();
+            result.setDbmsName(dbmsName);
             result.setDbServerPort(dbServerPort);
             result.setCurrentSchema(currentSchema);
             result.setConnectionTimeout(connectionTimeout);
@@ -89,6 +84,14 @@ public class BaseDataSourceProperties {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getDbmsName() {
+        return dbmsName;
+    }
+
+    public void setDbmsName(String dbmsName) {
+        this.dbmsName = dbmsName;
     }
 
     public String getUsername() {
@@ -154,16 +157,7 @@ public class BaseDataSourceProperties {
     public void setCurrentSchema(String currentSchema) {
         this.currentSchema = currentSchema;
     }
-
-
-    public String getDbmsName() {
-        return dbmsName;
-    }
-
-    public void setDbmsName(String dbmsName) {
-        this.dbmsName = dbmsName;
-    }
-
+    
     public String getDbServerPort() {
         return dbServerPort;
     }

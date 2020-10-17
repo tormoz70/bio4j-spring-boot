@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
 import ru.bio4j.spring.dba.ExcelBuilderImpl;
-import ru.bio4j.spring.model.CacheProperties;
+import ru.bio4j.spring.model.config.props.CacheProperties;
 
 @Configuration
 @EnableConfigurationProperties({ CacheProperties.class })

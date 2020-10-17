@@ -134,6 +134,12 @@
             <version>2.4-stable</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.1.4</version>
+            <scope>test</scope>
+        </dependency>
 
 
     </dependencies>

@@ -13,7 +13,6 @@ import ru.bio4j.spring.dba.defaults.DefaultLoginProcessorImpl;
 import ru.bio4j.spring.dba.defaults.DefaultSecurityModuleImpl;
 
 @Configuration
-@Import({ DateSerializerConfig.class, CacheConfiguration.class })
 public class DefaultConfiguration {
 
     private final ApplicationContext applicationContext;

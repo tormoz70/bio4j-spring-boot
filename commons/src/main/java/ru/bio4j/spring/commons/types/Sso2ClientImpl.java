@@ -6,7 +6,7 @@ import org.apache.http.util.EntityUtils;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.model.Sso2ClientProperties;
+import ru.bio4j.spring.model.config.props.Sso2ClientProperties;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
 

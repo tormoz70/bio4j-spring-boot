@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.bio4j.spring.commons.cache.CacheService;
 import ru.bio4j.spring.commons.cache.impl.CacheServiceImpl;
-import ru.bio4j.spring.model.CacheProperties;
+import ru.bio4j.spring.model.config.props.CacheProperties;
 
 @Configuration
 @EnableConfigurationProperties({ CacheProperties.class })

@@ -1,4 +1,4 @@
-package ru.bio4j.spring.model;
+package ru.bio4j.spring.model.config.props;
 
 
 import org.springframework.beans.factory.annotation.Value;

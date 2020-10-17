@@ -14,7 +14,7 @@ import ru.bio4j.spring.commons.cache.util.CacheUtil;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.model.CacheProperties;
+import ru.bio4j.spring.model.config.props.CacheProperties;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
