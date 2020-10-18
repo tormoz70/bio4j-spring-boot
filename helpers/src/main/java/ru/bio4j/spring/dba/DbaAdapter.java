@@ -473,7 +473,15 @@ public class DbaAdapter {
         final SQLDefinition cursorDef = CursorParser.pars(bioCode);
         return CrudReaderApi.loadFirstRecordExt(filter, context, cursorDef, usr, beanType);
     }
-
+    public <T> T loadFirstBean(
+            final String bioCode,
+            final Object id,
+            final User usr,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadFirstRecordExt(id, context, cursorDef, usr, beanType);
+    }
     /**
      * Возвращает бин по ID
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
