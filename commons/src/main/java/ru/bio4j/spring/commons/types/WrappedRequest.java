@@ -42,8 +42,9 @@ public class WrappedRequest extends HttpServletRequestWrapper {
     public WrappedRequest(final HttpServletRequest request) {
         super(request);
         ServletContextHolder.setServletContext(request.getServletContext());
-        HttpParamMap defaultHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
-        httpParamMap = defaultHttpParamMap.getOverride() != null ? defaultHttpParamMap.getOverride() : defaultHttpParamMap;
+        HttpParamMap defaultHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("defaultHttpParamMap");
+        HttpParamMap overrideHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
+        httpParamMap = overrideHttpParamMap != null ? overrideHttpParamMap : defaultHttpParamMap;
         modParameters = new TreeMap<>();
         appendParams(request.getParameterMap());
         modHeaders = new HashMap();

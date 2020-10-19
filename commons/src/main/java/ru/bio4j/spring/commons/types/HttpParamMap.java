@@ -61,8 +61,4 @@ public interface HttpParamMap {
     default String clientVerHeader() {
         return "X-Client-Ver";
     }
-
-    default HttpParamMap getOverride() {
-        return null;
-    }
 }
