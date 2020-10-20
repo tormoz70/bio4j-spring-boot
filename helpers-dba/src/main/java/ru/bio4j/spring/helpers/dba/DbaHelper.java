@@ -935,55 +935,73 @@ public class DbaHelper {
         return request.getRequestURI() + "?" + request.getQueryString();
     }
 
-    public <T extends Serializable> T getObjectFromCache(String cacheName, HttpServletRequest request) {
+    public <T extends Serializable> T getObjectFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
+        return cacheService.get(cacheName, key);
+    }
+    public <T extends Serializable> T getObjectFromCache(String cacheName, HttpServletRequest request) {
         String requestHash = getRequestHash(request);
-        return cacheService.get(cacheName, requestHash);
+        return getObjectFromCache(cacheName, requestHash);
     }
 
-    public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
+    public <T extends Serializable> void putObjectToCache(String cacheName, String key, T value) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
-        String key = getRequestHash(request);
         cacheService.put(cacheName, key, value);
+    }
+    public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
+        String key = getRequestHash(request);
+        putObjectToCache(cacheName, key, value);
     }
 
     private static final String CACHE_CONTENT_HOLDER = "cached_content_holder";
-    public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
+    public <T extends Serializable> List<T> getListFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
-        String key = getRequestHash(request);
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
         return content != null ? (List<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
     }
+    public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
+        String key = getRequestHash(request);
+        return getListFromCache(cacheName, key);
+    }
 
-    public <T extends Serializable> void putListToCache(String cacheName, HttpServletRequest request, List<T> value) {
+    public <T extends Serializable> void putListToCache(String cacheName, String key, List<T> value) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
         ABean container = new ABean();
         container.put(CACHE_CONTENT_HOLDER, value);
-        String key = getRequestHash(request);
         cacheService.put(cacheName, key, container);
     }
+    public <T extends Serializable> void putListToCache(String cacheName, HttpServletRequest request, List<T> value) {
+        String key = getRequestHash(request);
+        putListToCache(cacheName, key, value);
+    }
 
-    public <T extends Serializable> BeansPage<T> getBeansPageFromCache(String cacheName, HttpServletRequest request) {
+    public <T extends Serializable> BeansPage<T> getBeansPageFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
-        String key = getRequestHash(request);
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
         return content != null ? (BeansPage<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
     }
+    public <T extends Serializable> BeansPage<T> getBeansPageFromCache(String cacheName, HttpServletRequest request) {
+        String key = getRequestHash(request);
+        return getBeansPageFromCache(cacheName, key);
+    }
 
-    public <T extends Serializable> void putBeansPageToCache(String cacheName, HttpServletRequest request, BeansPage<T> value) {
+    public <T extends Serializable> void putBeansPageToCache(String cacheName, String key, BeansPage<T> value) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
         ABean container = new ABean();
         container.put(CACHE_CONTENT_HOLDER, value);
-        String key = getRequestHash(request);
         cacheService.put(cacheName, key, container);
+    }
+    public <T extends Serializable> void putBeansPageToCache(String cacheName, HttpServletRequest request, BeansPage<T> value) {
+        String key = getRequestHash(request);
+        putBeansPageToCache(cacheName, key, value);
     }
 
 }

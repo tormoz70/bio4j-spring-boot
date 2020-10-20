@@ -1,7 +1,5 @@
 package ru.bio4j.spring.helpers.web.defaults;
 
-//import ru.bio4j.ng.commons.utils.Jsons;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.bio4j.spring.commons.types.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
