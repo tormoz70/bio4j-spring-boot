@@ -1,10 +1,22 @@
 package ru.bio4j.spring.commons.utils;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.util.ReflectionUtils;
 import ru.bio4j.spring.commons.converter.Converter;
+import ru.bio4j.spring.model.transport.ABean;
+import ru.bio4j.spring.model.transport.Prop;
+import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.util.*;
+
+import static ru.bio4j.spring.commons.utils.Lists.arrayCopyOf;
+import static ru.bio4j.spring.commons.utils.Reflex.*;
+import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
 
 public class ABeans {
 
@@ -48,6 +60,19 @@ public class ABeans {
             }
         }
         return defauldValue;
+    }
+
+    public static Object getPropertyValue(Object bean, String propName) {
+        try {
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()) {
+                if (pd.getReadMethod() != null && !"class".equals(pd.getName()) && propName.equals(pd.getName())) {
+                    return pd.getReadMethod().invoke(bean);
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
     }
 
     public static Map<String, Object> extractBeanFromBean(final Map<String, Object> bean, final String path) throws Exception {
@@ -100,4 +125,237 @@ public class ABeans {
             bean.put(newAttrName, val);
         }
     }
+
+    public static void setPropertyValue(Object bean, String propName, Object value, String dateTimeFormat) {
+        if(bean == null)
+            throw new IllegalArgumentException("Parameter \"bean\" cannot be null!");
+        if(Strings.isNullOrEmpty(propName))
+            throw new IllegalArgumentException("Parameter \"propName\" cannot be null or empty!");
+        try {
+            ReflectionUtils.doWithMethods(bean.getClass(), m -> {
+                try {
+                    Object valueLocal = value;
+                    if(valueLocal instanceof Date)
+                        valueLocal = DateFormatUtils.format((Date)value, dateTimeFormat);
+                    m.invoke(bean, valueLocal);
+                } catch (Exception e) {
+                    throw Utl.wrapErrorAsRuntimeException(String.format("Error on set \"%s\" to prop \"%s\" of bean!", value, propName), e);
+                }
+            },  m -> m.getName().equalsIgnoreCase("set"+propName));
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+    public static void applyBeanProps2BeanProps(Object srcBean, Object destBean, boolean skipNulls) {
+        if(srcBean == null)
+            throw new IllegalArgumentException("Parameter \"srcBean\" cannot be null!");
+        if(destBean == null)
+            throw new IllegalArgumentException("Parameter \"destBean\" cannot be null!");
+        try {
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(srcBean.getClass()).getPropertyDescriptors()) {
+                if (pd.getReadMethod() != null && !"class".equals(pd.getName())) {
+                    Object value = pd.getReadMethod().invoke(srcBean);
+                    if(value == null && skipNulls)
+                        continue;
+                    setPropertyValue(destBean, pd.getName(), value, "yyyy-MM-dd'T'hh:mm:ss");
+                }
+            }
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+    public static <T> T newInstance(Class<T> type) {
+        try {
+            return type.newInstance();
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+    public static boolean applyValuesToBeanFromBean(Object srcBean, Object bean) {
+        boolean result = false;
+        if (srcBean == null)
+            throw new IllegalArgumentException("Argument \"srcBean\" cannot be null!");
+        if (bean == null)
+            throw new IllegalArgumentException("Argument \"bean\" cannot be null!");
+        Class<?> srcType = srcBean.getClass();
+        Class<?> type = bean.getClass();
+        for (java.lang.reflect.Field fld : getAllObjectFields(type)) {
+            String fldName = fld.getName();
+            Field srcFld = findFieldOfBean(srcType, fldName);
+            if (srcFld == null)
+                continue;
+            try {
+                srcFld.setAccessible(true);
+                Object valObj = srcFld.get(srcBean);
+                if (valObj != null) {
+                    Object val;
+                    if (valObj.getClass().isArray()) {
+                        val = arrayCopyOf(valObj);
+                    } else {
+                        val = (fld.getType().equals(Object.class) || fld.getType().equals(valObj.getClass())) ? valObj : Converter.toType(valObj, fld.getType());
+                    }
+                    fld.setAccessible(true);
+                    fld.set(bean, val);
+                    result = true;
+                }
+            } catch (Exception e) {
+                String msg = String.format("Can't set value to field. Msg: %s", e.getMessage());
+                throw new ApplyValuesToBeanException(fldName, msg, e);
+            }
+        }
+        return result;
+    }
+
+    public static Object cloneBean(Object bean) {
+        if (bean != null && !bean.getClass().isPrimitive()) {
+            Class<?> type = bean.getClass();
+            Object newBean = newInstance(type);
+            applyValuesToBeanFromBean(bean, newBean);
+            return newBean;
+        }
+        return null;
+    }
+
+    public static <T> T cloneBean1(T bean, Class<T> clazz) {
+        if (bean != null && !clazz.isPrimitive()) {
+            T newBean = newInstance(clazz);
+            applyValuesToBeanFromBean(bean, newBean);
+            return newBean;
+        }
+        return null;
+    }
+
+    public static void applyValuesToABeanFromJSONObject(JSONObject jsonObject, Object dstBean) {
+        if (jsonObject == null)
+            throw new IllegalArgumentException("Argument \"srcBean\" cannot be null!");
+        if (dstBean == null)
+            throw new IllegalArgumentException("Argument \"dstBean\" cannot be null!");
+        Map<String, Object> values = new HashMap<>();
+        Iterator keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = (String)keys.next();
+            try {
+                values.put(key, jsonObject.get(key));
+            } catch(JSONException e) {
+                throw Utl.wrapErrorAsRuntimeException(e);
+            }
+        }
+        if(dstBean instanceof ABean)
+            applyValuesToABeanFromMap(values, (ABean) dstBean, true);
+        else
+            applyValuesToBeanFromMap(values, dstBean);
+    }
+
+    public static <T> T createBeanFromJSONObject(JSONObject jsonObject, Class<T> beanType) {
+        try {
+            T instance = beanType.newInstance();
+            applyValuesToABeanFromJSONObject(jsonObject, instance);
+            return instance;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+
+    private static boolean applyValueToField(Object valObj, Field field, Object bean) {
+        boolean result = false;
+        if (valObj != null) {
+            try {
+                Object val = (field.getType() == Object.class) ? valObj : Converter.toType(valObj, field.getType());
+                field.setAccessible(true);
+                field.set(bean, val);
+                if (!result) result = true;
+            } catch (Exception e) {
+                throw new ApplyValuesToBeanException(field.getName(), String.format("Can't set value %s to field. Msg: %s", valObj, e.getMessage()));
+            }
+        }
+        return result;
+    }
+
+    public static boolean applyValuesToBeanFromDict(Dictionary vals, Object bean) {
+        boolean result = false;
+        if (vals == null)
+            throw new IllegalArgumentException("Argument \"vals\" cannot be null!");
+        if (bean == null)
+            throw new IllegalArgumentException("Argument \"bean\" cannot be null!");
+        Class<?> type = bean.getClass();
+        for (java.lang.reflect.Field fld : getAllObjectFields(type)) {
+            String fldName = fld.getName();
+            Prop p = findAnnotation(Prop.class, fld);
+            if (p != null)
+                fldName = p.name();
+            Object valObj = vals.get(fldName);
+            result = applyValueToField(valObj, fld, bean);
+        }
+        return result;
+    }
+
+    public static boolean applyValuesToBeanFromMap(Map vals, Object bean, String inclideAttrs, String excludeAttrs) {
+        boolean result = false;
+        if (vals == null)
+            throw new IllegalArgumentException("Argument \"vals\" cannot be null!");
+        if (bean == null)
+            throw new IllegalArgumentException("Argument \"bean\" cannot be null!");
+        Class<?> type = bean.getClass();
+        for (java.lang.reflect.Field fld : getAllObjectFields(type)) {
+            String fldName = fld.getName();
+            Prop p = findAnnotation(Prop.class, fld);
+            if (p != null)
+                fldName = p.name();
+
+            boolean skip = !vals.containsKey(fldName) ||
+                    (!Strings.isNullOrEmpty(inclideAttrs) && !Strings.containsIgnoreCase(inclideAttrs, ",", fldName)) ||
+                    (!Strings.isNullOrEmpty(excludeAttrs) && Strings.containsIgnoreCase(excludeAttrs, ",", fldName));
+            if (skip) continue;
+
+            Object valObj = vals.get(fldName);
+            result = applyValueToField(valObj, fld, bean);
+
+        }
+        return result;
+    }
+
+    public static boolean applyValuesToBeanFromMap(Map vals, Object bean) {
+        return applyValuesToBeanFromMap(vals, bean, null, null);
+    }
+
+    public static boolean applyValuesToBeanFromABean(ABean vals, Object bean) {
+        return applyValuesToBeanFromMap(vals, bean);
+    }
+
+    public static void applyValuesToABeanFromABean(ABean srcBean, ABean dstBean, boolean addIfNotExists) {
+        boolean result = false;
+        if (srcBean == null)
+            throw new IllegalArgumentException("Argument \"srcBean\" cannot be null!");
+        if (dstBean == null)
+            throw new IllegalArgumentException("Argument \"dstBean\" cannot be null!");
+        for (String key : srcBean.keySet()) {
+            if (dstBean.containsKey(key))
+                dstBean.put(key, srcBean.get(key));
+            else {
+                if (addIfNotExists)
+                    dstBean.put(key, srcBean.get(key));
+            }
+        }
+    }
+
+    public static void applyValuesToABeanFromMap(Map vals, ABean dstBean, boolean addIfNotExists) {
+        boolean result = false;
+        if (vals == null)
+            throw new IllegalArgumentException("Argument \"srcBean\" cannot be null!");
+        if (dstBean == null)
+            throw new IllegalArgumentException("Argument \"dstBean\" cannot be null!");
+        for (Object key : vals.keySet()) {
+            if (dstBean.containsKey(key))
+                dstBean.put(key.toString(), vals.get(key));
+            else {
+                if (addIfNotExists)
+                    dstBean.put(key.toString(), vals.get(key));
+            }
+        }
+    }
+
 }

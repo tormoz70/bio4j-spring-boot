@@ -22,6 +22,8 @@ import java.sql.Connection;
 import java.util.*;
 import java.util.function.LongSupplier;
 
+import static ru.bio4j.spring.commons.utils.Reflex.fieldValue;
+
 public class CrudReaderApi {
     protected final static LogWrapper LOG = LogWrapper.getLogger(CrudReaderApi.class);
 
@@ -186,7 +188,7 @@ public class CrudReaderApi {
             if (bean instanceof HashMap)
                 value = ABeans.extractAttrFromBean((Map) bean, field, double.class, null);
             else
-                value = Utl.fieldValue(bean, field, double.class);
+                value = fieldValue(bean, field, double.class);
             Total rsTotal = pageTotals.stream().filter(t -> Strings.compare(t.getFieldName(), total.getFieldName(), true)).findFirst().orElse(null);
             if(rsTotal == null) {
                 rsTotal = Total.builder()

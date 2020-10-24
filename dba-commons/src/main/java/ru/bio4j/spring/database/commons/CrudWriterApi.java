@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static ru.bio4j.spring.commons.utils.ABeans.applyValuesToABeanFromABean;
+
 public class CrudWriterApi {
 
 
@@ -60,7 +62,7 @@ public class CrudWriterApi {
                 Paramus.setParamValue(prms, Rest2sqlParamNames.GETROW_PARAM_PKVAL, pkvalue);
                 BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, context, cursor, ABean.class);
                 if(pg.getRows().size() > 0)
-                    Utl.applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
+                    applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
             }
 
             return 0;

@@ -48,7 +48,7 @@ public class SrvcUtils {
     public static SsoUser userToSsoUser(User user) {
         if(user != null) {
             SsoUser rslt = new SsoUser();
-            Utl.applyValuesToBeanFromBean(user, rslt);
+            ABeans.applyValuesToBeanFromBean(user, rslt);
             return rslt;
         }
         return null;
@@ -57,7 +57,7 @@ public class SrvcUtils {
     public static User ssoUserToUser(SsoUser ssoUser) {
         if(ssoUser != null) {
             User rslt = new User();
-            Utl.applyValuesToBeanFromBean(ssoUser, rslt);
+            ABeans.applyValuesToBeanFromBean(ssoUser, rslt);
             return rslt;
         }
         return null;

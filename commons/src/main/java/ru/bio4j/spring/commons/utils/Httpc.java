@@ -12,6 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
 
+import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
+import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
+
 public class Httpc {
     private static final LogWrapper LOG = LogWrapper.getLogger(Httpc.class);
 
@@ -48,9 +51,9 @@ public class Httpc {
         try {
             T result;
             result = (T) clazz.newInstance();
-            for (java.lang.reflect.Field fld : Utl.getAllObjectFields(clazz)) {
+            for (java.lang.reflect.Field fld : getAllObjectFields(clazz)) {
                 String fldName = fld.getName();
-                Prop p = Utl.findAnnotation(Prop.class, fld);
+                Prop p = findAnnotation(Prop.class, fld);
                 if (p != null) {
                     fldName = p.name();
                     String val = request.getParameter(fldName);

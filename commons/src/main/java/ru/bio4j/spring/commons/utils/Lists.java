@@ -1,5 +1,6 @@
 package ru.bio4j.spring.commons.utils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -42,5 +43,22 @@ public class Lists {
         return last(list, null);
     }
 
+    public static <T> boolean arrayContains(T[] array, T item) {
+        for (T itm : array)
+            if (itm == item)
+                return true;
+        return false;
+    }
+
+    public static Object arrayCopyOf(Object original) {
+        if (original != null && original.getClass().isArray()) {
+            int l = ((Object[]) original).length;
+            Class<?> originalType = original.getClass();
+            Object rslt = Array.newInstance(originalType.getComponentType(), l);
+            System.arraycopy(original, 0, rslt, 0, l);
+            return rslt;
+        }
+        return null;
+    }
 
 }

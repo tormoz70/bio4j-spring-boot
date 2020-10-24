@@ -52,6 +52,12 @@ public class SsoUser implements Principal, Serializable {
     @ApiModelProperty("Уникальный идентификатор устройства пользователя")
     private String deviceuuid;
 
+    @ApiModelProperty("true - пуш-уведомления включены")
+    private Boolean pushenabled;
+
+    @ApiModelProperty("пуш-токен")
+    private String pushtoken;
+
     public String getStoken() {
         return stoken;
     }
@@ -183,5 +189,21 @@ public class SsoUser implements Principal, Serializable {
 
     public void setStokenExpire(Date stokenExpire) {
         this.stokenExpire = stokenExpire;
+    }
+
+    public Boolean getPushenabled() {
+        return pushenabled;
+    }
+
+    public void setPushenabled(Boolean pushenabled) {
+        this.pushenabled = pushenabled;
+    }
+
+    public String getPushtoken() {
+        return pushtoken;
+    }
+
+    public void setPushtoken(String pushtoken) {
+        this.pushtoken = pushtoken;
     }
 }

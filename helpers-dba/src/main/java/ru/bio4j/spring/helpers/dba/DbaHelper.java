@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import static ru.bio4j.spring.commons.utils.ABeans.createBeanFromJSONObject;
+
 /**
  * Адаптер для доступа к базе данных bio4j
  */
@@ -914,7 +916,7 @@ public class DbaHelper {
             if(data != null && meta != null) {
                 for(int i=0; i<data.length(); i++) {
                     JSONObject obj = data.getJSONObject(i);
-                    T bean = Utl.createBeanFromJSONObject(obj, beanType);
+                    T bean = createBeanFromJSONObject(obj, beanType);
                     rslt.getRows().add(bean);
                 }
                 if(totals != null) {

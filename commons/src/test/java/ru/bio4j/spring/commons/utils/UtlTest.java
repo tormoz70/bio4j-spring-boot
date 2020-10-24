@@ -23,6 +23,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.bio4j.spring.commons.utils.ABeans.*;
+import static ru.bio4j.spring.commons.utils.Lists.arrayCopyOf;
+import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
+import static ru.bio4j.spring.commons.utils.Reflex.typesIsSame;
+
 public class UtlTest {
     private final static LogWrapper LOG = LogWrapper.getLogger(UtlTest.class);
 
@@ -35,7 +40,7 @@ public class UtlTest {
 
     @Test
     public void findAnnotationTest() {
-        AnnotationTest annot = Utl.findAnnotation(AnnotationTest.class, AnnotetedClass.class);
+        AnnotationTest annot = findAnnotation(AnnotationTest.class, AnnotetedClass.class);
         if(annot != null)
             Assert.assertEquals(annot.path(), "/test_path");
         else
@@ -44,7 +49,7 @@ public class UtlTest {
 
     @Test
     public void typesIsSameTest() {
-        Assert.assertTrue(Utl.typesIsSame(DateTimeParser.class, DateTimeParser.class));
+        Assert.assertTrue(typesIsSame(DateTimeParser.class, DateTimeParser.class));
     }
 
     @Test
@@ -131,7 +136,7 @@ public class UtlTest {
         Dictionary d = new Hashtable();
         d.put("pool.name", expctd);
         TestConfig1 c = new TestConfig1();
-        Utl.applyValuesToBeanFromDict(d, c);
+        applyValuesToBeanFromDict(d, c);
         Assert.assertEquals(c.getPoolName(), expctd);
     }
     @Test
@@ -139,7 +144,7 @@ public class UtlTest {
         TestConfig1 c1 = new TestConfig1();
         c1.setPoolName("ru.bio4j.ng.doa.connectionPool.main");
         TestConfig2 c2 = new TestConfig2();
-        Utl.applyValuesToBeanFromBean(c1, c2);
+        applyValuesToBeanFromBean(c1, c2);
         Assert.assertEquals(c2.getPoolName(), c1.getPoolName());
     }
 
@@ -148,7 +153,7 @@ public class UtlTest {
         TestConfig1 c1 = new TestConfig1();
         c1.setPoolName("ru.bio4j.ng.doa.connectionPool.main");
         ImsConfig c2 = new ImsConfig();
-        Utl.applyValuesToBeanFromBean(c1, c2);
+        applyValuesToBeanFromBean(c1, c2);
         Assert.assertEquals(c2.getPoolName(), c1.getPoolName());
     }
 
@@ -157,7 +162,7 @@ public class UtlTest {
         Sort s1 = new Sort();
         s1.setFieldName("f1");
         s1.setDirection(Sort.Direction.DESC);
-        Sort s2 = (Sort)Utl.cloneBean(s1);
+        Sort s2 = (Sort)cloneBean(s1);
         Assert.assertEquals(s2.getFieldName(), s1.getFieldName());
     }
 
@@ -171,7 +176,7 @@ public class UtlTest {
     @Test
     public void arrayCopyTest() throws Exception {
         String[] a = {"1", "2"};
-        Object b = Utl.arrayCopyOf(a);
+        Object b = arrayCopyOf(a);
         Assert.assertEquals(((Object[])b).length, a.length);
         Assert.assertEquals(((Object[])b)[0], a[0]);
         Assert.assertEquals(((Object[])b)[1], a[1]);

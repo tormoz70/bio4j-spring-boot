@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static ru.bio4j.spring.commons.utils.Lists.arrayContains;
+
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar
  */
@@ -101,7 +103,7 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
                         for (Param p : prms) {
                             Param exists = Paramus.getParam(this.params, DbUtils.normalizeParamName(p.getName()));
                             if (exists != null && !exists.getName().equalsIgnoreCase(p.getName())
-                                    && Utl.arrayContains(new Param.Direction[]{Param.Direction.INOUT, Param.Direction.OUT}, exists.getDirection()))
+                                    && arrayContains(new Param.Direction[]{Param.Direction.INOUT, Param.Direction.OUT}, exists.getDirection()))
                                 exists.setName(p.getName());
                         }
                     }

@@ -22,6 +22,8 @@ import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.Rest2sqlParamNames;
 import ru.bio4j.spring.commons.utils.*;
 
+import static ru.bio4j.spring.commons.utils.ABeans.cloneBean;
+
 /**
  * Это helper для совершения разных манипуляций с List<Param>...
  */
@@ -481,7 +483,7 @@ public class Paramus implements Closeable {
 	        return null;
         List<Param> rslt = new ArrayList<>();
         for(Param p : params)
-            rslt.add((Param) Utl.cloneBean(p));
+            rslt.add((Param) cloneBean(p));
 	    return rslt;
     }
 

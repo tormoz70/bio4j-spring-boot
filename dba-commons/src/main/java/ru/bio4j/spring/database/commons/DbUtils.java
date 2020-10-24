@@ -19,6 +19,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.bio4j.spring.commons.utils.ABeans.newInstance;
+import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
+import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
+
 /**
  * Утилиты для работы с метаданными СУБД
  */
@@ -209,7 +213,7 @@ public class DbUtils {
             throw new IllegalArgumentException("Argument \"reader\" cannot be null!");
         if(clazz == null)
             throw new IllegalArgumentException("Argument \"bean\" cannot be null!");
-        T result = Utl.newInstance(clazz);
+        T result = newInstance(clazz);
         if(result instanceof Map) {
             for (DBField dbField : reader.getFields()) {
                 Object valObj = reader.getValue(dbField.getId());
@@ -222,9 +226,9 @@ public class DbUtils {
             }
             return result;
         } else {
-            for (java.lang.reflect.Field fld : Utl.getAllObjectFields(clazz)) {
+            for (java.lang.reflect.Field fld : getAllObjectFields(clazz)) {
                 String attrName = fld.getName();
-                Prop p = Utl.findAnnotation(Prop.class, fld);
+                Prop p = findAnnotation(Prop.class, fld);
                 if (p != null)
                     attrName = p.name();
                 String fldName = metaData != null ? findFieldName(metaData, attrName) : attrName;
@@ -430,7 +434,7 @@ public class DbUtils {
         if (src == null || src.size() == 0 || dst == null)
             return;
         Class<?> dstType = dst.getClass();
-        for (java.lang.reflect.Field fld : Utl.getAllObjectFields(dstType)) {
+        for (java.lang.reflect.Field fld : getAllObjectFields(dstType)) {
             String param2find = fld.getName();
             Prop prp = fld.getAnnotation(Prop.class);
             if (prp != null && !Strings.isNullOrEmpty(prp.name()))

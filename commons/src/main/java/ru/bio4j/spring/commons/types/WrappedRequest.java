@@ -19,6 +19,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
+import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
+
 public class WrappedRequest extends HttpServletRequestWrapper {
 
     private static final String UNKNOWN_APPLICATION_TOKEN = "fk-inner-system-unknown-application";
@@ -80,9 +83,9 @@ public class WrappedRequest extends HttpServletRequestWrapper {
     private static final String[] ACS_SYS_PAR_NAMES = {"_dc"};
     private static List<String> extractSysParamNames() {
         List<String> rslt = new ArrayList<>();
-        for(java.lang.reflect.Field fld : Utl.getAllObjectFields(BioQueryParams.class)) {
+        for(java.lang.reflect.Field fld : getAllObjectFields(BioQueryParams.class)) {
             String fldName = fld.getName();
-            Prop p = Utl.findAnnotation(Prop.class, fld);
+            Prop p = findAnnotation(Prop.class, fld);
             if(p != null) {
                 fldName = p.name();
                 rslt.add(fldName);
@@ -332,7 +335,7 @@ public class WrappedRequest extends HttpServletRequestWrapper {
                 (result.offset == null && result.offsetOrig != null && result.offsetOrig.equalsIgnoreCase("last"))) {
             result.offset = Sqls.UNKNOWN_RECS_TOTAL + 1 - result.pageSize;
         }
-        if(result.pageSize == null && result.pageSizeOrig == null)
+        if(result.pageSize == null && Strings.isNullOrEmpty(result.pageSizeOrig))
             result.pageSize = 50;
         if((result.page == null && result.pageOrig == null) || (result.page != null && result.page < 1))
             result.page = 1;
