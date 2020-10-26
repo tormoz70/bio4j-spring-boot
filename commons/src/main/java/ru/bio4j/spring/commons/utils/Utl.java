@@ -38,10 +38,9 @@ public class Utl {
 
 
     /**
-     * Вытаскивает имя вайла из полного пути
-     *
+     * Вытаскивает имя файла из полного пути
      * @param filePath
-     * @return
+     * @return fileName
      */
     public static String fileName(String filePath) {
         if (Strings.isNullOrEmpty(filePath)) {
@@ -55,9 +54,8 @@ public class Utl {
 
     /**
      * Вытаскивает расширение файла из полного пути
-     *
      * @param fileName
-     * @return
+     * @return fileExt
      */
     public static String fileNameExt(String fileName) {
         String extension = "";
@@ -79,9 +77,8 @@ public class Utl {
 
     /**
      * Приводит LongToInt, если это возможно
-     *
-     * @param l
-     * @return
+     * @param l long
+     * @return int
      */
     public static int safeLongToInt(long l) {
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
@@ -93,11 +90,9 @@ public class Utl {
 
     /**
      * Читает из потока заданное кол-во байтов и возвращает их в виде массива
-     *
-     * @param in
-     * @param length
-     * @return
-     * @throws IOException
+     * @param in stream
+     * @param length length og stream
+     * @return bytes
      */
     public static byte[] readStream(InputStream in, int length) {
         try {
@@ -112,9 +107,11 @@ public class Utl {
     }
 
     /**
-     * @param in
-     * @return
-     * @throws IOException
+     * Читает из потока заданное кол-во байтов и возвращает их в виде массива
+     * @param in stream
+     * @param encoding encoding
+     * @param addLineSeparator adds separator to end line
+     * @return string
      */
     public static String readStream(InputStream in, String encoding, boolean addLineSeparator) {
         try {
@@ -144,10 +141,11 @@ public class Utl {
 
 
     /**
-     * @param clazz
-     * @param in
-     * @return
-     * @throws JAXBException
+     * Десериализует xml в объект
+     * @param clazz type to unmarshal
+     * @param <T> type
+     * @param in source stream
+     * @return object
      */
     public static <T> T unmarshalXml(Class<T> clazz, InputStream in) {
         try {
@@ -164,8 +162,9 @@ public class Utl {
     }
 
     /**
-     * @param packageName
-     * @return
+     * Преобразует имя пакета в путь
+     * @param packageName packageName
+     * @return path
      */
     public static String pkg2path(String packageName) {
         return (Strings.isNullOrEmpty(packageName) ? null : "/" + packageName.replace('.', '/') + "/");
@@ -186,8 +185,9 @@ public class Utl {
     }
 
     /**
-     * @param path
-     * @return
+     * Имя сласса из пути
+     * @param path path to class
+     * @return className
      */
     public static String classNameFromPath(String path) {
         if (Strings.isNullOrEmpty(path)) return null;

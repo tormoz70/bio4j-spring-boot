@@ -106,7 +106,8 @@ public class Reflex {
 
     /**
      * @param annotationType - Type of annotation to find
-     * @param clazz          - Annotated type
+     * @param clazz - Annotated type
+     * @param <T> - type
      * @return - Annotation object
      */
     public static <T extends Annotation> T findAnnotation(Class<T> annotationType, Class<?> clazz) {
@@ -129,11 +130,9 @@ public class Reflex {
 
     /**
      * Checks two classes is assignable
-     *
-     * @param clazz1
-     * @param clazz2
+     * @param clazz1 type
+     * @param clazz2 type
      * @return boolean
-     * @throws
      */
     public static boolean typesIsAssignable(Class<?> clazz1, Class<?> clazz2) {
         if ((clazz1 == null) && (clazz2 == null)) return true;
@@ -143,11 +142,9 @@ public class Reflex {
 
     /**
      * Checks two classes is the same
-     *
-     * @param clazz1
-     * @param clazz2
+     * @param clazz1 type
+     * @param clazz2 type
      * @return boolean
-     * @throws
      */
     public static boolean typesIsSame(Class<?> clazz1, Class<?> clazz2) {
         if ((clazz1 == null) || (clazz2 == null)) return true;

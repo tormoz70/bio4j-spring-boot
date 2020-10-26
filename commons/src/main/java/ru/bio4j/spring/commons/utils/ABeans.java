@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.util.ReflectionUtils;
 import ru.bio4j.spring.commons.converter.Converter;
+import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
@@ -12,6 +13,7 @@ import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static ru.bio4j.spring.commons.utils.Lists.arrayCopyOf;
@@ -132,16 +134,26 @@ public class ABeans {
         if(Strings.isNullOrEmpty(propName))
             throw new IllegalArgumentException("Parameter \"propName\" cannot be null or empty!");
         try {
-            ReflectionUtils.doWithMethods(bean.getClass(), m -> {
-                try {
-                    Object valueLocal = value;
-                    if(valueLocal instanceof Date)
-                        valueLocal = DateFormatUtils.format((Date)value, dateTimeFormat);
-                    m.invoke(bean, valueLocal);
-                } catch (Exception e) {
-                    throw Utl.wrapErrorAsRuntimeException(String.format("Error on set \"%s\" to prop \"%s\" of bean!", value, propName), e);
+            for (PropertyDescriptor pd : Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()) {
+                if(pd.getName().equalsIgnoreCase(propName)) {
+                    Method method = pd.getWriteMethod();
+                    if (method != null) {
+                        try {
+                            Object valueLocal;
+                            if (value instanceof Date && pd.getPropertyType() == String.class)
+                                valueLocal = DateFormatUtils.format((Date) value, dateTimeFormat);
+                            else if (value instanceof String && pd.getPropertyType() == Date.class)
+                                valueLocal = DateTimeParser.getInstance().pars((String) value, dateTimeFormat);
+                            else
+                                valueLocal = Converter.toType(value, pd.getPropertyType());
+                            method.invoke(bean, valueLocal);
+                            return;
+                        } catch (Exception e) {
+                            throw Utl.wrapErrorAsRuntimeException(String.format("Error on set \"%s\" to prop \"%s\" of bean!", value, propName), e);
+                        }
+                    }
                 }
-            },  m -> m.getName().equalsIgnoreCase("set"+propName));
+            }
         } catch (Exception e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }

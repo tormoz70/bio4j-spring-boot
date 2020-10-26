@@ -26,7 +26,7 @@ public class Strings {
 
 	/**
 	 * Проверяет строку на null или пустую (length == 0)
-	 * @param str 
+	 * @param str строка
 	 * @return Если null или пусто (length == 0), то возвращает true
 	 */
 	public static boolean isNullOrEmpty(String str) {

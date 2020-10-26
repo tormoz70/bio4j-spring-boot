@@ -16,7 +16,8 @@ public class FilterBuilder {
     }
 
     /**
-     * Логическое 'или' (||, OR, +)
+     * Логическое 'или'
+     * @param exps Выражения, которые нужно объединить с пом OR
      * @return Выражение логическое "ИЛИ"
      */
     public static Expression or(Expression ... exps){
@@ -25,7 +26,8 @@ public class FilterBuilder {
 
 
     /**
-     * Логическое 'и' (&&, AND, *)
+     * Логическое 'и'
+     * @param exps Выражения, которые нужно объединить с пом AND
      * @return Выражение логическое "И"
      */
     public static Expression and(Expression ... exps){
@@ -34,6 +36,8 @@ public class FilterBuilder {
 
     /**
      * Значение поля равно значению
+     * @param column имя поля слева
+     * @param value значение справа
      * @return результат операции
      */
     public static Expression eq(String column, Object value){
@@ -42,6 +46,9 @@ public class FilterBuilder {
 
     /**
      * Значение поля равно строке
+     * @param column имя поля слева
+     * @param value значение справа
+     * @param ignoreCase не учитывать регистр при странении
      * @return результат операции
      */
     public static Expression eq(String column, String value, boolean ignoreCase){
@@ -50,7 +57,7 @@ public class FilterBuilder {
 
     /**
      * инверсия
-     * @param arg
+     * @param arg выражение
      * @return результат операции
      */
     public static Expression not(Expression arg){
@@ -59,7 +66,7 @@ public class FilterBuilder {
 
     /**
      * Значение поля IS NULL
-     * @param column
+     * @param column имя поля
      * @return результат операции
      */
     public static Expression isNull(String column){
@@ -68,8 +75,8 @@ public class FilterBuilder {
 
     /**
      * Значение поля БОЛЬШЕ значения
-     * @param column
-     * @param value
+     * @param column имя поля
+     * @param value значение
      * @return результат операции
      */
     public static Expression gt(String column, Object value){
@@ -78,8 +85,8 @@ public class FilterBuilder {
 
     /**
      * Значение поля БОЛЬШЕ ИЛИ РАВНО значения
-     * @param column
-     * @param value
+     * @param column имя поля
+     * @param value значение
      * @return результат операции
      */
     public static Expression ge(String column, Object value){
@@ -88,8 +95,8 @@ public class FilterBuilder {
 
     /**
      * Значение поля МЕНЬШЕ значения
-     * @param column
-     * @param value
+     * @param column имя поля
+     * @param value значение
      * @return результат операции
      */
     public static Expression lt(String column, Object value){
@@ -98,8 +105,8 @@ public class FilterBuilder {
 
     /**
      * Значение поля МЕНЬШЕ ИЛИ РАВНО значения
-     * @param column
-     * @param value
+     * @param column имя поля
+     * @param value значение
      * @return результат операции
      */
     public static Expression le(String column, Object value){
@@ -108,9 +115,9 @@ public class FilterBuilder {
 
     /**
      * Значение поля НАЧИНАЕТСЯ С строки...
-     * @param column
-     * @param value
-     * @param ignoreCase
+     * @param column имя поля
+     * @param value значение
+     * @param ignoreCase не учитывать регистр при странении
      * @return результат операции
      */
     public static Expression bgn(String column, String value, boolean ignoreCase){
@@ -119,9 +126,9 @@ public class FilterBuilder {
 
     /**
      * Значение поля ЗАКАНСИВАЕТСЯ НА строку...
-     * @param column
-     * @param value
-     * @param ignoreCase
+     * @param column имя поля
+     * @param value значение
+     * @param ignoreCase не учитывать регистр при странении
      * @return результат операции
      */
     public static Expression end(String column, String value, boolean ignoreCase){
@@ -130,9 +137,9 @@ public class FilterBuilder {
 
     /**
      * Значение поля СОДЕРЖИТ строку...
-     * @param column
-     * @param value
-     * @param ignoreCase
+     * @param column имя поля
+     * @param value значение
+     * @param ignoreCase не учитывать регистр при странении
      * @return результат операции
      */
     public static Expression contains(String column, String value, boolean ignoreCase){

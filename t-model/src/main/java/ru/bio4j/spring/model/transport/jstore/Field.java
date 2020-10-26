@@ -173,15 +173,14 @@ public class Field {
 
     /**
      * Field id starts from 1
-     * @return
+     * @return id
      */
     public int getId() { return id; }
 
     /**
      * Field index starts from 0
-     * @return
+     * @return index
      */
-//    @JSON(include = false)
     public int getIndex() { return id-1; }
 
     public void setId(int id) { this.id = id; }
