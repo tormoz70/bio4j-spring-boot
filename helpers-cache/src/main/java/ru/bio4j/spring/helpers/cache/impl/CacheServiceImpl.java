@@ -7,6 +7,7 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
+import org.springframework.util.FileSystemUtils;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
@@ -31,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheServiceImpl implements CacheService {
 	private static LogWrapper LOG = LogWrapper.getLogger(CacheService.class);
 
-    private final static String CACHE_DEFAULT_CONFIG_FILE = "ehcache-default-config.xml";
 	private final static String CACHE_DEFAULT_PERSISTENT_PATH = "ehcache-storage";
 	private final static String CACHE_PERSISTENT_PATH_PARAM = "${ehcache.persistent.path}";
 	private final static String CACHE_CONFIG_FILE_PARAM = "${ehcache.config}";
@@ -154,8 +154,8 @@ public class CacheServiceImpl implements CacheService {
 	private String getCacheConfigFile() {
 		String cacheConfigFile = cacheProperties.getCacheConfigFile();
 		if(Strings.isNullOrEmpty(cacheConfigFile) || Strings.compare(cacheConfigFile, CACHE_CONFIG_FILE_PARAM, true))
-			return CACHE_DEFAULT_CONFIG_FILE;
-		return Strings.resourceExists(cacheConfigFile) ? cacheConfigFile : CACHE_DEFAULT_CONFIG_FILE;
+			throw new IllegalArgumentException("Cache config file % not defined!");
+		return cacheConfigFile;
 	}
 
 	private String getCachePersistentPath() {
@@ -230,14 +230,18 @@ public class CacheServiceImpl implements CacheService {
 				inMemCount, inMemSizeInBytes);
 	}
 
+	private InputStream openCacheConfigFile(String cacheConfigFile) throws IOException {
+		if(Strings.resourceExists(cacheConfigFile))
+			return Strings.openResourceAsStream(cacheConfigFile);
+		if(Utl.fileExists(cacheConfigFile))
+			return Utl.openFile(cacheConfigFile);
+		throw new IOException(String.format("File %s not found!", cacheConfigFile));
+	}
+
     private volatile Configuration serviceConfiguration;
     private void createCacheConfiguration() {
     	LOG.debug("Attempting to find cache configuration");
-        try(InputStream configIn = Strings.openResourceAsStream(getCacheConfigFile())) {
-			if (configIn == null) {
-				LOG.debug("Could not find configuration content for cache service");
-				throw new IllegalArgumentException("Could not find cache config content");
-			}
+        try(InputStream configIn = openCacheConfigFile(getCacheConfigFile())) {
 			LOG.debug("Attempting to create new cache service");
 			serviceConfiguration = ConfigurationFactory.parseConfiguration(configIn);
 			DiskStoreConfiguration cfg = null;
