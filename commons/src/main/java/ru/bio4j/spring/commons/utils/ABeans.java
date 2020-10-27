@@ -11,6 +11,7 @@ import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
 
 import java.beans.Introspector;
+import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -128,6 +129,18 @@ public class ABeans {
         }
     }
 
+    public static Method getMethodOfBean(Object bean, String methodName) {
+        try {
+            for (MethodDescriptor md : Introspector.getBeanInfo(bean.getClass()).getMethodDescriptors()) {
+                if(md.getName().equalsIgnoreCase(methodName))
+                    return md.getMethod();
+            }
+            return null;
+        } catch (Exception e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
     public static void setPropertyValue(Object bean, String propName, Object value, String dateTimeFormat) {
         if(bean == null)
             throw new IllegalArgumentException("Parameter \"bean\" cannot be null!");
@@ -137,6 +150,8 @@ public class ABeans {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors()) {
                 if(pd.getName().equalsIgnoreCase(propName)) {
                     Method method = pd.getWriteMethod();
+                    if(method == null)
+                        method = getMethodOfBean(bean, "set"+propName);
                     if (method != null) {
                         try {
                             Object valueLocal;
