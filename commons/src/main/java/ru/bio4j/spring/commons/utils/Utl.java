@@ -631,8 +631,11 @@ public class Utl {
         if (Strings.isNullOrEmpty(anjson))
             return result;
 
-        ABean bioParamsContainer = Jecksons.getInstance().decodeABean(anjson);
-        if (bioParamsContainer.containsKey("bioParams")) {
+        ABean bioParamsContainer = null;
+        try {
+            bioParamsContainer = Jecksons.getInstance().decodeABean(anjson);
+        } catch (Exception e) { }
+        if (bioParamsContainer != null && bioParamsContainer.containsKey("bioParams")) {
             List<HashMap<String, Object>> bioParamsArray = (List) bioParamsContainer.get("bioParams");
             for (HashMap<String, Object> prm : bioParamsArray) {
                 String paramName = (String) prm.get("name");
