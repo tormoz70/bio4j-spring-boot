@@ -59,7 +59,7 @@ public class BioError extends RuntimeException {
     public static class BadRequestType extends BioError {
 
         public BadRequestType() {
-            super(6400);
+            super(6400, "Неизвестный тип запроса!");
         }
         public BadRequestType(String requestType) {
             super(6400, String.format("Value of argument \"requestType\":\"%s\" is unknown!", requestType));
@@ -115,6 +115,17 @@ public class BioError extends RuntimeException {
         }
         public BadIODescriptor(String message) {
             super(message);
+        }
+    }
+
+    public static BioError build(int code, String message) {
+        switch (code) {
+            case 6400: return new BadRequestType();
+            case 6401: return new Login.Unauthorized();
+            case 6403: return new Login.Forbidden();
+            case 6405: return new MethodNotAllowed();
+            case 6501: return new MethodNotImplemented();
+            default: return new BioError(code, message);
         }
     }
 
