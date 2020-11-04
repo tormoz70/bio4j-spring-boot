@@ -57,6 +57,6 @@ _по идее пункты 4,5 можно опустить если не нуж
 #####4. Релиз  
 Для релиза перейти в основную ветку (например в master-v2.1), выполнить следующие команды:
 ```
-# mvn release:prepare -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
-# mvn release:perform -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
+mvn release:prepare -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
+mvn release:perform -Darguments="-DskipTests -Dmaven.javadoc.skip=true"
 ```

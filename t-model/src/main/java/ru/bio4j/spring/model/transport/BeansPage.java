@@ -107,4 +107,65 @@ public class BeansPage<T> {
     public void setTotals(List<Total> totals) {
         this.totals = totals;
     }
+
+    public static class Builder<T> {
+        private List<T> rows;
+        private long paginationPage;
+        private long paginationOffset;
+        private long paginationCount;
+        private long paginationPageSize;
+        private long totalCount;
+        private List<Field> metadata;
+        private List<Total> totals;
+
+        public Builder rows(List<T> value) {
+            rows = value;
+            return this;
+        }
+        public Builder paginationPage(long value) {
+            paginationPage = value;
+            return this;
+        }
+        public Builder paginationOffset(long value) {
+            paginationOffset = value;
+            return this;
+        }
+        public Builder paginationCount(long value) {
+            paginationCount = value;
+            return this;
+        }
+        public Builder paginationPageSize(long value) {
+            paginationPageSize = value;
+            return this;
+        }
+        public Builder totalCount(long value) {
+            totalCount = value;
+            return this;
+        }
+        public Builder metadata(List<Field> value) {
+            metadata = value;
+            return this;
+        }
+        public Builder totals(List<Total> value) {
+            totals = value;
+            return this;
+        }
+
+        public BeansPage<T> build() {
+            BeansPage<T> result = new BeansPage<>();
+            result.setRows(rows);
+            result.setPaginationPage(paginationPage);
+            result.setPaginationOffset(paginationOffset);
+            result.setPaginationCount(paginationCount);
+            result.setPaginationPageSize(paginationPageSize);
+            result.setTotalCount(totalCount);
+            result.setMetadata(metadata);
+            result.setTotals(totals);
+            return result;
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
 }

@@ -14,7 +14,12 @@ public class DefaultSecurityModuleImpl implements SecurityService {
     public boolean checkPathIsOpened(HttpServletRequest request) { return true; }
 
     @Override
-    public User login(final BioQueryParams qprms) {
+    public User login(String apptoken, String login, BioQueryParams qprms) {
+        return null;
+    }
+
+    @Override
+    public User loginGuest(String apptoken, String deviceuuid, BioQueryParams qprms) {
         return null;
     }
 

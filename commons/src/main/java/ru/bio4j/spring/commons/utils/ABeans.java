@@ -16,6 +16,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.bio4j.spring.commons.utils.Lists.arrayCopyOf;
 import static ru.bio4j.spring.commons.utils.Reflex.*;
@@ -383,6 +384,20 @@ public class ABeans {
                     dstBean.put(key.toString(), vals.get(key));
             }
         }
+    }
+
+    public static  <T, R> R convertBeanType(T bean, Class<R> resultType) {
+        try {
+            R rslt = (R) resultType.newInstance();
+            ABeans.applyBeanProps2BeanProps(bean, rslt, true);
+            return rslt;
+        } catch (InstantiationException|IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static  <T, R> List<R> convertListType(List<T> list, Class<R> resultType) {
+        return list.stream().map(r -> convertBeanType(r, resultType)).collect(Collectors.toList());
     }
 
 }
