@@ -56,16 +56,13 @@ public class BioError extends RuntimeException {
 
 
     @JsonTypeInfo(use = Id.CLASS, property = "@class")
-    public static class BadRequestType extends BioError {
+    public static class BadRequest extends BioError {
 
-        public BadRequestType() {
-            super(6400, "Неизвестный тип запроса!");
+        public BadRequest() {
+            super(6400, "Не правильный запрос!");
         }
-        public BadRequestType(String requestType) {
-            super(6400, String.format("Value of argument \"requestType\":\"%s\" is unknown!", requestType));
-        }
-        public BadRequestType(String msgTemplate, String requestType) {
-            super(6400, String.format(msgTemplate, requestType));
+        public BadRequest(String message) {
+            super(6400, message);
         }
     }
 
@@ -106,6 +103,24 @@ public class BioError extends RuntimeException {
             }
         }
 
+        @JsonTypeInfo(use = Id.CLASS, property = "@class")
+        public static class BadSToken extends BioError.Login {
+            public BadSToken() {
+                super(6400, "Токен безопастности не актуален!");
+            }
+        }
+
+        @JsonTypeInfo(use = Id.CLASS, property = "@class")
+        public static class BadRequest extends BioError {
+
+            public BadRequest() {
+                super(6400, "Не правильный запрос!");
+            }
+            public BadRequest(String message) {
+                super(6400, message);
+            }
+        }
+
     }
 
     @JsonTypeInfo(use = Id.CLASS, property = "@class")
@@ -120,7 +135,7 @@ public class BioError extends RuntimeException {
 
     public static BioError build(int code, String message) {
         switch (code) {
-            case 6400: return new BadRequestType();
+            case 6400: return new BadRequest();
             case 6401: return new Login.Unauthorized();
             case 6403: return new Login.Forbidden();
             case 6405: return new MethodNotAllowed();

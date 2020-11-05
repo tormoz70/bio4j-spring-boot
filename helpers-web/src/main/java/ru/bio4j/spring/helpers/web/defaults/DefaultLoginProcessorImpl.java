@@ -1,6 +1,7 @@
 package ru.bio4j.spring.helpers.web.defaults;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import ru.bio4j.spring.commons.types.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.BioQueryParams;
@@ -45,7 +46,6 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
 
     private void doOthers(final HttpServletRequest request, final HttpServletResponse response) {
         final WrappedRequest req = (WrappedRequest)request;
-        final BioQueryParams qprms = req.getBioQueryParams();
         User user = getSecurityService().getUser(decodeQParams(request));
         req.setUser(user);
         ServletContextHolder.setCurrentUser(user);
@@ -56,7 +56,7 @@ public class DefaultLoginProcessorImpl implements LoginProcessor {
         final HttpServletResponse resp = (HttpServletResponse) response;
         if(getSecurityService() != null) {
             resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("application/json");
+            resp.setContentType(MediaType.APPLICATION_JSON_VALUE);
             try {
                 if(!doCheckPathIsOpened(reqs))
                     doOthers(reqs, resp);
