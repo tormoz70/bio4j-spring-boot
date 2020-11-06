@@ -5,10 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.types.ExcelBuilder;
-import ru.bio4j.spring.commons.types.LogWrapper;
-import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.commons.types.WrappedRequest;
+import ru.bio4j.spring.commons.types.*;
 import ru.bio4j.spring.commons.utils.Jecksons;
 import ru.bio4j.spring.commons.utils.SrvcUtils;
 import ru.bio4j.spring.commons.utils.Strings;
@@ -33,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static ru.bio4j.spring.commons.utils.ABeans.createBeanFromJSONObject;
 
@@ -1006,4 +1004,69 @@ public class DbaHelper {
         putBeansPageToCache(cacheName, key, value);
     }
 
+    /**
+     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * @param cacheName имя используемого кэша
+     * @param request   объект запроса, который используется для получения уникального ключа
+     * @param creator   метод создания нового экзмпляра объекта
+     * @param <T>       тип получаемого объекта
+     * @return Экземпляр объекта из кэша, либо объект, созданный creator'ом.
+     */
+    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, HttpServletRequest request, Supplier<T> creator) {
+        T rslt = getObjectFromCache(cacheName, request);
+        if (rslt == null) {
+            rslt = creator.get();
+            putObjectToCache(cacheName, request, rslt);
+        }
+        return rslt;
+    }
+    /**
+     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * @param cacheName имя используемого кэша
+     * @param key       уникальный ключ в кэше
+     * @param creator   метод создания нового экзмпляра объекта
+     * @param <T>       тип получаемого объекта
+     * @return Экземпляр объекта из кэша, либо объект, созданный creator'ом.
+     */
+    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, String key, Supplier<T> creator) {
+        T rslt = getObjectFromCache(cacheName, key);
+        if (rslt == null) {
+            rslt = creator.get();
+            putObjectToCache(cacheName, key, rslt);
+        }
+        return rslt;
+    }
+
+    /**
+     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * @param cacheName имя используемого кэша
+     * @param request   объект запроса, который используется для получения уникального ключа
+     * @param creator   метод создания нового списка объектов
+     * @param <T>       тип получаемого объекта в списке
+     * @return Список объектов из кэша, либо список объектов, созданный creator'ом.
+     */
+    public <T extends Serializable> List<T> wrapListCacheCall(String cacheName, HttpServletRequest request, ListSupplier<T> creator) {
+        List<T> rslt = getListFromCache(cacheName, request);
+        if (rslt == null) {
+            rslt = creator.get();
+            putListToCache(cacheName, request, rslt);
+        }
+        return rslt;
+    }
+    /**
+     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * @param cacheName имя используемого кэша
+     * @param key       уникальный ключ в кэше
+     * @param creator   метод создания нового списка объектов
+     * @param <T>       тип получаемого объекта в списке
+     * @return Список объектов из кэша, либо список объектов, созданный creator'ом.
+     */
+    public <T extends Serializable> List<T> wrapListCacheCall(String cacheName, String key, ListSupplier<T> creator) {
+        List<T> rslt = getListFromCache(cacheName, key);
+        if (rslt == null) {
+            rslt = creator.get();
+            putListToCache(cacheName, key, rslt);
+        }
+        return rslt;
+    }
 }

@@ -362,6 +362,7 @@ public class UtlTest {
         Assert.assertEquals(r,"e:\\arch\\20171204\\57\\posted000\\ekb_57_20171021_100012002(31fc455a).xml");
     }
 
+    @Ignore
     @Test
     public void readFileTest() throws Exception {
         long fs = Utl.fileSize("e:\\arch\\20171204\\57\\posted000\\ekb_57_20171021_100012002(31fc455a).xml");
