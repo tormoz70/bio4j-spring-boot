@@ -67,13 +67,6 @@ public class BioError extends RuntimeException {
     }
 
     @JsonTypeInfo(use = Id.CLASS, property = "@class")
-    public static class MethodNotAllowed extends BioError {
-        public MethodNotAllowed() {
-            super(6405, "Метод не доступен!");
-        }
-    }
-
-    @JsonTypeInfo(use = Id.CLASS, property = "@class")
     public static class MethodNotImplemented extends BioError {
         public MethodNotImplemented() {
             super(6501, "Метод не реализован!");
@@ -104,20 +97,16 @@ public class BioError extends RuntimeException {
         }
 
         @JsonTypeInfo(use = Id.CLASS, property = "@class")
-        public static class BadSToken extends BioError.Login {
-            public BadSToken() {
-                super(6400, "Токен безопастности не актуален!");
+        public static class MethodNotAllowed extends BioError.Login {
+            public MethodNotAllowed() {
+                super(6405, "Метод не доступен!");
             }
         }
 
         @JsonTypeInfo(use = Id.CLASS, property = "@class")
-        public static class BadRequest extends BioError {
-
-            public BadRequest() {
-                super(6400, "Не правильный запрос!");
-            }
-            public BadRequest(String message) {
-                super(6400, message);
+        public static class BadSToken extends BioError.Login {
+            public BadSToken() {
+                super(6406, "Токен безопастности отсутствует!");
             }
         }
 
@@ -138,7 +127,8 @@ public class BioError extends RuntimeException {
             case 6400: return new BadRequest();
             case 6401: return new Login.Unauthorized();
             case 6403: return new Login.Forbidden();
-            case 6405: return new MethodNotAllowed();
+            case 6405: return new Login.MethodNotAllowed();
+            case 6406: return new Login.BadSToken();
             case 6501: return new MethodNotImplemented();
             default: return new BioError(code, message);
         }

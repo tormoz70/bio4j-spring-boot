@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+@Ignore
 public class SQLFactoryTest {
 
 //    адрес 192.168.70.101. порт tcp - 9000, http 8123

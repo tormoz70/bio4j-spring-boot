@@ -29,6 +29,7 @@ public class DbaTest {
     private DbaHelper pgsqlHelper;
 
     @Test
+    @Ignore
     public void doTest1() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
         ABean d1 = chHelper.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);

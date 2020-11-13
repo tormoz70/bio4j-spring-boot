@@ -50,7 +50,7 @@ public class DefaultErrorProcessorImpl implements ErrorProcessor {
                 LoginResult result = LoginResult.Builder.error(errorBean);
                 return createEntry(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), result, MediaType.APPLICATION_JSON);
             } else if (exception instanceof javax.ws.rs.NotAllowedException) {
-                LoginResult result = LoginResult.Builder.error(new BioError.MethodNotAllowed());
+                LoginResult result = LoginResult.Builder.error(new BioError.Login.MethodNotAllowed());
                 return createEntry(Response.Status.METHOD_NOT_ALLOWED.getStatusCode(), result, MediaType.APPLICATION_JSON);
             } else if (exception instanceof javax.ws.rs.NotFoundException) {
                 LoginResult result = LoginResult.Builder.error(exception);
