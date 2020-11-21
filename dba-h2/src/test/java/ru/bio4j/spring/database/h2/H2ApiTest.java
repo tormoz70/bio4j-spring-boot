@@ -41,9 +41,9 @@ public class H2ApiTest {
                         .build(),
                 H2Context.class);
 
-        context.execBatch((conn) -> {
+        context.execBatch((ctx) -> {
             String sql = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("ddl_cre_test_table.sql"));
-            DbUtils.execSQL(conn, sql);
+            DbUtils.execSQL(ctx.currentConnection(), sql);
         }, null);
 
     }
@@ -62,12 +62,12 @@ public class H2ApiTest {
 
     @Test
     public void selectTest() {
-        long dummysum = context.execBatch(conn -> {
+        long dummysum = context.execBatch(ctx -> {
             String sql = "select sum(id) from test";
             List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 101).pop();
             return context.createCursor()
-                    .init(conn, sql, null)
-                    .scalar(prms, context.getCurrentUser(), long.class, -1L);
+                    .init(ctx.currentConnection(), sql, null)
+                    .scalar(prms, context.currentUser(), long.class, -1L);
         }, null);
         LOG.debug("dummysum: " + dummysum);
         Assert.assertEquals(dummysum, 3, 0);

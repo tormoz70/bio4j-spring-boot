@@ -4,7 +4,6 @@ import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.utils.ABeans;
-import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
@@ -30,16 +29,16 @@ public class CrudWriterApi {
         UpdelexSQLDef sqlDef = cursor.getUpdateSqlDef();
         if(sqlDef == null)
             throw new BioError(String.format("For bio \"%s\" must be defined \"create/update\" sql!", cursor.getBioCode()));
-        context.execBatch((conn) -> {
-            SQLStoredProc cmd = context.createStoredProc();
+        context.execBatch((ctx) -> {
+            SQLStoredProc cmd = ctx.createStoredProc();
             try {
-                cmd.init(conn, sqlDef);
+                cmd.init(ctx.currentConnection(), sqlDef);
                 List<Param> prms = new ArrayList<>();
                 for (ABean row : rows) {
                     prms.clear();
                     Paramus.setParams(prms, params);
                     DbUtils.applayRowToParams(row, prms);
-                    cmd.execSQL(prms, context.getCurrentUser(), true);
+                    cmd.execSQL(prms, ctx.currentUser(), true);
                     try (Paramus paramus = Paramus.set(cmd.getParams())) {
                         for (Param p : paramus.get()) {
                             if (Arrays.asList(Param.Direction.INOUT, Param.Direction.OUT).contains(p.getDirection())) {
@@ -60,7 +59,7 @@ public class CrudWriterApi {
             for(ABean bean : rows){
                 Object pkvalue = ABeans.extractAttrFromBean(bean, pkFieldName, pkClazz, null);
                 Paramus.setParamValue(prms, Rest2sqlParamNames.GETROW_PARAM_PKVAL, pkvalue);
-                BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, context, cursor, ABean.class);
+                BeansPage<ABean> pg = CrudReaderApi.loadRecord0(prms, ctx, cursor, ABean.class);
                 if(pg.getRows().size() > 0)
                     applyValuesToABeanFromABean(pg.getRows().get(0), bean, true);
             }
@@ -81,11 +80,11 @@ public class CrudWriterApi {
         UpdelexSQLDef sqlDef = cursor.getDeleteSqlDef();
         if (sqlDef == null)
             throw new BioError(String.format("For bio \"%s\" must be defined \"delete\" sql!", cursor.getBioCode()));
-        int affected = context.execBatch((conn) -> {
+        int affected = context.execBatch((ctx) -> {
             int r = 0;
-            SQLStoredProc cmd = context.createStoredProc();
+            SQLStoredProc cmd = ctx.createStoredProc();
             try {
-                cmd.init(conn, sqlDef);
+                cmd.init(ctx.currentConnection(), sqlDef);
                 for (Object id : ids) {
                     Param prm = Paramus.getParam(cmd.getParams(), Rest2sqlParamNames.DELETE_PARAM_PKVAL);
                     if (prm == null)
@@ -112,13 +111,13 @@ public class CrudWriterApi {
         UpdelexSQLDef sqlDef = cursor.getExecSqlDef();
         if (sqlDef == null)
             throw new BioSQLException(String.format("For bio \"%s\" must be defined \"exec\" sql!", cursor.getBioCode()));
-        Connection connTest = context.getCurrentConnection();
+        Connection connTest = context.currentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
 
         SQLStoredProc cmd = context.createStoredProc();
-        cmd.init(context.getCurrentConnection(), sqlDef);
-        cmd.execSQL(params, context.getCurrentUser());
+        cmd.init(context.currentConnection(), sqlDef);
+        cmd.execSQL(params, context.currentUser());
     }
 
     public static void execSQL(

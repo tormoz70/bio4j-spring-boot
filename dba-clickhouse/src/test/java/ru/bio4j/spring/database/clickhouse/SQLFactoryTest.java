@@ -122,13 +122,13 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor() {
         try {
-            Double dummysum = context.execBatch(conn -> {
+            Double dummysum = context.execBatch(ctx -> {
                 Var var = new Var();
                 String sql = "select a.*, :dummy as dm from jdbc_test.data0 as a";
                 List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 1).pop();
-                context.createCursor()
-                        .init(conn, sql, null)
-                        .fetch(prms, context.getCurrentUser(), rs->{
+                ctx.createCursor()
+                        .init(ctx.currentConnection(), sql, null)
+                        .fetch(prms, ctx.currentUser(), rs->{
                             var.dummy += rs.getValue("DM", Double.class);
                             return true;
                         });
@@ -140,7 +140,6 @@ public class SQLFactoryTest {
             LOG.error("Error!", ex);
             Assert.fail();
         }
-
     }
 
     @Test

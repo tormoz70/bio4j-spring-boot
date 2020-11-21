@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface SQLContext {
 
-    User getCurrentUser();
-    Connection getCurrentConnection();
+    User currentUser();
+    Connection currentConnection();
 
     void execBatch (final SQLActionVoid0 batch, final User usr);
     <P> void execBatch (final SQLActionVoid1 batch, final P param, final User usr);
@@ -27,7 +27,7 @@ public interface SQLContext {
     SQLStoredProc createStoredProc();
     StatementPreparerer createDbStatementPreparerer(SQLCursor cursor);
 
-    String getDBMSName();
+    String dbmsName();
 
     DataSourceProperties getDataSourceProperties();
     Wrappers getWrappers();

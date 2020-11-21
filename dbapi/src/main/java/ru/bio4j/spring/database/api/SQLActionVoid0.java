@@ -1,11 +1,8 @@
 package ru.bio4j.spring.database.api;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- *
- */
+@FunctionalInterface
 public interface SQLActionVoid0 {
-    void exec(Connection conn) throws SQLException;
+    void exec(SQLContext context) throws SQLException;
 }

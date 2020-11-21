@@ -1,12 +1,13 @@
 package ru.bio4j.spring.database.api;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
  *
- * @param <R> - тип возвращаемого параметра
+ * @param <P> тип вх параметира
+ * @param <R> тип результата
  */
+@FunctionalInterface
 public interface SQLActionScalar1<P, R> {
-    R exec(Connection conn, P param) throws SQLException;
+    R exec(SQLContext context, P param) throws SQLException;
 }

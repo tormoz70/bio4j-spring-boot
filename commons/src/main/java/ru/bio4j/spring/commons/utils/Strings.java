@@ -361,4 +361,26 @@ public class Strings {
         return null;
     }
 
+
+    /**
+     * Объединяет строки в перечисления длинной не более itemLimit
+     * @param strings
+     * @param delimiter
+     * @param itemLimit
+     * @return
+     */
+    public static List<String> combineList2List(List<String> strings, String delimiter, int itemLimit) {
+	    List<String> result = new ArrayList<>();
+	    StringBuilder sb = new StringBuilder(itemLimit);
+	    strings.forEach(s -> {
+	        if(append(sb.toString(), s, delimiter).length() > itemLimit && sb.length() > 0) {
+                result.add(sb.toString());
+                sb.setLength(0);
+            }
+            append(sb, s, delimiter);
+        });
+        result.add(sb.toString());
+        return result;
+    }
+
 }

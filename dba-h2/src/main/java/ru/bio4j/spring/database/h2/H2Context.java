@@ -30,7 +30,7 @@ public class H2Context extends DbContextAbstract {
             );
         }
 
-        wrappers = new H2WrappersImpl(this.getDBMSName());
+        wrappers = new H2WrappersImpl(this.dbmsName());
         DbUtils.getInstance().init(
                 new H2TypeConverterImpl(),
                 new H2UtilsImpl()
@@ -43,7 +43,7 @@ public class H2Context extends DbContextAbstract {
     }
 
     @Override
-    public String getDBMSName() {
+    public String dbmsName() {
         return "h2";
     }
 

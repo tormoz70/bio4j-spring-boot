@@ -44,7 +44,7 @@ public class SQLFactoryTest1 extends TestCase {
     @Test
     public void testCreateSQLConnectionPool() throws Exception {
         context.execBatch(conn -> {
-            Assert.assertNotNull(context.getCurrentConnection());
+            Assert.assertNotNull(context.currentConnection());
             return null;
         }, null);
 

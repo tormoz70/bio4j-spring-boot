@@ -29,11 +29,11 @@ public abstract class DbContextAbstract implements SQLContext {
         this.dataSourceProperties = dataSourceProperties;
     }
 
-    public User getCurrentUser() {
+    public User currentUser() {
         return ThreadContextHolder.instance().getCurrentUser();
     }
 
-    public Connection getCurrentConnection() {
+    public Connection currentConnection() {
         return ThreadContextHolder.instance().getCurrentConnection();
     }
 
@@ -126,12 +126,12 @@ public abstract class DbContextAbstract implements SQLContext {
                 setCurrentContext(usr, conn);
                 try {
                     if (batch != null)
-                        result = batch.exec(this.getCurrentConnection(), param);
-                    getCurrentConnection().commit();
+                        result = batch.exec(this, param);
+                    currentConnection().commit();
                 } catch (SQLException e) {
-                    if (getCurrentConnection() != null)
+                    if (currentConnection() != null)
                         try {
-                            getCurrentConnection().rollback();
+                            currentConnection().rollback();
                         } catch (SQLException e1) {}
                     throw e;
                 } finally {
@@ -194,7 +194,7 @@ public abstract class DbContextAbstract implements SQLContext {
     }
 
     @Override
-    public abstract String getDBMSName();
+    public abstract String dbmsName();
 
     @Override
     public Wrappers getWrappers() {

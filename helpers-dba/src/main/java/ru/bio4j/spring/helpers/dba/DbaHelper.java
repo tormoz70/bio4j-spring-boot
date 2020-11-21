@@ -100,22 +100,22 @@ public class DbaHelper {
     
     private void prepareSQL(SQLDefinition sqlDefinition) {
         SQLContext context = getSqlContext();
-        context.execBatch((conn) -> {
+        context.execBatch((ctx) -> {
             UpdelexSQLDef def = sqlDefinition.getUpdateSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), ctx.currentConnection(), def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }
             def = sqlDefinition.getDeleteSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), ctx.currentConnection(), def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }
             def = sqlDefinition.getExecSqlDef();
             if (def != null) {
-                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), conn, def.getParamDeclaration());
+                StoredProgMetadata sp = context.prepareStoredProc(def.getPreparedSql(), ctx.currentConnection(), def.getParamDeclaration());
                 def.setSignature(sp.getSignature());
                 def.setParamDeclaration(sp.getParamDeclaration());
             }
@@ -677,30 +677,44 @@ public class DbaHelper {
 
     /**
      * Выполняет batch
-     * @param context
      * @param action
      * @param user
      */
-    public static void execBatch(final SQLContext context, final SQLActionVoid0 action, final User user) {
+    public void execBatch(final SQLActionVoid0 action, final User user) {
+        SQLContext context = getSqlContext();
         context.execBatch(action, user);
     }
-    public static <T> T execBatch(final SQLContext context, final SQLActionScalar0<T> action, final User user) {
+    public <T> T execBatch(final SQLActionScalar0<T> action, final User user) {
+        SQLContext context = getSqlContext();
         return context.execBatch(action, user);
     }
-    public static <P, T> T execBatch(final SQLContext context, final SQLActionScalar1<P, T> action, P param, final User user) {
+    public <P, T> T execBatch(final SQLActionScalar1<P, T> action, P param, final User user) {
+        SQLContext context = getSqlContext();
         return context.execBatch(action, param, user);
     }
 
     /**
-     * Выполняет запрос в текущей транзакции
+     * Выполняет запрос в текущей транзакции для текущего пользователя в контексте (транзакция не закрывается)
      * @param sqlDefinition
      * @param params
-     * @param context
      */
-    public static void execLocal(
+    public void execLocal(
             final SQLDefinition sqlDefinition,
-            final Object params,
-            final SQLContext context) {
+            final Object params) {
+        final SQLContext context = getSqlContext();
+        CrudWriterApi.execSQL0(params, context, sqlDefinition);
+    }
+
+    /**
+     * Выполняет запрос в текущей транзакции для текущего пользователя в контексте (транзакция не закрывается)
+     * @param bioCode
+     * @param params
+     */
+    public void execLocal(
+            final String bioCode,
+            final Object params) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         CrudWriterApi.execSQL0(params, context, sqlDefinition);
     }
 

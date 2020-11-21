@@ -5,6 +5,7 @@ package ru.bio4j.spring.commons.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.util.comparator.Comparators;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -165,4 +166,35 @@ public class StringUtlTest {
         Assert.assertEquals("qwe", Strings.firstNotEmpty("", null, "", "qwe", "asd", null));
         Assert.assertEquals("qwe", Strings.firstNotEmpty("", null, null, "qwe", "asd", null));
     }
+
+    @Test
+    public void testCombineList2List() {
+        final List<String> ls = Arrays.asList("123345", "qwe", "asdfg", "456g", "zxccvbbnm", "12", "234", "werdfg", "a");
+
+        int itemLen = 5;
+        List<String> rs = Strings.combineList2List(ls, ",", itemLen);
+        int maxItemLn = ls.stream().mapToInt(s -> s.length()).max().orElse(0);
+        int maxLn = rs.stream().mapToInt(s -> s.length()).max().orElse(0);
+        Assert.assertTrue(maxLn <= Math.max(itemLen, maxItemLn));
+        Assert.assertEquals(9, rs.size());
+
+        itemLen = 10;
+        rs = Strings.combineList2List(ls, ",", itemLen);
+        maxLn = rs.stream().mapToInt(s -> s.length()).max().orElse(0);
+        Assert.assertTrue(maxLn <= Math.max(itemLen, maxItemLn));
+        Assert.assertEquals(5, rs.size());
+
+        itemLen = 15;
+        rs = Strings.combineList2List(ls, ",", itemLen);
+        maxLn = rs.stream().mapToInt(s -> s.length()).max().orElse(0);
+        Assert.assertTrue(maxLn <= Math.max(itemLen, maxItemLn));
+        Assert.assertEquals(4, rs.size());
+
+        itemLen = 20;
+        rs = Strings.combineList2List(ls, ",", itemLen);
+        maxLn = rs.stream().mapToInt(s -> s.length()).max().orElse(0);
+        Assert.assertTrue(maxLn <= Math.max(itemLen, maxItemLn));
+        Assert.assertEquals(3, rs.size());
+    }
+
 }

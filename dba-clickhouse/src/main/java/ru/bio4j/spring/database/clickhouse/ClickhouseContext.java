@@ -30,7 +30,7 @@ public class ClickhouseContext extends DbContextAbstract {
             );
         }
 
-        wrappers = new ChWrappersImpl(this.getDBMSName());
+        wrappers = new ChWrappersImpl(this.dbmsName());
         DbUtils.getInstance().init(
                 new ChTypeConverterImpl(),
                 new ChUtilsImpl()
@@ -43,7 +43,7 @@ public class ClickhouseContext extends DbContextAbstract {
     }
 
     @Override
-    public String getDBMSName() {
+    public String dbmsName() {
         return "clickhouse";
     }
 

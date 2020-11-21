@@ -86,24 +86,24 @@ public class DbUtils {
         return rdbmsUtils.detectStoredProcParamsAuto(storedProcName, conn, fixedParamsOverride);
     }
 
-    public static void processExec(final User usr, final Object params, final SQLContext ctx, final SQLDefinition cursor) {
-        final SQLStoredProc cmd = ctx.createStoredProc();
+    public static void processExec(final User usr, final Object params, final SQLContext context, final SQLDefinition cursor) {
+        final SQLStoredProc cmd = context.createStoredProc();
         final UpdelexSQLDef sqlDef = cursor.getExecSqlDef();
         if(sqlDef == null)
             throw new IllegalArgumentException("Cursor definition has no Exec Sql definition!");
-        ctx.execBatch(conn -> {
-            cmd.init(conn, sqlDef.getPreparedSql());
-            cmd.execSQL(params, ctx.getCurrentUser());
+        context.execBatch(ctx -> {
+            cmd.init(ctx.currentConnection(), sqlDef.getPreparedSql());
+            cmd.execSQL(params, ctx.currentUser());
         }, usr);
     }
 
-    public static void processSelect(final User usr, final Object params, final SQLContext ctx, final SQLDefinition cursor, final DelegateSQLFetch action) {
+    public static void processSelect(final User usr, final Object params, final SQLContext context, final SQLDefinition cursor, final DelegateSQLFetch action) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         final SelectSQLDef sqlDef = cursor.getSelectSqlDef();
-        int r = ctx.execBatch((conn) -> {
+        int r = context.execBatch((ctx) -> {
             ctx.createCursor()
-                    .init(conn, sqlDef)
-                    .fetch(prms, ctx.getCurrentUser(), action);
+                    .init(ctx.currentConnection(), sqlDef)
+                    .fetch(prms, ctx.currentUser(), action);
             return 0;
         }, usr);
     }
@@ -112,13 +112,13 @@ public class DbUtils {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         final SelectSQLDef sqlDef = sqlDefinition.getSelectSqlDef();
         return context.createCursor()
-                    .init(context.getCurrentConnection(), sqlDef).scalar(prms, context.getCurrentUser(), fieldName, clazz, defaultValue);
+                    .init(context.currentConnection(), sqlDef).scalar(prms, context.currentUser(), fieldName, clazz, defaultValue);
     }
     public static <T> T processSelectScalar0(final Object params, final SQLContext context, final SQLDefinition sqlDefinition, final Class<T> clazz, final T defaultValue) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         final SelectSQLDef sqlDef = sqlDefinition.getSelectSqlDef();
         return context.createCursor()
-                .init(context.getCurrentConnection(), sqlDef).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
+                .init(context.currentConnection(), sqlDef).scalar(prms, context.currentUser(), clazz, defaultValue);
     }
 
     public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final SQLDefinition sqlDefinition, final String fieldName, final Class<T> clazz, final T defaultValue) {
@@ -135,12 +135,12 @@ public class DbUtils {
     public static <T> T processSelectScalar0(final Object params, final SQLContext context, final String sql, final String fieldName, final Class<T> clazz, final T defaultValue) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         return context.createCursor()
-                    .init(context.getCurrentConnection(), sql).scalar(prms, context.getCurrentUser(), fieldName, clazz, defaultValue);
+                    .init(context.currentConnection(), sql).scalar(prms, context.currentUser(), fieldName, clazz, defaultValue);
     }
     public static <T> T processSelectScalar0(final Object params, final SQLContext context, final String sql, final Class<T> clazz, final T defaultValue) {
         final List<Param> prms = params != null ? decodeParams(params) : new ArrayList<>();
         return context.createCursor()
-                .init(context.getCurrentConnection(), sql).scalar(prms, context.getCurrentUser(), clazz, defaultValue);
+                .init(context.currentConnection(), sql).scalar(prms, context.currentUser(), clazz, defaultValue);
     }
 
     public static <T> T processSelectScalar(final User usr, final Object params, final SQLContext ctx, final String sql, final String fieldName, final Class<T> clazz, final T defaultValue) {

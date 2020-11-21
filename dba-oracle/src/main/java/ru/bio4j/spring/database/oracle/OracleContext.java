@@ -30,7 +30,7 @@ public class OracleContext extends DbContextAbstract {
             );
         }
 
-        wrappers = new OraWrappersImpl(this.getDBMSName());
+        wrappers = new OraWrappersImpl(this.dbmsName());
         DbUtils.getInstance().init(
                 new OraTypeConverterImpl(),
                 new OraUtilsImpl()
@@ -38,7 +38,7 @@ public class OracleContext extends DbContextAbstract {
     }
 
     @Override
-    public String getDBMSName() {
+    public String dbmsName() {
         return "oracle";
     }
 

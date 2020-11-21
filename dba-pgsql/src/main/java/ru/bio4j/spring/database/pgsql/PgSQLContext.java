@@ -30,7 +30,7 @@ public class PgSQLContext extends DbContextAbstract {
             );
         }
 
-        wrappers = new PgSQLWrappersImpl(this.getDBMSName());
+        wrappers = new PgSQLWrappersImpl(this.dbmsName());
         DbUtils.getInstance().init(
                 new PgSQLTypeConverterImpl(),
                 new PgSQLUtilsImpl()
@@ -38,7 +38,7 @@ public class PgSQLContext extends DbContextAbstract {
     }
 
     @Override
-    public String getDBMSName() {
+    public String dbmsName() {
         return "pgsql";
     }
 

@@ -8,7 +8,6 @@ import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
@@ -114,9 +113,9 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        context.execBatch((conn) -> {
-            SQLCursor c = context.createDynamicCursor();
-            c.init(conn, cursor.getSelectSqlDef().getTotalsSql());
+        context.execBatch((ctx) -> {
+            SQLCursor c = ctx.createDynamicCursor();
+            c.init(ctx.currentConnection(), cursor.getSelectSqlDef().getTotalsSql());
             ABean totalsBean = c.firstBean(params, user, ABean.class);
             for (Total total : totals) {
                 _addTotal2Totals(totals, total);
@@ -411,7 +410,7 @@ public class CrudReaderApi {
      *
      */
     public static <T> BeansPage<T> loadRecord0(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
-        Connection connTest = context.getCurrentConnection();
+        Connection connTest = context.currentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
 
@@ -430,7 +429,7 @@ public class CrudReaderApi {
             final CrudOptions crudOptions,
             final Class<T> beanType) {
 
-        if (context.getCurrentConnection() == null)
+        if (context.currentConnection() == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursorDef.getBioCode()));
 
         LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
@@ -446,8 +445,8 @@ public class CrudReaderApi {
 
         //todo: сделать wrapper который накладывает лимит выбранных записей из CrudOptions.getRecordsLimit если нет пагинации
         context.createDynamicCursor()
-                .init(context.getCurrentConnection(), cursorDef.getSelectSqlDef())
-                .fetch(prms, context.getCurrentUser(), rs -> {
+                .init(context.currentConnection(), cursorDef.getSelectSqlDef())
+                .fetch(prms, context.currentUser(), rs -> {
                     if (rs.isFirstRow()) {
                         long estimatedTime = System.currentTimeMillis() - startTime;
                         LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
@@ -515,7 +514,7 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final boolean forceCalcCount) {
-        Connection connTest = context.getCurrentConnection();
+        Connection connTest = context.currentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
 
@@ -565,7 +564,7 @@ public class CrudReaderApi {
         Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
         gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
         if (calcTotals || forceCalcCount || gotoLastPage) {
-            result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.getCurrentUser());
+            result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.currentUser());
             totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
             if(gotoLastPage) {
                 factOffset = (long) Math.floor((long) totalCount.getFact() / paginationPagesize) * paginationPagesize;
@@ -580,8 +579,8 @@ public class CrudReaderApi {
         if (location != null) {
             LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
             int locatedPos = context.createDynamicCursor()
-                    .init(context.getCurrentConnection(), cursor.getSelectSqlDef().getLocateSql(), cursor.getSelectSqlDef().getParamDeclaration())
-                    .scalar(result.preparedParams, context.getCurrentUser(), int.class, -1);
+                    .init(context.currentConnection(), cursor.getSelectSqlDef().getLocateSql(), cursor.getSelectSqlDef().getParamDeclaration())
+                    .scalar(result.preparedParams, context.currentUser(), int.class, -1);
             if (locatedPos >= 0) {
                 locFactOffset = calcOffset(locatedPos, paginationPagesize);
                 LOG.debug("Cursor \"{}\" successfully located to [{}] record by pk. Position: [{}], New offset: [{}].", cursor.getBioCode(), location, locatedPos, locFactOffset);
@@ -604,7 +603,7 @@ public class CrudReaderApi {
             final List<Total> totals,
             final SQLContext context,
             final SQLDefinition cursor) {
-        Connection connTest = context.getCurrentConnection();
+        Connection connTest = context.currentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
@@ -790,11 +789,11 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
-        StringBuilder result = context.execBatch((conn) -> {
+        StringBuilder result = context.execBatch((ctx) -> {
             final StringBuilder r = new StringBuilder();
 
-            context.createDynamicCursor()
-                    .init(conn, cursor.getSelectSqlDef().getSql(), cursor.getSelectSqlDef().getParamDeclaration())
+            ctx.createDynamicCursor()
+                    .init(ctx.currentConnection(), cursor.getSelectSqlDef().getSql(), cursor.getSelectSqlDef().getParamDeclaration())
                     .fetch(params, user, rs -> {
                         List<Object> values = rs.getValues();
                         for (Object val : values)
