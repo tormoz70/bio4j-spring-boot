@@ -255,118 +255,6 @@ public class CrudReaderApi {
         return _calcTotals(readStoreData(prepareLoadPageResult, context, cursor, beanType), totals);
     }
 
-//    private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
-//        HSSFCellStyle rslt = wb.createCellStyle();
-//        HSSFFont headerFont = wb.createFont();
-//        headerFont.setFontHeightInPoints((short)12);
-//        headerFont.setBold(true);
-//        rslt.setFont(headerFont);
-//        rslt.setAlignment(HorizontalAlignment.CENTER);
-//        rslt.setVerticalAlignment(VerticalAlignment.CENTER);
-//        rslt.setBorderBottom(BorderStyle.THIN);
-//        rslt.setBorderLeft(BorderStyle.THIN);
-//        rslt.setBorderRight(BorderStyle.THIN);
-//        rslt.setBorderTop(BorderStyle.THIN);
-//        rslt.setLocked(true);
-//        rslt.setWrapText(true);
-//        return rslt;
-//    }
-//
-//    private static Map<String, HSSFCellStyle> createRowStyle(HSSFWorkbook wb, SelectSQLDef sqlDef) {
-//        Map<String, HSSFCellStyle> rslt = new HashMap<>();
-//        HSSFCellStyle style = wb.createCellStyle();
-//        HSSFFont cellFont = wb.createFont();
-//        cellFont.setFontHeightInPoints((short) 10);
-//        style.setFont(cellFont);
-//        style.setAlignment(HorizontalAlignment.CENTER);
-//        style.setVerticalAlignment(VerticalAlignment.CENTER);
-//        style.setBorderBottom(BorderStyle.THIN);
-//        style.setBorderLeft(BorderStyle.THIN);
-//        style.setBorderRight(BorderStyle.THIN);
-//        style.setBorderTop(BorderStyle.THIN);
-//        style.setWrapText(true);
-//        rslt.put("RNUM", style);
-//        for (Field fld : sqlDef.getFields()) {
-//            style = wb.createCellStyle();
-//            style.setFont(cellFont);
-//            style.setAlignment(HorizontalAlignment.CENTER);
-//            HorizontalAlignment ha = Enum.valueOf(HorizontalAlignment.class, fld.getAlign().name().toUpperCase());
-//            if(ha != null)
-//                style.setAlignment(ha);
-//            style.setVerticalAlignment(VerticalAlignment.CENTER);
-//            style.setBorderBottom(BorderStyle.THIN);
-//            style.setBorderLeft(BorderStyle.THIN);
-//            style.setBorderRight(BorderStyle.THIN);
-//            style.setBorderTop(BorderStyle.THIN);
-//            style.setWrapText(true);
-//            rslt.put(fld.getName(), style);
-//        }
-//        return rslt;
-//    }
-//
-//    private static void addHeader(HSSFSheet ws, SelectSQLDef sqlDef) {
-//        if(sqlDef != null && sqlDef.getFields()!= null && sqlDef.getFields().size() > 0) {
-//            HSSFRow r = ws.createRow(0);
-//            int celNum = 0;
-//            HSSFCell cellRNUM = r.createCell(celNum);
-//            cellRNUM.setCellValue("№ пп");
-//            HSSFCellStyle headerStyle = createHeaderStyle(ws.getWorkbook());
-//            cellRNUM.setCellStyle(headerStyle);
-//            celNum++;
-//            for (Field fld : sqlDef.getFields()) {
-//                if(fld.getExpEnabled()){
-//                    HSSFCell c = r.createCell(celNum);
-//                    int colWidth = Converter.toType(fld.getExpWidth(), int.class);
-//                    if(colWidth == 0) colWidth = 4700;
-//                    ws.setColumnWidth(celNum, colWidth);
-//                    c.setCellStyle(headerStyle);
-//                    c.setCellValue(Utl.nvl(fld.getTitle(), Utl.nvl(fld.getAttrName(), fld.getName())));
-//                    celNum++;
-//                }
-//            }
-//        }
-//    }
-//
-//    private static void addRow(HSSFSheet ws, Map<String, HSSFCellStyle> rowStyles, SelectSQLDef sqlDef, int rowNum, ABean rowData) {
-//        HSSFRow r = ws.createRow(rowNum);
-//        int celNum = 0;
-//        HSSFCell cellRNUM = r.createCell(celNum);
-//        cellRNUM.setCellValue(rowNum);
-//        cellRNUM.setCellStyle(rowStyles.get("RNUM"));
-//        celNum++;
-//        for (Field fld : sqlDef.getFields()) {
-//            if (fld.getExpEnabled()) {
-//                HSSFCell c = r.createCell(celNum);
-//                c.setCellStyle(rowStyles.get(fld.getName()));
-//                c.setCellValue(ABeans.extractAttrFromBean(rowData, Utl.nvl(fld.getAttrName(), fld.getName()), String.class, null));
-//                celNum++;
-//            }
-//        }
-//    }
-//
-//    public static HSSFWorkbook toExcel(final List<Param> params, final Filter filter, final List<Sort> sort, final SQLContext context, final SQLDefinition cursor) {
-//        Connection connTest = context.getCurrentConnection();
-//        if (connTest == null)
-//            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
-//        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
-//        _wrapSqlDefBySorter(sort, cursor, context);
-//        BeansPage<ABean> page = readStoreData(new PreparePageParams(params), context, cursor, ABean.class);
-//
-//        HSSFWorkbook wb = null;
-//        if(page != null && page.getRows() != null && page.getRows().size() > 0) {
-//            wb = new HSSFWorkbook();
-//            HSSFSheet ws = wb.createSheet();
-//            addHeader(ws, cursor.getSelectSqlDef());
-//            Map<String, HSSFCellStyle> rowStyles = createRowStyle(wb, cursor.getSelectSqlDef());
-//            int rowNum = 1;
-//            for (ABean bean : page.getRows()) {
-//                addRow(ws, rowStyles, cursor.getSelectSqlDef(), rowNum, bean);
-//                rowNum++;
-//            }
-//        }
-//        return wb;
-//    }
-
     /***
      * Выпоняет запрос в новой сессии
      * @param params
@@ -419,7 +307,74 @@ public class CrudReaderApi {
             throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
+
         return readStoreData(new PreparePageParams(params), context, cursor, beanType);
+    }
+
+    /***
+     * Выполняет запрос в текущей сессии
+     * @param pkValue
+     * @param context
+     * @param cursor
+     * @return первую запись
+     *
+     */
+    public static <T> BeansPage<T> loadRecord0(final Object pkValue, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
+        Connection connTest = context.currentConnection();
+        if (connTest == null)
+            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
+
+        Field pkField = cursor.getSelectSqlDef().findPk();
+        if(pkField == null)
+            throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+        List<Param> params = preparePkParamValue(pkValue, pkField);
+
+        return readStoreData(new PreparePageParams(params), context, cursor, beanType);
+    }
+
+    /***
+     * Выполняет запрос в текущей сессии
+     * @param params
+     * @param context
+     * @param cursor
+     * @return первую запись
+     *
+     */
+    public static <T> List<T> loadRecord0Ext(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
+        Connection connTest = context.currentConnection();
+        if (connTest == null)
+            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
+
+        Field pkField = cursor.getSelectSqlDef().findPk();
+        if(pkField == null)
+            throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+        preparePkParamValue(params, pkField);
+
+        return readStoreDataExt(params, context, cursor, beanType);
+    }
+
+    /***
+     * Выполняет запрос в текущей сессии
+     * @param pkValue
+     * @param context
+     * @param cursor
+     * @return первую запись
+     *
+     */
+    public static <T> List<T> loadRecord0Ext(final Object pkValue, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
+        Connection connTest = context.currentConnection();
+        if (connTest == null)
+            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
+
+        Field pkField = cursor.getSelectSqlDef().findPk();
+        if(pkField == null)
+            throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+        List<Param> params = preparePkParamValue(pkValue, pkField);
+
+        return readStoreDataExt(params, context, cursor, beanType);
     }
 
     private static <T> List<T> readStoreDataExt(
@@ -781,6 +736,34 @@ public class CrudReaderApi {
         List<T> result = context.execBatch((conn) -> {
             return loadAll0Ext(null, filter, null, context, cursor, beanType);
         }, user);
+        return result.stream().findFirst().orElse(null);
+    }
+
+    public static <T> T loadFirstRecord0Ext(
+            final List<Param> params,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final Class<T> beanType) {
+        cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
+        List<T> result = readStoreDataExt(params, context, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
+        return result.stream().findFirst().orElse(null);
+    }
+
+    public static <T> T loadFirstRecord0Ext(
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final Class<T> beanType) {
+        cursor.getSelectSqlDef().setPreparedSql(cursor.getSelectSqlDef().getSql());
+        List<T> result = readStoreDataExt(null, context, cursor, CrudOptions.builder().recordsLimit(1).build(), beanType);
+        return result.stream().findFirst().orElse(null);
+    }
+
+    public static <T> T loadFirstRecord0Ext(
+            final Filter filter,
+            final SQLContext context,
+            final SQLDefinition cursor,
+            final Class<T> beanType) {
+        List<T> result = loadAll0Ext(null, filter, null, context, cursor, beanType);
         return result.stream().findFirst().orElse(null);
     }
 

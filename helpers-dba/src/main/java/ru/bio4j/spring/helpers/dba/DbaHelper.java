@@ -238,6 +238,44 @@ public class DbaHelper {
         return loadAll(bioCode, params, user, null, null, beanType);
     }
 
+    /**
+     * Выполняет запрос по коду и возвращает структуру @BeansPage (в текущей транзакции, для текущего пользователя)
+     * Набор содержит все записи.
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params параметры запроса
+     * @param filterAndSorter фильтер и сортер
+     * @param totals описание агригатов, которые необходимо вычислить
+     * @param beanType bean, который описывает запись
+     */
+    public <T> BeansPage<T> loadAllLocal(
+            final String bioCode,
+            final Object params,
+            final FilterAndSorter filterAndSorter,
+            final List<Total> totals,
+            final Class<T> beanType
+    ) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadAll0(prms,
+                filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                totals, context, sqlDefinition, beanType);
+    }
+    public <T> BeansPage<T> loadAllLocal(
+            final String bioCode,
+            final Object params,
+            final FilterAndSorter filterAndSorter,
+            final Class<T> beanType
+    ) {
+        return loadAllLocal(bioCode, params, filterAndSorter,null, beanType);
+    }
+    public <T> BeansPage<T> loadAllLocal(
+            final String bioCode,
+            final Object params,
+            final Class<T> beanType) {
+        return loadAllLocal(bioCode, params, null, null, beanType);
+    }
 
     /**
      * Выполняет запрос по коду и возвращает структуру @BeansPage
@@ -473,6 +511,31 @@ public class DbaHelper {
     }
 
     /**
+     * Возвращает один бин (в иекущей сессии, для текущего пользователя)
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params
+     * @param beanType
+     * @param <T>
+     * @return первый бин, который вернул запрос к БД
+     */
+    public <T> T loadFirstBeanLocal(
+            final String bioCode,
+            final List<Param> params,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadFirstRecord0Ext(params, context, cursorDef, beanType);
+    }
+    public <T> T loadFirstBeanLocal(
+            final String bioCode,
+            final Filter filter,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadFirstRecord0Ext(filter, context, cursorDef, beanType);
+    }
+
+    /**
      * Возвращает бин по ID
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
      * @param request
@@ -512,6 +575,26 @@ public class DbaHelper {
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         if(id != null) {
             return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Возвращает все записи по ID (в текущей сессии, для текущего пользователя)
+     * @param bioCode
+     * @param id
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> loadBeanLocal(
+            final String bioCode,
+            final Object id,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        if(id != null) {
+            return CrudReaderApi.loadRecord0Ext(id, context, sqlDefinition, beanType);
         }
         return new ArrayList<>();
     }
