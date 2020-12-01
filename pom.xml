@@ -12,7 +12,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-framework.version>5.3.1</spring-framework.version>
         <spring-boot.version>2.4.0</spring-boot.version>
-        <spring-rubbit.version>2.3.1</spring-rubbit.version>
         <org.apache.poi.version>4.1.2</org.apache.poi.version>
         <hikaricp.version>3.4.5</hikaricp.version>
         <org.apache.httpcomponents.core.version>4.4.13</org.apache.httpcomponents.core.version>
@@ -207,12 +206,6 @@
                 <version>${spring-framework.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.springframework.amqp</groupId>
-                <artifactId>spring-rabbit</artifactId>
-                <version>${spring-rubbit.version}</version>
-            </dependency>
-
             <!-- jackson -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -244,18 +237,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
-            </dependency>
-
-            <!-- jackson -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
             </dependency>
 
             <!-- HttpClient -->
