@@ -10,15 +10,16 @@
     <properties>
         <dependency-plugin-version>2.7</dependency-plugin-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-framewoek.version>5.2.9.RELEASE</spring-framewoek.version>
-        <spring-boot.version>2.3.3.RELEASE</spring-boot.version>
-        <spring-rubbit.version>2.2.10.RELEASE</spring-rubbit.version>
+        <spring-framework.version>5.3.1</spring-framework.version>
+        <spring-boot.version>2.4.0</spring-boot.version>
+        <spring-rubbit.version>2.3.1</spring-rubbit.version>
         <org.apache.poi.version>4.1.2</org.apache.poi.version>
         <hikaricp.version>3.4.5</hikaricp.version>
         <org.apache.httpcomponents.core.version>4.4.13</org.apache.httpcomponents.core.version>
         <org.apache.httpcomponents.client.version>4.5.12</org.apache.httpcomponents.client.version>
         <swagger.version>2.9.2</swagger.version>
-        <ehcache.version>2.6.11</ehcache.version>
+        <ehcache.version>2.10.6</ehcache.version>
+        <ehcache-core.version>2.6.11</ehcache-core.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mail-api.version>1.4.7</mail-api.version>
@@ -188,22 +189,22 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>${spring-framewoek.version}</version>
+                <version>${spring-framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <version>${spring-framewoek.version}</version>
+                <version>${spring-framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>${spring-framewoek.version}</version>
+                <version>${spring-framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
-                <version>${spring-framewoek.version}</version>
+                <version>${spring-framework.version}</version>
             </dependency>
 
             <dependency>
@@ -277,6 +278,11 @@
             <dependency>
                 <groupId>net.sf.ehcache</groupId>
                 <artifactId>ehcache-core</artifactId>
+                <version>${ehcache-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.ehcache</groupId>
+                <artifactId>ehcache</artifactId>
                 <version>${ehcache.version}</version>
             </dependency>
 

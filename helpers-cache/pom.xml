@@ -65,6 +65,11 @@
             <artifactId>ehcache-core</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- bio4j -->
         <dependency>

@@ -467,6 +467,37 @@ public class DbaHelper {
     }
 
     /**
+     * Возвращает список бинов в текущей транзакции
+     * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
+     * @param params
+     * @param filterAndSorter
+     * @param beanType
+     * @param <T>
+     * @return набор содержит все записи
+     */
+    public <T> List<T> loadAllExtLocal(
+            final String bioCode,
+            final Object params,
+            final FilterAndSorter filterAndSorter,
+            final Class<T> beanType
+    ) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        return CrudReaderApi.loadAll0Ext(prms,
+                filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                context, sqlDefinition, beanType);
+    }
+    public <T> List<T> loadAllExtLocal(
+            final String bioCode,
+            final Object params,
+            final Class<T> beanType
+    ) {
+        return loadAllExtLocal(bioCode, params, null, beanType);
+    }
+
+    /**
      * Возвращает список бинов
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
      * @param request

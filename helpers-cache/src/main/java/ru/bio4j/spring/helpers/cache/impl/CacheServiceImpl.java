@@ -154,7 +154,7 @@ public class CacheServiceImpl implements CacheService {
 	private String getCacheConfigFile() {
 		String cacheConfigFile = cacheProperties.getCacheConfigFile();
 		if(Strings.isNullOrEmpty(cacheConfigFile) || Strings.compare(cacheConfigFile, CACHE_CONFIG_FILE_PARAM, true))
-			throw new IllegalArgumentException("Cache config file % not defined!");
+			throw new IllegalArgumentException(String.format("Cache config file %s not defined!", cacheConfigFile));
 		return cacheConfigFile;
 	}
 

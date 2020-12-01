@@ -29,7 +29,6 @@ public class DbaTest {
     private DbaHelper pgsqlHelper;
 
     @Test
-    @Ignore
     public void doTest1() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
         ABean d1 = chHelper.loadFirstBean("rcard", (List<Param>) null, null, ABean.class);
@@ -38,8 +37,8 @@ public class DbaTest {
         Assert.assertTrue(d2 != null);
     }
 
-    @Ignore
     @Test
+    @Ignore
     public void doTest2() {
         //DbaAdapter dbaAdapter = (DbaAdapter)applicationContext.getBean("dbaAdapter");
         List<Param> params = Paramus.createParams(

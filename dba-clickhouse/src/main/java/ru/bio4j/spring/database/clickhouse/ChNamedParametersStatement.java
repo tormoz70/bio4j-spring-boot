@@ -55,7 +55,7 @@ public class ChNamedParametersStatement extends DbNamedParametersStatement {
             } else if (Arrays.asList(Types.TIMESTAMP).contains(targetSqlType)) {
                 statement.setTimestamp(indx, new Timestamp(((Date) value).getTime()));
             } else {
-                statement.setString(indx, (String)value);
+                statement.setString(indx, ""+value);
             }
         }
     }
