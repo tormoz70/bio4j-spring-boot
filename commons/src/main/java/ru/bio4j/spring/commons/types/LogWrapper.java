@@ -55,4 +55,14 @@ public class LogWrapper {
         logger.error(msg);
     }
 
+    public void warn(String msg, Exception e) {
+        logger.warn(msg, e);
+    }
+    public void warn(Exception e) {
+        logger.warn(null, e);
+    }
+    public void warn(String msg) {
+        logger.warn(msg);
+    }
+
 }

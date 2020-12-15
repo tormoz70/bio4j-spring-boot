@@ -85,7 +85,7 @@ public class DateTimeParser {
 				throw new DateParseException("Ошибка разбора даты. Параметры: (" + value + ", " + format + "). Сообщение: " + ex.toString());
 			}
 		}
-		return Types.minValue();
+		return null;
 	}
 
 	public Date pars(String value) {

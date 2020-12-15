@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import ru.bio4j.spring.model.transport.ABean;
 
+
 public class TApple {
 	private String name;
 	private Double wheight;

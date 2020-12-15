@@ -1,27 +1,25 @@
 package ru.bio4j.spring.commons.utils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
-import ru.bio4j.spring.commons.converter.Converter;
+import org.xml.sax.SAXException;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.LogWrapper;
-import ru.bio4j.spring.model.transport.errors.AccessToBeanFieldException;
-import ru.bio4j.spring.model.transport.*;
-import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
+import ru.bio4j.spring.model.transport.ABean;
+import ru.bio4j.spring.model.transport.MetaType;
+import ru.bio4j.spring.model.transport.Param;
+import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.jstore.Sort;
 import ru.bio4j.spring.model.transport.jstore.filter.Expression;
 import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,7 +28,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static ru.bio4j.spring.commons.utils.Reflex.*;
+import static ru.bio4j.spring.commons.utils.Reflex.fieldValueAsString;
+import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
 import static ru.bio4j.spring.model.transport.jstore.filter.FilterBuilder.*;
 
 public class Utl {
@@ -99,7 +98,7 @@ public class Utl {
             if (length > (Integer.MAX_VALUE - 5))
                 throw new IllegalArgumentException("Parameter \"length\" too big!");
             byte[] buff = new byte[Utl.safeLongToInt(length)];
-            int readed = in.read(buff);
+            in.read(buff);
             return buff;
         } catch (IOException e) {
             throw Utl.wrapErrorAsRuntimeException(e);
@@ -156,6 +155,23 @@ public class Utl {
             if (obj.getClass() == clazz)
                 return (T) obj;
             return null;
+        } catch (JAXBException e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+    /**
+     * Сериализует объект в xml
+     * @param Object object
+     * @return xml
+     */
+    public static String marshalXml(Object object) {
+        try {
+            StringWriter writer = new StringWriter();
+            JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            jaxbMarshaller.marshal(object, writer);
+            return writer.toString();
         } catch (JAXBException e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
@@ -663,7 +679,7 @@ public class Utl {
             f.setValidating(false);
             DocumentBuilder builder = f.newDocumentBuilder();
             return builder.parse(inputStream);
-        } catch (Exception e) {
+        } catch (SAXException | ParserConfigurationException | IOException e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
     }
@@ -673,37 +689,35 @@ public class Utl {
             DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
             f.setValidating(false);
             DocumentBuilder builder = f.newDocumentBuilder();
-            InputStream inputStream = openFile(fileName);
-            return builder.parse(inputStream);
-        } catch (Exception e) {
-            throw Utl.wrapErrorAsRuntimeException(e);
-        }
-    }
-
-    public static void writeInputToOutput(InputStream input, OutputStream output) {
-        try {
-            BufferedInputStream buf = null;
-            try {
-                buf = new BufferedInputStream(input);
-                int readBytes = 0;
-                while ((readBytes = buf.read()) != -1)
-                    output.write(readBytes);
-            } finally {
-                if (output != null)
-                    output.flush();
-                output.close();
-                if (buf != null)
-                    buf.close();
+            try(InputStream inputStream = openFile(fileName)) {
+                return builder.parse(inputStream);
             }
         } catch (Exception e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
     }
 
+    public static void writeInputToOutput(InputStream input, OutputStream output, boolean closeOutput) {
+        try(BufferedInputStream buf = new BufferedInputStream(input)) {
+            int readBytes = 0;
+            while ((readBytes = buf.read()) != -1)
+                output.write(readBytes);
+            if(closeOutput) {
+                output.flush();
+                output.close();
+            }
+        } catch (IOException e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
+        }
+    }
+
+    public static void writeInputToOutput(InputStream input, OutputStream output) {
+        writeInputToOutput(input, output, true);
+    }
 
     public static void writeFileToOutput(File file, OutputStream output) {
-        try {
-            writeInputToOutput(new FileInputStream(file), output);
+        try(InputStream io = new FileInputStream(file)) {
+            writeInputToOutput(io, output);
         } catch (IOException e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
@@ -819,11 +833,9 @@ public class Utl {
     }
 
     public static Properties loadProperties(String filePath) {
-        try {
-            try (InputStream input = new FileInputStream(filePath)) {
-                return loadProperties(input);
-            }
-        } catch (Exception e) {
+        try (InputStream input = new FileInputStream(filePath)) {
+            return loadProperties(input);
+        } catch (IOException e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
     }
@@ -858,7 +870,7 @@ public class Utl {
 
     public static RuntimeException wrapErrorAsRuntimeException(String msg, Exception e) {
         if (e != null && e instanceof RuntimeException)
-            throw (RuntimeException) e;
+            return (RuntimeException) e;
         else {
             if (Strings.isNullOrEmpty(msg))
                 return new RuntimeException(e);

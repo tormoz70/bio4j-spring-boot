@@ -1,9 +1,14 @@
 package ru.bio4j.spring.commons.utils;
 
+import javax.xml.bind.annotation.*;
 
+@XmlRootElement(name="packet")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TPacket {
 	private String name;
 	private Double volume;
+
+	@XmlElement(name = "apple")
 	private TApple[] apples;
 
 	public TPacket() {

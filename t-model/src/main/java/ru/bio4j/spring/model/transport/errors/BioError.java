@@ -110,6 +110,12 @@ public class BioError extends RuntimeException {
             }
         }
 
+        @JsonTypeInfo(use = Id.CLASS, property = "@class")
+        public static class BadAppToken extends BioError.Login {
+            public BadAppToken() {
+                super(6407, "Токен приложения отсутствует!");
+            }
+        }
     }
 
     @JsonTypeInfo(use = Id.CLASS, property = "@class")
@@ -129,6 +135,7 @@ public class BioError extends RuntimeException {
             case 6403: return new Login.Forbidden();
             case 6405: return new Login.MethodNotAllowed();
             case 6406: return new Login.BadSToken();
+            case 6407: return new Login.BadAppToken();
             case 6501: return new MethodNotImplemented();
             default: return new BioError(code, message);
         }

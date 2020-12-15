@@ -474,5 +474,17 @@ public class UtlTest {
         Assert.assertEquals(ABeans.cutNextPathItem("asd/rty"), "rty");
         Assert.assertEquals(ABeans.cutNextPathItem("rty"), null);
     }
+
+    @Test
+    public void testMarshalXml() {
+        TPacket packet = new TPacket();
+        TApple apple = new TApple();
+        apple.setName("FTW-Apple");
+        packet.setApples(new TApple[] {apple});
+
+        String xml = Utl.marshalXml(packet);
+        System.out.println(xml);
+    }
+
 }
 
