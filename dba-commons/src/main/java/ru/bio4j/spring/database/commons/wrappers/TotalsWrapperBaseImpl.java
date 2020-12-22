@@ -56,7 +56,11 @@ public class TotalsWrapperBaseImpl extends AbstractWrapper implements TotalsWrap
                     if(Utl.nvl(field.getAggregate(), Total.Aggregate.UNDEFINED) != Total.Aggregate.UNDEFINED) {
                         Total exists = totals.stream().filter(f -> Strings.compare(f.getFieldName(), field.getName(), true) || Strings.compare(f.getFieldName(), field.getAttrName(), true)).findFirst().orElse(null);
                         if(exists == null)
-                            totals.add(Total.builder().fieldName(field.getName()).aggrigate(field.getAggregate()).build());
+                            totals.add(Total.builder()
+                                    .fieldName(field.getName())
+                                    .aggrigate(field.getAggregate())
+                                    .fieldType(MetaTypeConverter.write(field.getMetaType()))
+                                    .build());
                     }
                 }
             }
