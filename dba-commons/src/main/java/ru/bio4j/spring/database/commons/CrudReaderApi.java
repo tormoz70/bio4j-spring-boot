@@ -95,13 +95,13 @@ public class CrudReaderApi {
     }
 
     private static void _addTotal2Totals(List<Total> totals, Total total) {
-        Total foundTotal = totals.stream().filter(f -> {
-            return (total.getAggregate() == Total.Aggregate.COUNT && f.getAggregate() == Total.Aggregate.COUNT) ||
-                    Strings.compare(total.getFieldName(), f.getFieldName(), true);
-        }).findFirst().orElse(null);
+        Total foundTotal = totals.stream().filter(f ->
+                    (total.getAggregate() == Total.Aggregate.COUNT && f.getAggregate() == Total.Aggregate.COUNT) ||
+                    Strings.compare(total.getFieldName(), f.getFieldName(), true)
+        ).findFirst().orElse(null);
         if(foundTotal != null) {
             foundTotal.setFact(total.getFact());
-            foundTotal.setFieldType(total.getFact() != null ? total.getFact().getClass() : total.getFieldType());
+            foundTotal.setFieldType(total.getFieldType() == null && total.getFact() != null ? total.getFact().getClass() : total.getFieldType());
         } else {
             totals.add(total);
         }
@@ -117,12 +117,10 @@ public class CrudReaderApi {
             SQLCursor c = ctx.createDynamicCursor();
             c.init(ctx.currentConnection(), cursor.getSelectSqlDef().getTotalsSql());
             ABean totalsBean = c.firstBean(params, user, ABean.class);
-            for (Total total : totals) {
-                _addTotal2Totals(totals, total);
+            for (Total total : totals)
                 total.setFact(ABeans.extractAttrFromBean(totalsBean,
                         total.getAggregate() == Total.Aggregate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
                         total.getFieldType(), null));
-            }
         }, user);
         return totals;
     }
