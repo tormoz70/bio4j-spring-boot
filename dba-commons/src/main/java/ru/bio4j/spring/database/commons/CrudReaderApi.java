@@ -4,10 +4,8 @@ import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
+import ru.bio4j.spring.commons.utils.*;
 import ru.bio4j.spring.database.api.SQLDefinition;
-import ru.bio4j.spring.commons.utils.ABeans;
-import ru.bio4j.spring.commons.utils.Sqls;
-import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
@@ -101,7 +99,7 @@ public class CrudReaderApi {
         ).findFirst().orElse(null);
         if(foundTotal != null) {
             foundTotal.setFact(total.getFact());
-            foundTotal.setFieldType(total.getFieldType() == null && total.getFact() != null ? total.getFact().getClass() : total.getFieldType());
+            foundTotal.setFieldType(total.getFact() != null ? total.getFact().getClass() : total.getFieldType());
         } else {
             totals.add(total);
         }
@@ -113,10 +111,14 @@ public class CrudReaderApi {
             final SQLContext context,
             final SQLDefinition cursor,
             final User user) {
+        List<Param> p = Utl.nvl(params, new ArrayList<>());
+        SrvcUtils.applyCurrentUserParams(context.currentUser(), p);
+        List<Param> prepParams = Paramus.clone(cursor.getSelectSqlDef().getParamDeclaration());
+        DbUtils.applyParamsToParams(p, prepParams, false, true, false);
         context.execBatch((ctx) -> {
             SQLCursor c = ctx.createDynamicCursor();
             c.init(ctx.currentConnection(), cursor.getSelectSqlDef().getTotalsSql());
-            ABean totalsBean = c.firstBean(params, user, ABean.class);
+            ABean totalsBean = c.firstBean(prepParams, user, ABean.class);
             for (Total total : totals)
                 total.setFact(ABeans.extractAttrFromBean(totalsBean,
                         total.getAggregate() == Total.Aggregate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
