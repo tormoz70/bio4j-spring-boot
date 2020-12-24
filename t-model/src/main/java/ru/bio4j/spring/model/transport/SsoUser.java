@@ -9,6 +9,7 @@ import ru.bio4j.spring.model.serializers.DateSerializerOpt;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Date;
+import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class SsoUser implements Principal, Serializable {
@@ -35,6 +36,10 @@ public class SsoUser implements Principal, Serializable {
     private String orgName;
     @ApiModelProperty("Описание организации к которой относится пользователь")
     private String orgDesc;
+    @ApiModelProperty("ID вышестоящей организации по отношению к организации, к которой относится пользователь")
+    private String parentOrgId;
+    @ApiModelProperty("ID дочерних организаций по отношению к организации, к которой относится пользователь (разделитель \",\")")
+    private String childOrgIds;
 
     @ApiModelProperty("Список ролей пользователя (разделитель \",\")")
     private String roles;
@@ -205,5 +210,21 @@ public class SsoUser implements Principal, Serializable {
 
     public void setPushtoken(String pushtoken) {
         this.pushtoken = pushtoken;
+    }
+
+    public String getParentOrgId() {
+        return parentOrgId;
+    }
+
+    public void setParentOrgId(String parentOrgId) {
+        this.parentOrgId = parentOrgId;
+    }
+
+    public String getChildOrgIds() {
+        return childOrgIds;
+    }
+
+    public void setChildOrgIds(String childOrgIds) {
+        this.childOrgIds = childOrgIds;
     }
 }
