@@ -26,10 +26,7 @@ import ru.bio4j.spring.model.transport.jstore.filter.Filter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static ru.bio4j.spring.commons.utils.ABeans.createBeanFromJSONObject;
@@ -362,7 +359,8 @@ public class DbaHelper {
         Filter filter = pax.filterAndSorter != null ? pax.filterAndSorter.getFilter() : null;
         pax.sqlDefinition.getSelectSqlDef().setPreparedSql(pax.context.getWrappers().getFilteringWrapper().wrap(pax.sqlDefinition.getSelectSqlDef().getPreparedSql(), filter, pax.sqlDefinition.getSelectSqlDef().getFields()));
         Total countDef = Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(0L).build();
-        pax.sqlDefinition.getSelectSqlDef().setTotalsSql(pax.context.getWrappers().getTotalsWrapper().wrap(pax.sqlDefinition.getSelectSqlDef().getPreparedSql(), Arrays.asList(countDef), pax.sqlDefinition.getSelectSqlDef().getFields()));
+        List<Total> totals = pax.context.getWrappers().getTotalsWrapper().prepare(Collections.singletonList(countDef), pax.sqlDefinition.getSelectSqlDef().getFields());
+        pax.sqlDefinition.getSelectSqlDef().setTotalsSql(pax.context.getWrappers().getTotalsWrapper().wrap(pax.sqlDefinition.getSelectSqlDef().getPreparedSql(), totals, pax.sqlDefinition.getSelectSqlDef().getFields()));
         List<Total> countFact = CrudReaderApi.calcTotalsRemote(Arrays.asList(countDef), pax.params, pax.context, pax.sqlDefinition, pax.user);
         rslt.put("totalCount", countFact.stream().findFirst().get().getFact());
         return rslt;

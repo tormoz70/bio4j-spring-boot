@@ -498,10 +498,11 @@ public class CrudReaderApi {
 
         _initPreparedTotals(result, totals);
 
+        context.getWrappers().getTotalsWrapper().prepare(result.preparedTotals, cursor.getSelectSqlDef().getFields());
+        boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggregate() != Total.Aggregate.UNDEFINED);
         if(result.preparedTotals.stream().noneMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
             result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(paginationTotalcount).build());
         cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), result.preparedTotals, cursor.getSelectSqlDef().getFields()));
-        boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggregate() != Total.Aggregate.UNDEFINED);
 
         _wrapSqlDefBySorter(sort, cursor, context);
 
