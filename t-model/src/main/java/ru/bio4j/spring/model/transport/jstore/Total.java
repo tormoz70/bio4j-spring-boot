@@ -1,9 +1,11 @@
 package ru.bio4j.spring.model.transport.jstore;
 
+import java.io.Serializable;
+
 /**
  * Агрегат
  */
-public class Total {
+public class Total implements Serializable {
 
     public static final String TOTALCOUNT_FIELD_NAME = "TOTAL_COUNTER_SFIELD";
 

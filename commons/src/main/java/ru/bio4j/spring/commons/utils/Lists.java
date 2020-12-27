@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -59,6 +60,104 @@ public class Lists {
             return rslt;
         }
         return null;
+    }
+
+    public static boolean anyInList(final String check, final String list) {
+        String[] checkArray = Strings.split(check, ',');
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray)
+                .distinct()
+                .filter(a -> Arrays.stream(checkArray).anyMatch(c -> c.equalsIgnoreCase(a)))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final int[] check, final String list) {
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray)
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == Integer.parseInt(a)))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final long[] check, final String list) {
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray)
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == Long.parseLong(a)))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final int[] check, final int[] roles) {
+        return Arrays.stream(roles)
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final long[] check, final long[] roles) {
+        return Arrays.stream(roles)
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final int[] check, final List<Integer> roles) {
+        return roles.stream()
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final long[] check, final List<Long> roles) {
+        return roles.stream()
+                .distinct()
+                .filter(a -> Arrays.stream(check).anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final List<Integer> check, final int[] roles) {
+        return Arrays.stream(roles)
+                .distinct()
+                .filter(a -> check.stream().anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final List<Long> check, final long[] roles) {
+        return Arrays.stream(roles)
+                .distinct()
+                .filter(a -> check.stream().anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean anyInList(final List<Long> check, final List<Long> roles) {
+        return roles.stream()
+                .distinct()
+                .filter(a -> check.stream().anyMatch(c -> c == a))
+                .toArray().length > 0;
+    }
+    public static boolean itemInList(final int check, final String list) {
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray).anyMatch(r -> Integer.parseInt(r) == check);
+    }
+    public static boolean itemInList(final long check, final String list) {
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray).anyMatch(r -> Long.parseLong(r) == check);
+    }
+    public static boolean itemInList(final int check, final int[] list) {
+        return Arrays.stream(list).anyMatch(r -> r == check);
+    }
+    public static boolean itemInList(final long check, final long[] list) {
+        return Arrays.stream(list).anyMatch(r -> r == check);
+    }
+    public static boolean itemInList(final int check, final List<Integer> list) {
+        return list.stream().anyMatch(r -> r == check);
+    }
+    public static boolean itemInList(final long check, final List<Long> list) {
+        return list.stream().anyMatch(r -> r == check);
+    }
+    public static boolean itemInList(final String check, final String list) {
+        String[] rolesArray = Strings.split(list, ',');
+        return Arrays.stream(rolesArray).anyMatch(r -> r.equalsIgnoreCase(check));
+    }
+    public static boolean itemInList(final String check, final int[] list) {
+        return Arrays.stream(list).anyMatch(r -> r == Integer.parseInt(check));
+    }
+    public static boolean itemInList(final String check, final long[] list) {
+        return Arrays.stream(list).anyMatch(r -> r == Long.parseLong(check));
+    }
+    public static boolean itemInList(final String check, final List<Long> list) {
+        return list.stream().anyMatch(r -> r == Long.parseLong(check));
     }
 
 }

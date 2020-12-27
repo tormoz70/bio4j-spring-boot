@@ -3,11 +3,13 @@ package ru.bio4j.spring.model.transport.jstore;
 //import com.thoughtworks.xstream.annotations.XStreamAlias;
 //import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import java.io.Serializable;
+
 /**
  * Сортировка
  */
 //@XStreamAlias("sort")
-public class Sort {
+public class Sort implements Serializable {
 
     public enum NullsPosition {
         DEFAULT, NULLLAST, NULLFIRST;

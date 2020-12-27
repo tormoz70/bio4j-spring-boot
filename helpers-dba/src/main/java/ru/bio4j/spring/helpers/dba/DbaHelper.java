@@ -654,21 +654,21 @@ public class DbaHelper {
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
      * @return
      */
-    public static ABean getMetadata(final String bioCode) {
-        ABean rslt = new ABean();
+    public static Metadata getMetadata(final String bioCode) {
+        Metadata rslt = new Metadata();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         StoreMetadata metadata = new StoreMetadata();
         metadata.setReadonly(sqlDefinition.getReadOnly());
         metadata.setMultiSelection(sqlDefinition.getMultiSelection());
         List<Field> fields = sqlDefinition.getFields();
         metadata.setFields(fields);
-        rslt.put("dataset", metadata);
+        rslt.setDataset(metadata);
         if(sqlDefinition.getUpdateSqlDef() != null) {
             ABean createUpdateObject = new ABean();
             for(Param p : sqlDefinition.getUpdateSqlDef().getParamDeclaration()){
                 createUpdateObject.put(DbUtils.cutParamPrefix(p.getName()), p.getType().name());
             }
-            rslt.put("createUpdateObject", createUpdateObject);
+            rslt.setCreateUpdateObject(createUpdateObject);
         }
         return rslt;
     }

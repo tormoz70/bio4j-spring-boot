@@ -3,10 +3,13 @@ package ru.bio4j.spring.model.transport.jstore;
 //import flexjson.JSON;
 import ru.bio4j.spring.model.transport.MetaType;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * Описание поля пакета данных
  */
-public class Field {
+public class Field implements Serializable {
 
     private int id;
 
@@ -279,5 +282,41 @@ public class Field {
 
     public void setAggregate(Total.Aggregate aggregate) {
         this.aggregate = aggregate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Field field = (Field) o;
+        return id == field.id &&
+                showTooltip == field.showTooltip &&
+                hidden == field.hidden &&
+                filter == field.filter &&
+                readonly == field.readonly &&
+                mandatory == field.mandatory &&
+                pk == field.pk &&
+                useNull == field.useNull &&
+                Objects.equals(name, field.name) &&
+                Objects.equals(attrName, field.attrName) &&
+                Objects.equals(format, field.format) &&
+                align == field.align &&
+                Objects.equals(title, field.title) &&
+                Objects.equals(width, field.width) &&
+                Objects.equals(defaultVal, field.defaultVal) &&
+                Objects.equals(sorter, field.sorter) &&
+                nullsPosition == field.nullsPosition &&
+                Objects.equals(tooltip, field.tooltip) &&
+                metaType == field.metaType &&
+                Objects.equals(expEnabled, field.expEnabled) &&
+                Objects.equals(expFormat, field.expFormat) &&
+                Objects.equals(expWidth, field.expWidth) &&
+                textLocality == field.textLocality &&
+                aggregate == field.aggregate;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sorter, nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate);
     }
 }

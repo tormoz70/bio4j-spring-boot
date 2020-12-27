@@ -1,11 +1,12 @@
 package ru.bio4j.spring.model.transport.jstore;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Метаданные пакета данных
  */
-public class StoreMetadata {
+public class StoreMetadata implements Serializable {
     /**
      * Редактируемо пользователем (может быть преопределено в колонке)
      */

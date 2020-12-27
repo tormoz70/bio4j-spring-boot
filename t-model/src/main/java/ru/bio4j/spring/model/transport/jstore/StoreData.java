@@ -1,5 +1,6 @@
 package ru.bio4j.spring.model.transport.jstore;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static java.util.Collections.unmodifiableList;
@@ -7,7 +8,7 @@ import static java.util.Collections.unmodifiableList;
 /**
  * Пакет данных
  */
-public class StoreData {
+public class StoreData implements Serializable {
 
     /**
      * id объекта Store на клиенте, которому предназначен данный ответ

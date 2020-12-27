@@ -2,10 +2,12 @@ package ru.bio4j.spring.model.transport.jstore;
 
 import ru.bio4j.spring.model.transport.ABean;
 
+import java.io.Serializable;
+
 /**
  * Строка с данными
  */
-public class StoreRow {
+public class StoreRow implements Serializable {
 
     /**
      * используется при добавлении новой записи
