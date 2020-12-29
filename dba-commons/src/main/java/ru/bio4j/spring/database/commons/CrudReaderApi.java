@@ -95,7 +95,7 @@ public class CrudReaderApi {
     private static void _addTotal2Totals(List<Total> totals, Total total) {
         Total foundTotal = totals.stream().filter(f ->
                     (total.getAggregate() == Total.Aggregate.COUNT && f.getAggregate() == Total.Aggregate.COUNT) ||
-                    Strings.compare(total.getFieldName(), f.getFieldName(), true)
+                    Strings.compare(total.getFieldName(), f.getFieldName(), true) && total.getAggregate() == f.getAggregate()
         ).findFirst().orElse(null);
         if(foundTotal != null) {
             foundTotal.setFact(total.getFact());
@@ -109,19 +109,19 @@ public class CrudReaderApi {
             final List<Total> totals,
             final List<Param> params,
             final SQLContext context,
-            final SQLDefinition cursor,
+            final SelectSQLDef selectSQLDef,
             final User user) {
         List<Param> p = Utl.nvl(params, new ArrayList<>());
         SrvcUtils.applyCurrentUserParams(context.currentUser(), p);
-        List<Param> prepParams = Paramus.clone(cursor.getSelectSqlDef().getParamDeclaration());
+        List<Param> prepParams = Paramus.clone(selectSQLDef.getParamDeclaration());
         DbUtils.applyParamsToParams(p, prepParams, false, true, false);
         context.execBatch((ctx) -> {
             SQLCursor c = ctx.createDynamicCursor();
-            c.init(ctx.currentConnection(), cursor.getSelectSqlDef().getTotalsSql());
+            c.init(ctx.currentConnection(), selectSQLDef.getTotalsSql());
             ABean totalsBean = c.firstBean(prepParams, user, ABean.class);
             for (Total total : totals)
                 total.setFact(ABeans.extractAttrFromBean(totalsBean,
-                        total.getAggregate() == Total.Aggregate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : total.getFieldName(),
+                        total.getAggregate() == Total.Aggregate.COUNT ? Total.TOTALCOUNT_FIELD_NAME : String.format("%s_%s", total.getFieldName(), total.getAggregate()),
                         total.getFieldType(), null));
         }, user);
         return totals;
@@ -454,11 +454,11 @@ public class CrudReaderApi {
         }
     }
 
-    private static void _wrapSqlDefBySorter(final List<Sort> sort, final SQLDefinition cursor, final SQLContext context) {
+    private static String _wrapSqlDefBySorter(final List<Sort> sort, final List<Sort> defaultSort, String sql, final List<Field> fields, final SortingWrapper sortingWrapper) {
         List<Sort> localSort = sort != null ? sort : new ArrayList<>();
-        if (localSort.size() == 0 && cursor.getSelectSqlDef() != null && cursor.getSelectSqlDef().getDefaultSort() != null)
-            localSort.addAll(cursor.getSelectSqlDef().getDefaultSort());
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getSortingWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), localSort, cursor.getSelectSqlDef().getFields()));
+        if (localSort.size() == 0 && defaultSort != null)
+            localSort.addAll(defaultSort);
+        return sortingWrapper.wrap(sql, localSort, fields);
     }
 
     private static PreparePageParams _prepareLoadPageParams(
@@ -471,8 +471,9 @@ public class CrudReaderApi {
             final boolean forceCalcCount) {
         Connection connTest = context.currentConnection();
         if (connTest == null)
-            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
+            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
 
+        final SelectSQLDef selectSQLDef = cursor.getSelectSqlDef();
         PreparePageParams result = new PreparePageParams(Paramus.createParams(params));
 
         final Object location = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.LOCATE_PARAM_PKVAL, java.lang.Object.class, null);
@@ -494,33 +495,38 @@ public class CrudReaderApi {
         final String paginationTotalcountStr = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, String.class, null);
         final long paginationTotalcount = Strings.isNullOrEmpty(paginationTotalcountStr) ? Sqls.UNKNOWN_RECS_TOTAL : Converter.toType(paginationTotalcountStr, long.class);
 
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
+        String preparedSql = selectSQLDef.getSql();
+        if (filter != null)
+            preparedSql = context.getWrappers().getFilteringWrapper().wrap(preparedSql, filter, selectSQLDef.getFields());
 
         _initPreparedTotals(result, totals);
 
-        context.getWrappers().getTotalsWrapper().prepare(result.preparedTotals, cursor.getSelectSqlDef().getFields());
+        TotalsWrapper totalsWrapper = context.getWrappers().getTotalsWrapper();
+
+        totalsWrapper.prepare(result.preparedTotals, selectSQLDef.getFields());
         boolean calcTotals = result.preparedTotals.stream().anyMatch(t -> t.getAggregate() != Total.Aggregate.UNDEFINED);
         if(result.preparedTotals.stream().noneMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
             result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(paginationTotalcount).build());
-        cursor.getSelectSqlDef().setTotalsSql(context.getWrappers().getTotalsWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql(), result.preparedTotals, cursor.getSelectSqlDef().getFields()));
+        selectSQLDef.setTotalsSql(totalsWrapper.wrap(preparedSql, result.preparedTotals, selectSQLDef.getFields()));
 
-        _wrapSqlDefBySorter(sort, cursor, context);
+        preparedSql = _wrapSqlDefBySorter(sort, selectSQLDef.getDefaultSort(), preparedSql, selectSQLDef.getFields(), context.getWrappers().getSortingWrapper());
 
         if (location != null) {
-            Field pkField = cursor.getSelectSqlDef().findPk();
+            Field pkField = selectSQLDef.findPk();
             if (pkField == null)
-                throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
-            cursor.getSelectSqlDef().setLocateSql(context.getWrappers().getLocateWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+                throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", selectSQLDef.getBioCode()));
+            selectSQLDef.setLocateSql(context.getWrappers().getLocateWrapper().wrap(selectSQLDef.getSql(), pkField.getName()));
             preparePkParamValue(result.preparedParams, pkField);
         }
         if (paginationPagesize > 0)
-            cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getPaginationWrapper().wrap(cursor.getSelectSqlDef().getPreparedSql()));
+            preparedSql = context.getWrappers().getPaginationWrapper().wrap(preparedSql);
+        selectSQLDef.setPreparedSql(preparedSql);
 
         long factOffset = paginationOffset;
         Total totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
         gotoLastPage = paginationOffset == (Sqls.UNKNOWN_RECS_TOTAL - paginationPagesize + 1);
         if (calcTotals || forceCalcCount || gotoLastPage) {
-            result.preparedTotals = calcTotalsRemote(result.preparedTotals, result.preparedParams, context, cursor, context.currentUser());
+            calcTotalsRemote(result.preparedTotals, result.preparedParams, context, selectSQLDef, context.currentUser());
             totalCount = result.preparedTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(Total.builder().fact(paginationTotalcount).build());
             if(gotoLastPage) {
                 factOffset = (long) Math.floor((long) totalCount.getFact() / paginationPagesize) * paginationPagesize;
@@ -535,7 +541,7 @@ public class CrudReaderApi {
         if (location != null) {
             LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
             int locatedPos = context.createDynamicCursor()
-                    .init(context.currentConnection(), cursor.getSelectSqlDef().getLocateSql(), cursor.getSelectSqlDef().getParamDeclaration())
+                    .init(context.currentConnection(), selectSQLDef.getLocateSql(), selectSQLDef.getParamDeclaration())
                     .scalar(result.preparedParams, context.currentUser(), int.class, -1);
             if (locatedPos >= 0) {
                 locFactOffset = calcOffset(locatedPos, paginationPagesize);
@@ -561,14 +567,15 @@ public class CrudReaderApi {
             final SQLDefinition cursor) {
         Connection connTest = context.currentConnection();
         if (connTest == null)
-            throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursor.getBioCode()));
-        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(cursor.getSelectSqlDef().getSql(), filter, cursor.getSelectSqlDef().getFields()));
+            throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
+        SelectSQLDef sqlDef = cursor.getSelectSqlDef();
+        sqlDef.setPreparedSql(context.getWrappers().getFilteringWrapper().wrap(sqlDef.getSql(), filter, sqlDef.getFields()));
 
-        _wrapSqlDefBySorter(sort, cursor, context);
+        _wrapSqlDefBySorter(sort, sqlDef.getDefaultSort(), sqlDef.getPreparedSql(), sqlDef.getFields(), context.getWrappers().getSortingWrapper());
 
         PreparePageParams result = new PreparePageParams();
         _initPreparedTotals(result, totals);
-        if(!result.preparedTotals.stream().anyMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
+        if(result.preparedTotals.stream().noneMatch(t -> t.getAggregate() == Total.Aggregate.COUNT))
             result.preparedTotals.add(Total.builder().fieldName("*").fieldType(long.class).aggrigate(Total.Aggregate.COUNT).fact(0L).build());
         return result;
     }

@@ -150,7 +150,7 @@ public class PgSQLWrapperInterpreter implements WrapperInterpreter {
                     if(aggregate == Total.Aggregate.COUNT)
                         result.append(String.format("%sCOUNT(1) as %s", comma, Total.TOTALCOUNT_FIELD_NAME));
                     else
-                        result.append(String.format("%s%s(%s.%s) AS %s", comma, aggregate.name(), alias, fieldName, fieldName.toUpperCase()));
+                        result.append(String.format("%s%s(%s.%s) AS %s_%s", comma, aggregate.name(), alias, fieldName, fieldName.toUpperCase(), aggregate.name()));
                 }
             }
             return result.toString();
