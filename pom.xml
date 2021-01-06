@@ -12,11 +12,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-framework.version>5.3.1</spring-framework.version>
         <spring-boot.version>2.4.0</spring-boot.version>
+        <spring-kafka.version>2.6.4</spring-kafka.version>
         <org.apache.poi.version>4.1.2</org.apache.poi.version>
         <hikaricp.version>3.4.5</hikaricp.version>
         <org.apache.httpcomponents.core.version>4.4.13</org.apache.httpcomponents.core.version>
         <org.apache.httpcomponents.client.version>4.5.12</org.apache.httpcomponents.client.version>
-        <swagger.version>2.9.2</swagger.version>
+        <swagger.version>3.0.0</swagger.version>
         <ehcache.version>2.10.6</ehcache.version>
         <ehcache-core.version>2.6.11</ehcache-core.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
@@ -294,10 +295,16 @@
                 <artifactId>springfox-swagger2</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
+<!--            <dependency>-->
+<!--                <groupId>io.springfox</groupId>-->
+<!--                <artifactId>springfox-swagger-ui</artifactId>-->
+<!--                <version>${swagger.version}</version>-->
+<!--            </dependency>-->
+
             <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-ui</artifactId>
-                <version>${swagger.version}</version>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
 
             <!-- javax.ws.rs-api -->
@@ -424,6 +431,8 @@
         <module>helpers-cache</module>
         <module>helpers-dba</module>
         <module>helpers-web</module>
+
+		<module>isrvt-kafka</module>
 	</modules>
 
 </project>
