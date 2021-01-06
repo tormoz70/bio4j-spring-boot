@@ -135,4 +135,21 @@ public class IsrvtProducerProperies {
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
+
+    @Override
+    public String toString() {
+        return "IsrvtProducerProperies{" +
+                "props=" + props +
+                ", bootstrapServer='" + bootstrapServer + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", topicName='" + topicName + '\'' +
+                ", topicPartitions=" + topicPartitions +
+                ", topicReplicationFactor=" + topicReplicationFactor +
+                ", acks='" + acks + '\'' +
+                ", retries=" + retries +
+                ", batchSize=" + batchSize +
+                ", lingerMs=" + lingerMs +
+                ", bufferMemory=" + bufferMemory +
+                '}';
+    }
 }

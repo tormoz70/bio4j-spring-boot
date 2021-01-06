@@ -12,7 +12,7 @@ public class IsrvtConsumerBase<K, V> {
     private static final LogWrapper LOG = LogWrapper.getLogger(IsrvtConsumerBase.class);
 
     private final IsrvtConsumerProperies properies;
-    private final List<IsrvtConsumerRunner> runners;
+    private final List<IsrvtConsumerRunner<K, V>> runners;
     private final MessageHandlerFactory messageHandlerFactory;
     private final Deserializer<K> keyDeserializer;
     private final Deserializer<V> messageDeserializer;
@@ -27,22 +27,31 @@ public class IsrvtConsumerBase<K, V> {
     }
 
     public void startConsume() {
+        LOG.info("About starting consume...");
+        LOG.info(String.format("Consumer properties: %s", properies));
+        LOG.info("About init consumers pool...");
         for(int i=0; i<properies.getThreadPoolSize(); i++) {
             runners.add(new IsrvtConsumerRunner<>(properies, messageHandlerFactory, keyDeserializer, messageDeserializer));
         }
+        LOG.info("Consumers pool initialized");
+        LOG.info("About consumers pool running...");
         runners.forEach(r -> r.run());
+        LOG.info("Consumers pool running is done");
     }
 
 
     public void stopConsume() {
+        LOG.info("About consumers pool stopping...");
         runners.forEach(r -> r.stop());
+        LOG.info("Consumers pool stopped");
+        LOG.info("About consumers pool clearing...");
         runners.clear();
+        LOG.info("Consumers pool cleared");
     }
 
     @PreDestroy
     public void destroy() {
-        System.out.println(
-                "Callback triggered - @PreDestroy.");
+        LOG.info("Callback triggered - @PreDestroy");
         stopConsume();
     }
 }

@@ -28,6 +28,9 @@ public class IsrvtConsumerProperies {
     @Value("${upldr.consumer.sessionTimeoutMs}")
     private int sessionTimeoutMs;
 
+    @Value("${upldr.consumer.heartbeatIntervalMs}")
+    private int heartbeatIntervalMs;
+
     public String getTopicName() {
         return topicName;
     }
@@ -76,6 +79,14 @@ public class IsrvtConsumerProperies {
         this.sessionTimeoutMs = sessionTimeoutMs;
     }
 
+    public int getHeartbeatIntervalMs() {
+        return heartbeatIntervalMs;
+    }
+
+    public void setHeartbeatIntervalMs(int heartbeatIntervalMs) {
+        this.heartbeatIntervalMs = heartbeatIntervalMs;
+    }
+
     public Map<String, Object> consumerConfig() {
         if(props == null) {
             props = new HashMap<>();
@@ -84,9 +95,26 @@ public class IsrvtConsumerProperies {
             props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, getSessionTimeoutMs());
+            if(getHeartbeatIntervalMs() > 0)
+                props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, getHeartbeatIntervalMs());
 //            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
 //            props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MessageDeserializer.class);
         }
         return props;
     }
+
+    @Override
+    public String toString() {
+        return "IsrvtConsumerProperies{" +
+                "props=" + props +
+                ", topicName='" + topicName + '\'' +
+                ", threadPoolSize=" + threadPoolSize +
+                ", bootstrapServer='" + bootstrapServer + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", sessionTimeoutMs=" + sessionTimeoutMs +
+                ", heartbeatIntervalMs=" + heartbeatIntervalMs +
+                '}';
+    }
+
 }

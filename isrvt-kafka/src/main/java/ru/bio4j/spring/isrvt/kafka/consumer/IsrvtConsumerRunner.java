@@ -14,20 +14,20 @@ public class IsrvtConsumerRunner<K, V> implements Runnable {
     private static final LogWrapper LOG = LogWrapper.getLogger(IsrvtConsumerRunner.class);
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
-    private final IsrvtConsumerProperies properies;
+    private final IsrvtConsumerProperies properties;
     private final Consumer<K, V> consumer;
     private final MessageHandler<K, V> messageHandler;
 
     public IsrvtConsumerRunner(IsrvtConsumerProperies properties, MessageHandlerFactory messageHandlerFactory, Deserializer<K> keyDeserializer, Deserializer<V> messageDeserializer) {
-        this.properies = properties;
+        this.properties = properties;
         this.consumer = new KafkaConsumer<>(properties.consumerConfig(), keyDeserializer, messageDeserializer);
-        this.consumer.subscribe(Arrays.asList(properties.getTopicName()));
         this.messageHandler = messageHandlerFactory.create();
     }
 
     @Override
     public void run() {
         try {
+            this.consumer.subscribe(Arrays.asList(properties.getTopicName()));
             while (!closed.get()) {
                 messageHandler.process(consumer.poll(Duration.ofMillis(10_000)));
                 consumer.commitSync();
