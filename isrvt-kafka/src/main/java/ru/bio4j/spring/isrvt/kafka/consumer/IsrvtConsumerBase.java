@@ -31,18 +31,19 @@ public class IsrvtConsumerBase<K, V> {
         LOG.info(String.format("Consumer properties: %s", properies));
         LOG.info("About init consumers pool...");
         for(int i=0; i<properies.getThreadPoolSize(); i++) {
+//            properies.setClientId(properies.getTopicName() + "-" + i);
             runners.add(new IsrvtConsumerRunner<>(properies, messageHandlerFactory, keyDeserializer, messageDeserializer));
         }
         LOG.info("Consumers pool initialized");
         LOG.info("About consumers pool running...");
-        runners.forEach(r -> r.run());
+        runners.forEach(r -> r.start());
         LOG.info("Consumers pool running is done");
     }
 
 
     public void stopConsume() {
         LOG.info("About consumers pool stopping...");
-        runners.forEach(r -> r.stop());
+        runners.forEach(r -> r.close());
         LOG.info("Consumers pool stopped");
         LOG.info("About consumers pool clearing...");
         runners.clear();

@@ -19,8 +19,7 @@ public class IsrvtConsumerProperies {
     @Value("${upldr.consumer.bootstrapServer}")
     private String bootstrapServer;
 
-    @Value("${upldr.consumer.clientId}")
-    private String clientId;
+//    private String clientId;
 
     @Value("${upldr.consumer.groupId}")
     private String groupId;
@@ -55,13 +54,13 @@ public class IsrvtConsumerProperies {
         this.bootstrapServer = bootstrapServer;
     }
 
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
+//    public String getClientId() {
+//        return clientId;
+//    }
+//
+//    public void setClientId(String clientId) {
+//        this.clientId = clientId;
+//    }
 
     public String getGroupId() {
         return groupId;
@@ -95,6 +94,7 @@ public class IsrvtConsumerProperies {
             props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
             props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, getSessionTimeoutMs());
+//            props.put(ConsumerConfig.CLIENT_ID_CONFIG, getClientId());
             if(getHeartbeatIntervalMs() > 0)
                 props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, getHeartbeatIntervalMs());
 //            props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
@@ -110,7 +110,7 @@ public class IsrvtConsumerProperies {
                 ", topicName='" + topicName + '\'' +
                 ", threadPoolSize=" + threadPoolSize +
                 ", bootstrapServer='" + bootstrapServer + '\'' +
-                ", clientId='" + clientId + '\'' +
+//                ", clientId='" + clientId + '\'' +
                 ", groupId='" + groupId + '\'' +
                 ", sessionTimeoutMs=" + sessionTimeoutMs +
                 ", heartbeatIntervalMs=" + heartbeatIntervalMs +
