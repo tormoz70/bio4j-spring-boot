@@ -198,9 +198,9 @@
                                                     <xs:documentation>Заголовок при отображении в DataGrid</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="filter" type="xs:boolean">
+                                            <xs:attribute name="filter" type="xs:boolean" default="true">
                                                 <xs:annotation>
-                                                    <xs:documentation>Вкл фитрации по полю</xs:documentation>
+                                                    <xs:documentation>Вкл фильтрации по полю</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
                                             <xs:attribute name="hidden" type="xs:boolean">
@@ -269,6 +269,11 @@
                                                     <xs:documentation>Формат колонки при экспорте в Excel (по умолчанию '@')</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="sort" type="xs:boolean" default="true">
+                                                <xs:annotation>
+                                                    <xs:documentation>Вкл сортировки по полю</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
                                             <xs:attribute name="sorter" type="xs:string" default="@">
                                                 <xs:annotation>
                                                     <xs:documentation>Имя колонки, по которой будет сортировка</xs:documentation>
@@ -321,6 +326,21 @@
                                                         <xs:enumeration value="MIN"/>
                                                     </xs:restriction>
                                                 </xs:simpleType>
+                                            </xs:attribute>
+                                            <xs:attribute name="looCaption" type="xs:boolean" default="true">
+                                                <xs:annotation>
+                                                    <xs:documentation>Поле является значением в combobox</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                            <xs:attribute name="editMaxLength" type="xs:integer" default="30">
+                                                <xs:annotation>
+                                                    <xs:documentation>Максимальное кол-во символов при вводе в поле редактирования</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                            <xs:attribute name="editor" type="xs:boolean" default="true">
+                                                <xs:annotation>
+                                                    <xs:documentation>Вкл поле в форму редактирования</xs:documentation>
+                                                </xs:annotation>
                                             </xs:attribute>
                                         </xs:extension>
                                     </xs:simpleContent>

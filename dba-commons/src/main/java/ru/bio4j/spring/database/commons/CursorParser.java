@@ -243,12 +243,18 @@ public class CursorParser {
                 col.setExpEnabled(Converter.toType(Doms.getAttribute(paramElem, "expEnabled", "true", String.class), boolean.class));
                 col.setExpFormat(Doms.getAttribute(paramElem, "expFormat", null, String.class));
                 col.setExpWidth(Doms.getAttribute(paramElem, "expWidth", null, String.class));
+                col.setSort(Converter.toType(Doms.getAttribute(paramElem, "sort", "true", String.class), boolean.class));
                 col.setSorter(Doms.getAttribute(paramElem, "sorter", null, String.class));
                 col.setNullsPosition(Converter.toType(Doms.getAttribute(paramElem, "nullsPosition", "DEFAULT", String.class), Sort.NullsPosition.class));
                 col.setTextLocality(Converter.toType(Doms.getAttribute(paramElem, "textLocality", "UNDEFINED", String.class), Sort.TextLocality.class));
                 col.setTooltip(Doms.getAttribute(paramElem, "tooltip", null, String.class));
                 col.setMandatory(Converter.toType(Doms.getAttribute(paramElem, "mandatory", "false", String.class), boolean.class));
                 col.setAggregate(Converter.toType(Doms.getAttribute(paramElem, "aggregate", "UNDEFINED", String.class), Total.Aggregate.class));
+                col.setLooCaption(Converter.toType(Doms.getAttribute(paramElem, "looCaption", "false", String.class), boolean.class));
+                String editMaxLength = Doms.getAttribute(paramElem, "editMaxLength", null, String.class);
+                col.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
+                col.setEditor(Converter.toType(Doms.getAttribute(paramElem, "editor", "false", String.class), boolean.class));
+                col.setLooReference(Doms.getAttribute(paramElem, "looReference", null, String.class));
             }
         }
 

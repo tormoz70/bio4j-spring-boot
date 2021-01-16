@@ -55,6 +55,9 @@ public class Field implements Serializable {
     /** Значение по умолчанию */
     private Object defaultVal;
 
+    /** Вкл сортировки по полю */
+    private boolean sort;
+
     /** Имя поля, по которому будет сортировка, если null, то sorter == name */
     private String sorter;
 
@@ -77,9 +80,20 @@ public class Field implements Serializable {
     /** Использовать локализованную сортировку при сортировке по текстовому полю */
     private Sort.TextLocality textLocality = Sort.TextLocality.UNDEFINED;
 
-
     /** Агригруемое поле */
     private Total.Aggregate aggregate;
+
+    /** Поле является значением в combobox */
+    private boolean looCaption;
+
+    /** Максимальное кол-во символов при вводе в поле редактирования */
+    private Integer editMaxLength;
+
+    /** Вкл поле в форму редактирования */
+    private boolean editor;
+
+    /** Код справочника для выбора значения с помощью combobox */
+    private String looReference;
 
     @Override
     public String toString() {
@@ -174,16 +188,8 @@ public class Field implements Serializable {
         this.metaType = value;
     }
 
-    /**
-     * Field id starts from 1
-     * @return id
-     */
     public int getId() { return id; }
 
-    /**
-     * Field index starts from 0
-     * @return index
-     */
     public int getIndex() { return id-1; }
 
     public void setId(int id) { this.id = id; }
@@ -284,6 +290,46 @@ public class Field implements Serializable {
         this.aggregate = aggregate;
     }
 
+    public boolean isSort() {
+        return sort;
+    }
+
+    public void setSort(boolean sort) {
+        this.sort = sort;
+    }
+
+    public boolean isLooCaption() {
+        return looCaption;
+    }
+
+    public void setLooCaption(boolean looCaption) {
+        this.looCaption = looCaption;
+    }
+
+    public Integer getEditMaxLength() {
+        return editMaxLength;
+    }
+
+    public void setEditMaxLength(Integer editMaxLength) {
+        this.editMaxLength = editMaxLength;
+    }
+
+    public boolean isEditor() {
+        return editor;
+    }
+
+    public void setEditor(boolean editor) {
+        this.editor = editor;
+    }
+
+    public String getLooReference() {
+        return looReference;
+    }
+
+    public void setLooReference(String looReference) {
+        this.looReference = looReference;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -304,6 +350,7 @@ public class Field implements Serializable {
                 Objects.equals(title, field.title) &&
                 Objects.equals(width, field.width) &&
                 Objects.equals(defaultVal, field.defaultVal) &&
+                sort == field.sort &&
                 Objects.equals(sorter, field.sorter) &&
                 nullsPosition == field.nullsPosition &&
                 Objects.equals(tooltip, field.tooltip) &&
@@ -312,11 +359,16 @@ public class Field implements Serializable {
                 Objects.equals(expFormat, field.expFormat) &&
                 Objects.equals(expWidth, field.expWidth) &&
                 textLocality == field.textLocality &&
-                aggregate == field.aggregate;
+                aggregate == field.aggregate &&
+                Objects.equals(looCaption, field.looCaption) &&
+                editMaxLength == editMaxLength &&
+                editor == field.editor &&
+                Objects.equals(looReference, looReference);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sorter, nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate);
+        return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sort, sorter,
+                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference);
     }
 }
