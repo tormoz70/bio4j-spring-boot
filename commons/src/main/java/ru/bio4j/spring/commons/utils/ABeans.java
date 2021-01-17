@@ -3,7 +3,6 @@ package ru.bio4j.spring.commons.utils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.util.ReflectionUtils;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.model.transport.ABean;
@@ -159,7 +158,7 @@ public class ABeans {
                             if (value instanceof Date && pd.getPropertyType() == String.class)
                                 valueLocal = DateFormatUtils.format((Date) value, dateTimeFormat);
                             else if (value instanceof String && pd.getPropertyType() == Date.class)
-                                valueLocal = DateTimeParser.getInstance().pars((String) value, dateTimeFormat);
+                                valueLocal = DateTimeParser.getInstance().parse((String) value, dateTimeFormat);
                             else
                                 valueLocal = Converter.toType(value, pd.getPropertyType());
                             method.invoke(bean, valueLocal);

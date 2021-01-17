@@ -652,7 +652,7 @@ public class DbaHelper {
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
      * @return
      */
-    public static Metadata getMetadata(final String bioCode) {
+    public Metadata getMetadata(final String bioCode) {
         Metadata rslt = new Metadata();
         final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
         StoreMetadata metadata = new StoreMetadata();

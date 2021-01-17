@@ -3,7 +3,7 @@ package ru.bio4j.spring.commons.converter;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.model.transport.errors.DateParseException;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static ru.bio4j.spring.commons.converter.hanlers.DateTimePatterns.detectFormat;
 
@@ -13,16 +13,16 @@ import static ru.bio4j.spring.commons.converter.hanlers.DateTimePatterns.detectF
  * Класс для преобразований из строки в дату.
  * 
  */
-public class DateTimeParser {
+public class LocalDateParser {
 
 	/**
 	 * Экземпляр класса.
 	 */
-	private static DateTimeParser instance;
+	private static LocalDateParser instance;
 
-	public static DateTimeParser getInstance() {
+	public static LocalDateParser getInstance() {
 		if (instance == null)
-			synchronized (DateTimeParser.class) {
+			synchronized (LocalDateParser.class) {
 				if (instance == null)
 					createDateTimeParser();
 			}
@@ -30,22 +30,22 @@ public class DateTimeParser {
 	}
 
 	private static void createDateTimeParser() {
-		instance = new DateTimeParser();
+		instance = new LocalDateParser();
 	}
 
-	private DateTimeParser() {
+	private LocalDateParser() {
 	}
 
-	public Date parse(String value, String format) {
+	public LocalDate parse(String value, String format) {
 		if (!Strings.isNullOrEmpty(value)) {
 			if (value.toUpperCase().equals("NOW"))
-				return new Date();
+				return LocalDate.now();
 			if (value.toUpperCase().equals("MAX"))
-				return Types.maxDate();
+				return LocalDate.MAX;
 			if (value.toUpperCase().equals("MIN"))
-				return Types.minDate();
+				return LocalDate.MIN;
 			try {
-				return Types.parseDate(value, format);
+				return Types.parseLocalDate(value, format);
 			} catch (Exception ex) {
 				throw new DateParseException("Ошибка разбора даты. Параметры: (" + value + ", " + format + "). Сообщение: " + ex.toString());
 			}
@@ -53,7 +53,7 @@ public class DateTimeParser {
 		return null;
 	}
 
-	public Date parse(String value) {
+	public LocalDate parse(String value) {
 		String datetimeFormat = detectFormat(value);
 		if (Strings.isNullOrEmpty(datetimeFormat))
 			throw new DateParseException("Не верная дата: [" + value + "]. Невозможно определить формат даты.");

@@ -13,9 +13,9 @@ public class StringHandler extends TypeHandlerBase implements TypeHandler<String
         Object result = null;
         Class<?> targetTypeWrapped = Types.wrapPrimitiveType(targetType);
         if (Types.typeIsDate(targetTypeWrapped))
-            result = Types.date2Date(Types.parsDate(value), targetTypeWrapped);
+            result = Types.date2Date(Types.parseDate(value), targetTypeWrapped);
         else if (targetTypeWrapped == Boolean.class)
-            result = Types.parsBoolean(value);
+            result = Types.parseBoolean(value);
         else if (Types.typeIsNumber(targetTypeWrapped)) {
             if(Strings.isNullOrEmpty(value))
                 result = null;
@@ -28,7 +28,7 @@ public class StringHandler extends TypeHandlerBase implements TypeHandler<String
         else if (targetTypeWrapped == byte[].class)
             result = value.getBytes();
         else if (targetTypeWrapped.isEnum())
-            result = Types.parsEnum(value, targetTypeWrapped);
+            result = Types.parseEnum(value, targetTypeWrapped);
         else if (targetTypeWrapped.isArray() && Types.isPrimitiveOrWrapper(targetTypeWrapped.getComponentType())){
             String[] valStrs = Strings.split(value, ",");
             result = Array.newInstance(targetTypeWrapped.getComponentType(), valStrs.length);

@@ -32,7 +32,7 @@ public class CharacterHandler extends TypeHandlerBase implements TypeHandler<Cha
         if (Types.typeIsDate(targetTypeWrapped))
             return null;
         else if (targetTypeWrapped == Boolean.class)
-            return (T) Types.parsBoolean(value);
+            return (T) Types.parseBoolean(value);
         else if (Types.typeIsNumber(targetTypeWrapped)) {
             if(value == null)
                 return null;
@@ -44,7 +44,7 @@ public class CharacterHandler extends TypeHandlerBase implements TypeHandler<Cha
         else if (targetTypeWrapped == byte[].class)
             return (T) value;
         else if (targetTypeWrapped.isEnum())
-            return (T) Types.parsEnum(""+value, targetTypeWrapped);
+            return (T) Types.parseEnum(""+value, targetTypeWrapped);
         throw new ConvertValueException(value, genericType, targetTypeWrapped);
     }
 

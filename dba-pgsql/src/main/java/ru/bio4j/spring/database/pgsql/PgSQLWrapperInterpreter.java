@@ -2,6 +2,7 @@ package ru.bio4j.spring.database.pgsql;
 
 
 import ru.bio4j.spring.commons.converter.DateTimeParser;
+import ru.bio4j.spring.commons.converter.hanlers.DateTimePatterns;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.WrapperInterpreter;
 import ru.bio4j.spring.model.transport.jstore.Field;
@@ -32,15 +33,15 @@ public class PgSQLWrapperInterpreter implements WrapperInterpreter {
         if(value instanceof String) {
             String strValue = (String) value;
             Date detectedValue = null;
-            String fmtDetected = DateTimeParser.getInstance().detectFormat(strValue);
+            String fmtDetected = DateTimePatterns.detectFormat(strValue);
             if (!Strings.isNullOrEmpty(fmtDetected)) {
                 if (fmtDetected.equalsIgnoreCase("yyyy-MM-dd")) {
                     if (e instanceof Le)
-                        detectedValue = DateTimeParser.getInstance().pars(strValue + "T23:59:59", "yyyy-MM-dd'T'HH:mm:ss");
+                        detectedValue = DateTimeParser.getInstance().parse(strValue + "T23:59:59", "yyyy-MM-dd'T'HH:mm:ss");
                     else
-                        detectedValue = DateTimeParser.getInstance().pars(strValue, "yyyy-MM-dd");
+                        detectedValue = DateTimeParser.getInstance().parse(strValue, "yyyy-MM-dd");
                 } else {
-                    detectedValue = DateTimeParser.getInstance().pars(strValue, fmtDetected);
+                    detectedValue = DateTimeParser.getInstance().parse(strValue, fmtDetected);
                 }
             }
             if (detectedValue != null) {
@@ -67,10 +68,6 @@ public class PgSQLWrapperInterpreter implements WrapperInterpreter {
                 value = "'" + value + "'";
         }
         String slike = e.ignoreCase() ? "ilike" : "like";
-//        if (e.ignoreCase()) {
-//            value = "upper("+value+")";
-//            column = "upper("+column+")";
-//        }
 
         if (value != null && value instanceof Date)
             value = "to_date('" + new SimpleDateFormat("YYYYMMdd").format(value) + "', 'YYYYMMDD')";

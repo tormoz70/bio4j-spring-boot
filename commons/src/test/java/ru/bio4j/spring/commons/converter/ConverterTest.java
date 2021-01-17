@@ -7,6 +7,7 @@ import ru.bio4j.spring.model.transport.Param;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
 
@@ -186,6 +187,38 @@ public class ConverterTest {
     }
 
     @Test
+    public void sqlDate2javaLocalDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(2012, (12-1), 20, 15, 11, 50);
+        java.sql.Date sqldate = new java.sql.Date(calendar.getTime().getTime());
+        try {
+            java.time.LocalDate javadate = Converter.toType(sqldate, java.time.LocalDate.class);
+            java.sql.Date actual = java.sql.Date.valueOf(javadate);
+            System.out.println(actual + " ? " + sqldate);
+            Assert.assertEquals(actual.toString(), sqldate.toString());
+        } catch (ConvertValueException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void sqlDate2javaLocalDateTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(2012, (12-1), 20, 15, 11, 50);
+        java.sql.Date sqldate = new java.sql.Date(calendar.getTime().getTime());
+        try {
+            java.time.LocalDateTime javadate = Converter.toType(sqldate, java.time.LocalDateTime.class);
+            java.sql.Date actual = java.sql.Date.valueOf(javadate.toLocalDate());
+            System.out.println(actual + " ? " + sqldate);
+            Assert.assertEquals(actual.toString(), sqldate.toString());
+        } catch (ConvertValueException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    @Test
     public void sqlTimestamp2javaDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
@@ -194,6 +227,20 @@ public class ConverterTest {
         try {
             java.util.Date javadate = Converter.toType(sqldate, java.util.Date.class);
             Assert.assertEquals(javadate.getTime(), sqldate.getTime());
+        } catch (ConvertValueException ex) {
+            Assert.fail(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void sqlTimestamp2javaLocalDateTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(2012, (12-1), 20, 15, 11, 50);
+        Timestamp sqldate = new Timestamp(calendar.getTime().getTime());
+        try {
+            java.time.LocalDateTime javadate = Converter.toType(sqldate, java.time.LocalDateTime.class);
+            Assert.assertEquals(javadate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), sqldate.getTime());
         } catch (ConvertValueException ex) {
             Assert.fail(ex.getMessage());
         }

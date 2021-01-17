@@ -8,6 +8,8 @@ import ru.bio4j.spring.commons.utils.Strings;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class DateHandler extends TypeHandlerBase implements TypeHandler<Date> {
@@ -21,10 +23,14 @@ public class DateHandler extends TypeHandlerBase implements TypeHandler<Date> {
 
         if (Types.typeIsDate(valType))
             return (Date) value;
+        else if (valType == LocalDate.class)
+            return Types.date2Date((LocalDate)value, Date.class);
+        else if (valType == LocalDateTime.class)
+            return Types.date2Date((LocalDateTime) value, Date.class);
         else if (Types.typeIsNumber(valType))
             return new java.util.Date(Types.number2Number((Number) value, long.class));
         else if (valType == String.class)
-            return Types.parsDate((String) value);
+            return Types.parseDate((String) value);
         else
             Types.nop();
         throw new ConvertValueException(value, valType, genericType);
@@ -37,6 +43,10 @@ public class DateHandler extends TypeHandlerBase implements TypeHandler<Date> {
         Class<?> targetTypeWrapped = Types.wrapPrimitiveType(targetType);
         if (Types.typeIsDate(targetTypeWrapped))
             return (T) Types.date2Date(value, targetTypeWrapped);
+        else if (targetTypeWrapped == LocalDate.class)
+            return (T) Types.date2Date(value, LocalDate.class);
+        else if (targetTypeWrapped == LocalDateTime.class)
+            return (T) Types.date2Date( value, LocalDateTime.class);
         else if (targetTypeWrapped == Boolean.class)
             Types.nop();
         else if (Types.typeIsNumber(targetTypeWrapped))

@@ -9,6 +9,8 @@ public class TypeHandlerMapper {
             new ByteArrayHandler(),
             new BytePArrayHandler(),
             new DateHandler(),
+            new LocalDateHandler(),
+            new LocalDateTimeHandler(),
             new StringHandler(),
             new CharacterHandler(),
             new NumberHandler(),

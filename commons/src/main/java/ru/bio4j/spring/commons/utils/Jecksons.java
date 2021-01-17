@@ -21,6 +21,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.bio4j.spring.commons.converter.hanlers.DateTimePatterns.detectFormat;
+
 public class Jecksons {
 
     private Jecksons() { /* hidden constructor */ }
@@ -290,10 +292,10 @@ public class Jecksons {
 
             Param deserializedParam = jsonParser.readValuesAs(ParamPOJO.class).next();
             if (Arrays.asList(MetaType.DATE, MetaType.UNDEFINED).contains(Utl.nvl(deserializedParam.getType(), MetaType.UNDEFINED)) && deserializedParam.getValue() != null && deserializedParam.getValue() instanceof String) {
-                boolean isValueDateAsString = Strings.compare(DateTimeParser.getInstance().detectFormat((String) deserializedParam.getValue()), Jecksons.getInstance().defaultDateTimeFormat, true);
+                boolean isValueDateAsString = Strings.compare(detectFormat((String) deserializedParam.getValue()), Jecksons.getInstance().defaultDateTimeFormat, true);
                 if (isValueDateAsString) {
                     try {
-                        Date val = DateTimeParser.getInstance().pars((String) deserializedParam.getValue(), Jecksons.getInstance().defaultDateTimeFormat);
+                        Date val = DateTimeParser.getInstance().parse((String) deserializedParam.getValue(), Jecksons.getInstance().defaultDateTimeFormat);
                         deserializedParam.setValue(val);
                     } catch (DateParseException e) {
                         throw Utl.wrapErrorAsRuntimeException(e);

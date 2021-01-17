@@ -26,7 +26,7 @@ public class JecksonsTest extends TestCase {
 //        TimeZone.setDefault(TimeZone.getTimeZone("GMT+03:00"));
         this.testBox.setType(MetaType.INTEGER);
 		this.testBox.setName("Test-Box");
-		this.testBox.setCreated(Types.parse("2012.12.20-15:11:24", "yyyy.MM.dd-HH:mm:ss"));
+		this.testBox.setCreated(Types.parseDate("2012.12.20-15:11:24", "yyyy.MM.dd-HH:mm:ss"));
 		this.testBox.setVolume(123.05);
 		this.testBox.setPackets(new TPacket[]{new TPacket()});
 		this.testBox.getPackets()[0].setName("packet-0");
@@ -192,7 +192,7 @@ public class JecksonsTest extends TestCase {
     @Test
     public void bdecode10() throws Exception {
         TBox dummy = new TBox();
-        dummy.setCreated(DateTimeParser.getInstance().pars("2019-09-11T15:43:02"));
+        dummy.setCreated(DateTimeParser.getInstance().parse("2019-09-11T15:43:02"));
         String json = Jecksons.getInstance().encode(dummy);
         Assert.assertTrue(json.endsWith("2019-09-11T15:43:02\"}"));
     }

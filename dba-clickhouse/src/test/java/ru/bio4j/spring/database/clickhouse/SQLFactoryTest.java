@@ -90,8 +90,8 @@ public class SQLFactoryTest {
                     "      ,? as periodEnd\n" +
                     "      ,toDateTime(?) as periodEnd1\n" +
                     "      ,now() as emptyDate");
-            java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().pars("2009-01-01").getTime());
-            java.sql.Timestamp endDate = new java.sql.Timestamp(DateTimeParser.getInstance().pars("2009-01-02T12:00:00").getTime());
+            java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().parse("2009-01-01").getTime());
+            java.sql.Timestamp endDate = new java.sql.Timestamp(DateTimeParser.getInstance().parse("2009-01-02T12:00:00").getTime());
             stmt.setObject(1, startDate);
             stmt.setObject(2, startDate);
             stmt.setObject(3, endDate);
@@ -262,8 +262,8 @@ public class SQLFactoryTest {
         try {
             SQLDefinition sqlDefinition = CursorParser.pars("bios.testDT");
             List<Param> params = Paramus.createParams();
-            Paramus.setParamValue(params, "periodStart", DateTimeParser.getInstance().pars("2009-01-01"));
-            Paramus.setParamValue(params, "periodEnd", DateTimeParser.getInstance().pars("2009-01-02"));
+            Paramus.setParamValue(params, "periodStart", DateTimeParser.getInstance().parse("2009-01-01"));
+            Paramus.setParamValue(params, "periodEnd", DateTimeParser.getInstance().parse("2009-01-02"));
             BeansPage<ABean> rst = CrudReaderApi.loadPage(params, null, null, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(true)

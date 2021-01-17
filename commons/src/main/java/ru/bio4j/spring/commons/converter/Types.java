@@ -12,6 +12,11 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -122,6 +127,38 @@ public class Types {
             return (T)new java.sql.Date(inValue.getTime());
         if (targetType == java.sql.Timestamp.class)
             return (T)new java.sql.Timestamp(inValue.getTime());
+        if (targetType == java.time.LocalDate.class)
+            return (T) Instant.ofEpochMilli(inValue.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+        if (targetType == java.time.LocalDateTime.class)
+            return (T) Instant.ofEpochMilli(inValue.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return null;
+    }
+
+    public static <T> T date2Date(java.time.LocalDate inValue, Class<T> targetType) {
+        if (targetType == java.util.Date.class)
+            return (T)java.util.Date.from(inValue.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        if (targetType == java.sql.Date.class)
+            return (T)java.sql.Date.valueOf(inValue);
+        if (targetType == java.sql.Timestamp.class)
+            return (T)java.sql.Timestamp.from(inValue.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        if (targetType == java.time.LocalDate.class)
+            return (T) inValue;
+        if (targetType == java.time.LocalDateTime.class)
+            return (T) inValue.atStartOfDay();
+        return null;
+    }
+
+    public static <T> T date2Date(java.time.LocalDateTime inValue, Class<T> targetType) {
+        if (targetType == java.util.Date.class)
+            return (T)java.util.Date.from(inValue.atZone(ZoneId.systemDefault()).toInstant());
+        if (targetType == java.sql.Date.class)
+            return (T)java.sql.Date.valueOf(inValue.toLocalDate());
+        if (targetType == java.sql.Timestamp.class)
+            return (T)java.sql.Timestamp.from(inValue.atZone(ZoneId.systemDefault()).toInstant());
+        if (targetType == java.time.LocalDate.class)
+            return (T) inValue;
+        if (targetType == java.time.LocalDateTime.class)
+            return (T) inValue;
         return null;
     }
 
@@ -144,9 +181,9 @@ public class Types {
         return Number.class.isAssignableFrom(type);
     }
 
-    public static Date parsDate(String value) throws ConvertValueException {
+    public static Date parseDate(String value) throws ConvertValueException {
         try {
-            return DateTimeParser.getInstance().pars(value);
+            return DateTimeParser.getInstance().parse(value);
         } catch (DateParseException ex) {
             throw new ConvertValueException(value, String.class, Date.class);
         }
@@ -184,7 +221,7 @@ public class Types {
     }
 
 
-	public static Date parse(String str, String formatStr) {
+	public static Date parseDate(String str, String formatStr) {
 		SimpleDateFormat format = new SimpleDateFormat(formatStr);
 		try {
 	        return format.parse(str);
@@ -193,14 +230,32 @@ public class Types {
         }
 	}
 	
-	public static Date minValue(){
+	public static Date minDate(){
 		return new Date(Long.MIN_VALUE);
 	}
-	public static Date maxValue(){
+	public static Date maxDate(){
 		return new Date(Long.MAX_VALUE);
 	}
 
-    public static Boolean parsBoolean(String value) {
+    public static LocalDate parseLocalDate(String str, String formatStr) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);
+        try {
+            return LocalDate.parse(str, format);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static LocalDateTime parseLocalDateTime(String str, String formatStr) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);
+        try {
+            return LocalDateTime.parse(str, format);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Boolean parseBoolean(String value) {
         if(Strings.isNullOrEmpty(value))
             return false;
         return  value.toLowerCase().equals("true") ||
@@ -210,7 +265,7 @@ public class Types {
                 value.toLowerCase().equals("y");
     }
 
-    public static Boolean parsBoolean(Character value) {
+    public static Boolean parseBoolean(Character value) {
         if(value == null)
             return false;
         return  Character.compare(Character.toLowerCase(value), 't') == 0 ||
@@ -218,7 +273,7 @@ public class Types {
                 Character.compare(Character.toLowerCase(value), 'y') == 0;
     }
 
-    public static <T> T parsEnum(String value, Class<T> type) {
+    public static <T> T parseEnum(String value, Class<T> type) {
         if(!type.isEnum())
             throw new IllegalArgumentException("Parameter type mast be instance of Enum!");
         Field[] flds = type.getDeclaredFields();

@@ -44,7 +44,7 @@ public class XStreamUtilityTest {
         prms.add(Param.builder().name("inparam11").value(1).build());
         prms.add(Param.builder().name("inparam12").value(1L).build());
         prms.add(Param.builder().name("inparam13").value(1D).build());
-        prms.add(Param.builder().name("inparam2").value(DateTimeParser.getInstance().pars("2017-01-01T17:55")).build());
+        prms.add(Param.builder().name("inparam2").value(DateTimeParser.getInstance().parse("2017-01-01T17:55")).build());
         xlrCfg.getAppend().setInParams(prms);
         xlrCfg.getAppend().setSessionID("sess-id");
         xlrCfg.getAppend().setUserUID("user-uid");
