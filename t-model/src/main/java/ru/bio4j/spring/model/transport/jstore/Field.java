@@ -90,7 +90,7 @@ public class Field implements Serializable {
     private Integer editMaxLength;
 
     /** Вкл поле в форму редактирования */
-    private boolean editor;
+    private Boolean editor;
 
     /** Код справочника для выбора значения с помощью combobox */
     private String looReference;
@@ -314,11 +314,11 @@ public class Field implements Serializable {
         this.editMaxLength = editMaxLength;
     }
 
-    public boolean isEditor() {
+    public Boolean isEditor() {
         return editor;
     }
 
-    public void setEditor(boolean editor) {
+    public void setEditor(Boolean editor) {
         this.editor = editor;
     }
 

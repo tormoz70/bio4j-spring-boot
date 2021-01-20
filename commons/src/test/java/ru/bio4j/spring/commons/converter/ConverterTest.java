@@ -256,6 +256,9 @@ public class ConverterTest {
         Assert.assertFalse(r);
         r = Converter.toType(null, boolean.class);
         Assert.assertFalse(r);
+
+        Boolean rn = Converter.toType(null, Boolean.class);
+        Assert.assertNull(rn);
     }
 
     @Test

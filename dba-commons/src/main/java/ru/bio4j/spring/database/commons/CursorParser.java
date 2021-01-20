@@ -253,7 +253,7 @@ public class CursorParser {
                 col.setLooCaption(Converter.toType(Doms.getAttribute(paramElem, "looCaption", "false", String.class), boolean.class));
                 String editMaxLength = Doms.getAttribute(paramElem, "editMaxLength", null, String.class);
                 col.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
-                col.setEditor(Converter.toType(Doms.getAttribute(paramElem, "editor", "false", String.class), boolean.class));
+                col.setEditor(Doms.getAttribute(paramElem, "editor", null, Boolean.class));
                 col.setLooReference(Doms.getAttribute(paramElem, "looReference", null, String.class));
             }
         }
