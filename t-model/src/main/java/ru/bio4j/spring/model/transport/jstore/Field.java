@@ -95,6 +95,9 @@ public class Field implements Serializable {
     /** Код справочника для выбора значения с помощью combobox */
     private String looReference;
 
+    /** Зафиксировать колонку в гриде слева */
+    private boolean fixed;
+
     @Override
     public String toString() {
         return String.format("{name: \"%s\", metaType: \"%s\", pk: \"%s\"}", name, metaType, pk);
@@ -330,6 +333,14 @@ public class Field implements Serializable {
         this.looReference = looReference;
     }
 
+    public boolean isFixed() {
+        return fixed;
+    }
+
+    public void setFixed(boolean fixed) {
+        this.fixed = fixed;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -361,9 +372,10 @@ public class Field implements Serializable {
                 textLocality == field.textLocality &&
                 aggregate == field.aggregate &&
                 Objects.equals(looCaption, field.looCaption) &&
-                editMaxLength == editMaxLength &&
+                Objects.equals(editMaxLength, field.editMaxLength) &&
                 editor == field.editor &&
-                Objects.equals(looReference, looReference);
+                Objects.equals(looReference, field.looReference) &&
+                fixed == field.fixed;
     }
 
     @Override

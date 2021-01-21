@@ -342,6 +342,11 @@
                                                     <xs:documentation>¬кл поле в форму редактировани€</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="fixed" type="xs:boolean">
+                                                <xs:annotation>
+                                                    <xs:documentation>≈сли true, то эта колонка при горизонтальной прокрутке фиксируетс€ слева в DataGrid</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
                                         </xs:extension>
                                     </xs:simpleContent>
                                 </xs:complexType>

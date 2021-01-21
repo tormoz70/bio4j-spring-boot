@@ -255,6 +255,7 @@ public class CursorParser {
                 col.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
                 col.setEditor(Doms.getAttribute(paramElem, "editor", null, Boolean.class));
                 col.setLooReference(Doms.getAttribute(paramElem, "looReference", null, String.class));
+                col.setFixed(Converter.toType(Doms.getAttribute(paramElem, "fixed", "false", String.class), boolean.class));
             }
         }
 
