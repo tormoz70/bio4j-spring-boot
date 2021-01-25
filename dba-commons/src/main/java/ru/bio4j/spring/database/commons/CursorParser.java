@@ -15,10 +15,7 @@ import ru.bio4j.spring.database.api.SelectSQLDef;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
-import ru.bio4j.spring.model.transport.jstore.Alignment;
-import ru.bio4j.spring.model.transport.jstore.Field;
-import ru.bio4j.spring.model.transport.jstore.Sort;
-import ru.bio4j.spring.model.transport.jstore.Total;
+import ru.bio4j.spring.model.transport.jstore.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -255,7 +252,7 @@ public class CursorParser {
                 col.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
                 col.setEditor(Doms.getAttribute(paramElem, "editor", null, Boolean.class));
                 col.setLooReference(Doms.getAttribute(paramElem, "looReference", null, String.class));
-                col.setFixed(Converter.toType(Doms.getAttribute(paramElem, "fixed", "false", String.class), boolean.class));
+                col.setFixed(Converter.toType(Doms.getAttribute(paramElem, "fixed", "NONE", String.class), Fixed.class));
             }
         }
 

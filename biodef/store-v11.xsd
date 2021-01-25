@@ -342,10 +342,17 @@
                                                     <xs:documentation>Вкл поле в форму редактирования</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="fixed" type="xs:boolean">
+                                            <xs:attribute name="fixed">
                                                 <xs:annotation>
-                                                    <xs:documentation>Если true, то эта колонка при горизонтальной прокрутке фиксируется слева в DataGrid</xs:documentation>
+                                                    <xs:documentation>Фиксировать колонку при горизонтальной прокрутке DataGrid слева или справа</xs:documentation>
                                                 </xs:annotation>
+                                                <xs:simpleType>
+                                                    <xs:restriction base="xs:NMTOKEN">
+                                                        <xs:enumeration value="NONE"/>
+                                                        <xs:enumeration value="LEFT"/>
+                                                        <xs:enumeration value="RIGHT"/>
+                                                    </xs:restriction>
+                                                </xs:simpleType>
                                             </xs:attribute>
                                         </xs:extension>
                                     </xs:simpleContent>

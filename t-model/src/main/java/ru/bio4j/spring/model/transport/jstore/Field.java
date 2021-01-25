@@ -95,8 +95,8 @@ public class Field implements Serializable {
     /** Код справочника для выбора значения с помощью combobox */
     private String looReference;
 
-    /** Зафиксировать колонку в гриде слева */
-    private boolean fixed;
+    /** Зафиксировать колонку в гриде слева или справа*/
+    private Fixed fixed;
 
     @Override
     public String toString() {
@@ -333,11 +333,11 @@ public class Field implements Serializable {
         this.looReference = looReference;
     }
 
-    public boolean isFixed() {
+    public Fixed getFixed() {
         return fixed;
     }
 
-    public void setFixed(boolean fixed) {
+    public void setFixed(Fixed fixed) {
         this.fixed = fixed;
     }
 
