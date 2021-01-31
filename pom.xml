@@ -433,6 +433,10 @@
         <module>helpers-web</module>
 
 		<module>isrvt-kafka</module>
-	</modules>
+
+        <module>dto-model-gen-mojo</module>
+        <module>dto-model-gen-mojo-test</module>
+        <module>dto-model-gen-lib</module>
+    </modules>
 
 </project>

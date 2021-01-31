@@ -1,8 +1,9 @@
 package ru.bio4j.spring.database.commons;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
 import ru.bio4j.spring.database.api.SQLParamSetter;
@@ -12,7 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class DbSelectableParamSetter implements SQLParamSetter {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbSelectableParamSetter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbSelectableParamSetter.class);
 
     @Override
     public void setParamsToStatement(SQLNamedParametersStatement statment, List<Param> params) throws SQLException {

@@ -1,7 +1,8 @@
 package ru.bio4j.spring.database.h2;
 
 import org.h2.tools.Server;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.DbServer;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
@@ -9,7 +10,7 @@ import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import java.sql.SQLException;
 
 public class H2ServerImpl implements DbServer {
-    private static final LogWrapper LOG = LogWrapper.getLogger(H2ServerImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(H2ServerImpl.class);
 
     private final String tcpPort;
     private String actualTcpPort = null;

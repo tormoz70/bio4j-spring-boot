@@ -7,8 +7,9 @@ import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.helpers.cache.CacheEventListener;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CacheServiceImpl implements CacheService {
-	private static LogWrapper LOG = LogWrapper.getLogger(CacheService.class);
+	private static Logger LOG = LoggerFactory.getLogger(CacheService.class);
 
 	private final static String CACHE_DEFAULT_PERSISTENT_PATH = "ehcache-storage";
 	private final static String CACHE_PERSISTENT_PATH_PARAM = "${ehcache.persistent.path}";

@@ -1,7 +1,8 @@
 package ru.bio4j.spring.database.commons;
 
 import com.zaxxer.hikari.HikariConfig;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.commons.converter.Converter;
@@ -15,7 +16,7 @@ import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 public class DbContextFactory {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbContextFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbContextFactory.class);
 
     private static <T> T getValFromCfg(String str, final String defaultStr, final Class<T> type) throws ConvertValueException {
         if(Strings.isNullOrEmpty(str))
@@ -24,7 +25,7 @@ public class DbContextFactory {
     }
 
     public static <T extends DbContextAbstract> SQLContext createHikariCP(DataSourceProperties dataSourceProperties, Class<T> clazz) {
-        LOG.debug("Creating SQLContext with:\n" + Utl.buildBeanStateInfo(dataSourceProperties, null, "\t"));
+        if(LOG.isDebugEnabled()) LOG.debug("Creating SQLContext with:\n" + Utl.buildBeanStateInfo(dataSourceProperties, null, "\t"));
         final Properties properties = new Properties();
         properties.setProperty("dataSource.cachePrepStmts", "true");
         properties.setProperty("dataSource.prepStmtCacheSize", "250");

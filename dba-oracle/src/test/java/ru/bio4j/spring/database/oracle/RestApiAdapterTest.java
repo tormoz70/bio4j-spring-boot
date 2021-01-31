@@ -1,10 +1,11 @@
 package ru.bio4j.spring.database.oracle;
 
 import org.junit.Test;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RestApiAdapterTest {
-    private static final LogWrapper LOG = LogWrapper.getLogger(RestApiAdapterTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestApiAdapterTest.class);
     private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
     private static final String testDBUrl = "jdbc:oracle:thin:@192.168.70.30:1521:EKBS02";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";

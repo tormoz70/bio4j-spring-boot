@@ -1,8 +1,9 @@
 package ru.bio4j.spring.database.commons;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.*;
 import ru.bio4j.spring.database.api.SQLDefinition;
@@ -22,7 +23,7 @@ import java.util.function.LongSupplier;
 import static ru.bio4j.spring.commons.utils.Reflex.fieldValue;
 
 public class CrudReaderApi {
-    protected final static LogWrapper LOG = LogWrapper.getLogger(CrudReaderApi.class);
+    protected final static Logger LOG = LoggerFactory.getLogger(CrudReaderApi.class);
 
     //TODO Перенести в настройки
     private static final int MAX_RECORDS_FETCH_LIMIT = 250000;
@@ -61,7 +62,7 @@ public class CrudReaderApi {
             final SQLDefinition cursorDef,
             final CrudOptions crudOptions,
             final Class<T> beanType) {
-        LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
+        if(LOG.isDebugEnabled()) LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
         BeansPage result = new BeansPage();
         final long paginationPagesize = Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, long.class, 0L);
         result.setTotalCount(Paramus.paramValue(prepareLoadPageResult.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, long.class, 0L));
@@ -387,7 +388,7 @@ public class CrudReaderApi {
         if (context.currentConnection() == null)
             throw new BioSQLException(String.format("This methon can be useded only in SQLAction of execBatch!", cursorDef.getBioCode()));
 
-        LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
+        if(LOG.isDebugEnabled()) LOG.debug("Opening Cursor \"{}\"...", cursorDef.getBioCode());
         List<T> result = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
@@ -404,7 +405,7 @@ public class CrudReaderApi {
                 .fetch(prms, context.currentUser(), rs -> {
                     if (rs.isFirstRow()) {
                         long estimatedTime = System.currentTimeMillis() - startTime;
-                        LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
+                        if(LOG.isDebugEnabled()) LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
                     }
                     T bean;
                     if(beanType == ABean.class)
@@ -416,7 +417,7 @@ public class CrudReaderApi {
                         return false;
                     return true;
                 });
-        LOG.debug("Cursor \"{}\" fetched! {} - records loaded.", cursorDef.getBioCode(), result.size());
+        if(LOG.isDebugEnabled()) LOG.debug("Cursor \"{}\" fetched! {} - records loaded.", cursorDef.getBioCode(), result.size());
         return result;
     }
 
@@ -533,21 +534,21 @@ public class CrudReaderApi {
                 if(factOffset == (long)totalCount.getFact())
                     factOffset -= paginationPagesize;
             }
-            LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount.getFact());
+            if(LOG.isDebugEnabled()) LOG.debug("Count of records of cursor \"{}\" - {}!!!", cursor.getBioCode(), totalCount.getFact());
         }
         Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, factOffset);
         Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_TOTALCOUNT, totalCount.getFact());
         long locFactOffset = Paramus.paramValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, long.class, 0L);
         if (location != null) {
-            LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
+            if(LOG.isDebugEnabled()) LOG.debug("Try locate cursor \"{}\" to [{}] record by pk!!!", cursor.getBioCode(), location);
             int locatedPos = context.createDynamicCursor()
                     .init(context.currentConnection(), selectSQLDef.getLocateSql(), selectSQLDef.getParamDeclaration())
                     .scalar(result.preparedParams, context.currentUser(), int.class, -1);
             if (locatedPos >= 0) {
                 locFactOffset = calcOffset(locatedPos, paginationPagesize);
-                LOG.debug("Cursor \"{}\" successfully located to [{}] record by pk. Position: [{}], New offset: [{}].", cursor.getBioCode(), location, locatedPos, locFactOffset);
+                if(LOG.isDebugEnabled()) LOG.debug("Cursor \"{}\" successfully located to [{}] record by pk. Position: [{}], New offset: [{}].", cursor.getBioCode(), location, locatedPos, locFactOffset);
             } else {
-                LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
+                if(LOG.isDebugEnabled()) LOG.debug("Cursor \"{}\" failed location to [{}] record by pk!!!", cursor.getBioCode(), location);
             }
         }
         Paramus.setParamValue(result.preparedParams, Rest2sqlParamNames.PAGINATION_PARAM_OFFSET, locFactOffset);

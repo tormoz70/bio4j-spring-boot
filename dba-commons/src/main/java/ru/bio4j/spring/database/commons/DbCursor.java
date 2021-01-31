@@ -1,7 +1,8 @@
 package ru.bio4j.spring.database.commons;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
@@ -19,7 +20,7 @@ import java.util.List;
  * Реализует 3 основных вида запроса Query, Exec, Scalar
  */
 public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbCursor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbCursor.class);
 
 
 	protected boolean isActive = false;
@@ -116,7 +117,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
 
                 setParamsToStatement(); // Применяем параметры
 
-                LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
+                if(LOG.isDebugEnabled()) LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
                 try (ResultSet result = this.preparedStatement.executeQuery()) {
                     this.isActive = true;
                     while (this.reader.next(result)) {

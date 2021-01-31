@@ -4,7 +4,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.DbServer;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class H2ApiTest {
-    private static final LogWrapper LOG = LogWrapper.getLogger(H2ApiTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(H2ApiTest.class);
 
     private static final String testDBDriverName = "org.h2.Driver";
 

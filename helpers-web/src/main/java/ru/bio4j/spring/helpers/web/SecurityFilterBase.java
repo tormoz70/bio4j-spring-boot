@@ -1,9 +1,10 @@
 package ru.bio4j.spring.helpers.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.LoginProcessor;
 import ru.bio4j.spring.commons.types.WrappedRequest;
 import ru.bio4j.spring.commons.utils.Strings;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 
 @Configuration
 public class SecurityFilterBase {
-    LogWrapper LOG = LogWrapper.getLogger(SecurityFilterBase.class);
+    private Logger LOG = LoggerFactory.getLogger(SecurityFilterBase.class);
 
     private LoginProcessor loginProcessor;
     private boolean disableAnonymouse;

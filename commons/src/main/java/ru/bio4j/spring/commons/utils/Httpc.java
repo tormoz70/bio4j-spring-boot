@@ -1,6 +1,7 @@
 package ru.bio4j.spring.commons.utils;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.model.transport.errors.BioError;
 import ru.bio4j.spring.model.transport.Prop;
 
@@ -16,7 +17,7 @@ import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
 import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
 
 public class Httpc {
-    private static final LogWrapper LOG = LogWrapper.getLogger(Httpc.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Httpc.class);
 
     public static interface Callback {
         void process(InputStream inputStream) throws Exception;
@@ -81,6 +82,22 @@ public class Httpc {
 
     public static final String CONTENT_TYPE_JSON = "application/json";
 
+    private static void processResponseJson(HttpURLConnection connection, Callback callback) throws Exception {
+        if (connection.getResponseCode() == 200) {
+            InputStream is = connection.getInputStream();
+            try {
+                if(callback != null)
+                    callback.process(is);
+            } finally {
+                if (is != null)
+                    is.close();
+            }
+        } else {
+            throw new Exception(String.format("Error on forwarded server: [%d] - %s", connection.getResponseCode(), connection.getResponseMessage()));
+        }
+
+    }
+
     public static void requestJson(String url, String jsonData, Callback callback) throws Exception {
         URL u = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) u.openConnection();
@@ -98,19 +115,7 @@ public class Httpc {
             wr.flush();
             wr.close();
         }
-        if (connection.getResponseCode() == 200) {
-            InputStream is = connection.getInputStream();
-            try {
-                if(callback != null)
-                    callback.process(is);
-            } finally {
-                if (is != null)
-                    is.close();
-            }
-        } else {
-            throw new Exception(String.format("Error on forwarded server: [%d] - %s", connection.getResponseCode(), connection.getResponseMessage()));
-        }
-
+        processResponseJson(connection, callback);
     }
 
     public static void forwardRequestOld(String url, HttpServletRequest request, Callback callback) throws Exception {
@@ -131,19 +136,7 @@ public class Httpc {
             if (outputStream != null)
                 outputStream.close();
         }
-        if (connection.getResponseCode() == 200) {
-            InputStream is = connection.getInputStream();
-            try {
-                if(callback != null)
-                    callback.process(is);
-            } finally {
-                if (is != null)
-                    is.close();
-            }
-        } else {
-            throw new Exception(String.format("Error on forwarded server: [%d] - %s", connection.getResponseCode(), connection.getResponseMessage()));
-        }
-
+        processResponseJson(connection, callback);
     }
 
     public static void forwardRequestNew(String forwardUrl, HttpServletRequest req, HttpServletResponse resp) throws Exception {

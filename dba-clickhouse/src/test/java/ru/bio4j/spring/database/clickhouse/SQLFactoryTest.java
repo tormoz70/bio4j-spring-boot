@@ -1,8 +1,9 @@
 package ru.bio4j.spring.database.clickhouse;
 
 import org.junit.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.commons.utils.Utl;
@@ -31,7 +32,7 @@ public class SQLFactoryTest {
 //    логин: default/j12
 //    таблица jdbc_test.data0
 
-    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
 //    private static final String testDBDriverName = "cc.blynk.clickhouse.ClickHouseDriver";
     private static final String testDBDriverName = "com.github.housepower.jdbc.ClickHouseDriver";
 //    private static final String testDBDriverName = "ru.yandex.clickhouse.ClickHouseDriver";

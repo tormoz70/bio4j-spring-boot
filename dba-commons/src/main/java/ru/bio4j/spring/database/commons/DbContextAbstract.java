@@ -1,6 +1,7 @@
 package ru.bio4j.spring.database.commons;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DbContextAbstract implements SQLContext {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbContextAbstract.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbContextAbstract.class);
 
     protected Wrappers wrappers;
     protected DataSource dataSource;
@@ -102,7 +103,7 @@ public abstract class DbContextAbstract implements SQLContext {
                 return conn;
             } catch (Exception e) {
                 forceCloseConnection(conn);
-                LOG.debug(String.format("Unexpected error on execute doAfterConnect event! Message: %s", e.getMessage()), e);
+                LOG.error(String.format("Unexpected error on execute doAfterConnect event! Message: %s", e.getMessage()), e);
                 throw e;
             }
         }

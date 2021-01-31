@@ -1,14 +1,11 @@
 package ru.bio4j.spring.commons.utils;
 
-//import flexjson.ObjectBinder;
-//import flexjson.ObjectFactory;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.Param;
@@ -29,7 +26,7 @@ import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
 import static ru.bio4j.spring.commons.utils.Reflex.typesIsSame;
 
 public class UtlTest {
-    private final static LogWrapper LOG = LogWrapper.getLogger(UtlTest.class);
+    private final static Logger LOG = LoggerFactory.getLogger(UtlTest.class);
 
     @Test
     public void getClassNamesFromPackageTest() {

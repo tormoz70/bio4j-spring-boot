@@ -1,15 +1,16 @@
 package ru.bio4j.spring.isrvt.kafka.consumer;
 
 import org.apache.kafka.common.serialization.Deserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.bio4j.spring.commons.types.LogWrapper;
 
 import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
 public class IsrvtConsumerBase<K, V> {
-    private static final LogWrapper LOG = LogWrapper.getLogger(IsrvtConsumerBase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IsrvtConsumerBase.class);
 
     private final IsrvtConsumerProperies properies;
     private final List<IsrvtConsumerRunner<K, V>> runners;

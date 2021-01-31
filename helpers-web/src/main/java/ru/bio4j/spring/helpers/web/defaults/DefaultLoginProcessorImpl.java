@@ -1,5 +1,7 @@
 package ru.bio4j.spring.helpers.web.defaults;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import ru.bio4j.spring.commons.types.*;
@@ -16,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class DefaultLoginProcessorImpl implements LoginProcessor {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DefaultLoginProcessorImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultLoginProcessorImpl.class);
 
     @Autowired
     private SecurityService defaultSecurityService;

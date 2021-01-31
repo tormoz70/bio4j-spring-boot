@@ -1,6 +1,5 @@
 package ru.bio4j.spring.database.commons;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.database.api.DBField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * To change this template use File | Settings | File Templates.
  */
 public class DBFieldImpl implements DBField {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DBFieldImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DBFieldImpl.class);
 
     private String name;
     private Class<?> type;

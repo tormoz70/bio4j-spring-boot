@@ -2,27 +2,15 @@ package ru.bio4j.spring.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.bio4j.spring.commons.types.LogWrapper;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
-//import org.apache.commons.codec.digest.DigestUtils;
 
 public class MD5Checksum {
-    private static final LogWrapper LOG = LogWrapper.getLogger(MD5Checksum.class);
-
-//    public static void main(String args[]) {
-//        String file = "C:/temp/abc.txt";
-//
-//        System.out.println("MD5 checksum for file using Java :                          "
-//                + checkSum(file));
-//        System.out.println("MD5 checksum of file in Java using Apache commons codec:    "
-//                + checkSumApacheCommons(file));
-//
-//    }
+    private static final Logger LOG = LoggerFactory.getLogger(MD5Checksum.class);
 
     /*
      * Calculate checksum of a File using MD5 algorithm
@@ -42,10 +30,10 @@ public class MD5Checksum {
             byte[] hash = md.digest();
             checksum = new BigInteger(1, hash).toString(16); //don't use this, truncates leading zero
         } catch (IOException ex) {
-            LOG.debug(null, ex);
+            LOG.error(null, ex);
             throw ex;
         } catch (NoSuchAlgorithmException ex) {
-            LOG.debug(null, ex);
+            LOG.error(null, ex);
             throw ex;
         }
 

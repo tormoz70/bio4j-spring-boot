@@ -3,9 +3,10 @@ package ru.bio4j.spring.commons.utils;
 import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.commons.converter.Types;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.errors.BioError;
@@ -16,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class JecksonsTest extends TestCase {
-    private static final LogWrapper LOG = LogWrapper.getLogger(JecksonsTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JecksonsTest.class);
 
 	private final TBox testBox = new TBox();
 
@@ -86,10 +87,10 @@ public class JecksonsTest extends TestCase {
         LOG.debug("d:{}", d);
         Calendar c1 = Calendar.getInstance();
         c1.setTime(d);
-        LOG.debug("c1:{}, {}", c1.getTime(), c1.getTimeZone());
+        if(LOG.isDebugEnabled()) LOG.debug("c1:{}, {}", c1.getTime(), c1.getTimeZone());
         Calendar c2 = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:00"));
         c2.setTime(d);
-        LOG.debug("c2:{}, {}", c2.getTime(), c2.getTimeZone());
+        if(LOG.isDebugEnabled()) LOG.debug("c2:{}, {}", c2.getTime(), c2.getTimeZone());
     }
 
     @Test

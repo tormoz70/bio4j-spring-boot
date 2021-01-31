@@ -3,15 +3,10 @@ package ru.bio4j.spring.commons.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.util.ResourceUtils;
-import ru.bio4j.spring.commons.types.LogWrapper;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -22,7 +17,7 @@ import java.util.*;
  *
  */
 public class Strings {
-    private static final LogWrapper LOG = LogWrapper.getLogger(Strings.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Strings.class);
 
 	/**
 	 * Проверяет строку на null или пустую (length == 0)

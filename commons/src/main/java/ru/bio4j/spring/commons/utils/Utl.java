@@ -1,9 +1,10 @@
 package ru.bio4j.spring.commons.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.Param;
@@ -33,7 +34,7 @@ import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
 import static ru.bio4j.spring.model.transport.jstore.filter.FilterBuilder.*;
 
 public class Utl {
-    private static final LogWrapper LOG = LogWrapper.getLogger(Utl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Utl.class);
 
 
     /**
@@ -162,7 +163,7 @@ public class Utl {
 
     /**
      * Сериализует объект в xml
-     * @param Object object
+     * @param object
      * @return xml
      */
     public static String marshalXml(Object object) {

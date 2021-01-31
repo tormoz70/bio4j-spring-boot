@@ -1,6 +1,7 @@
 package ru.bio4j.spring.database.oracle;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.database.api.SQLReader;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
@@ -10,7 +11,7 @@ import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import javax.sql.DataSource;
 
 public class OracleContext extends DbContextAbstract {
-    private static final LogWrapper LOG = LogWrapper.getLogger(OracleContext.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OracleContext.class);
 
     public OracleContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
         super(dataSource, dataSourceProperties);

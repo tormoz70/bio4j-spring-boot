@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.ABeans;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLDefinition;
@@ -21,7 +20,6 @@ import java.util.Map;
 
 
 public class ExcelBuilderImpl implements ExcelBuilder {
-    private static final LogWrapper LOG = LogWrapper.getLogger(ExcelBuilderImpl.class);
 
     private static HSSFCellStyle createHeaderStyle(HSSFWorkbook wb) {
         HSSFCellStyle rslt = wb.createCellStyle();

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd">
+	<SQL action="select">
+		<text><![CDATA[
+SELECT a.film_id, a.name_rus as film_name, a.prod_year, a.madein, a.studia,
+        (case when a.film_id < 100000000 and a.orig_film_id is null then 1 else 0 end) editable
+FROM fk_nsi.pfilms a
+WHERE a.deleted = 0
+  and ((nvl(:onlymanual, 0) = 0) or (:onlymanual = 1 and a.film_id < 100000000))
+  /*@{cutempty}*/and (upper(a.name_rus) like '%'||upper(:film_name)||'%')/*{cutempty}@*/
+ORDER BY film_name
+]]></text>
+        <param type="string" name="film_name"/>
+        <param name="onlymanual" type="decimal"/>
+  </SQL>
+
+  <fields>
+    <field name="film_id" type="integer" pk="1" attrName="filmId" header="ID" readOnly="true" editor="false"/>
+    <field name="film_name" type="string" attrName="filmName" header="Название фильма" readOnly="false" mandatory="true" editMaxLength="500"/>
+    <field name="prod_year" type="string" attrName="prodYear" header="Год выпуска" readOnly="false" mandatory="true" editMaxLength="30"/>
+    <field name="madein" type="string" header="Страна" readOnly="false" mandatory="true" editMaxLength="100"/>
+    <field name="studia" type="string" header="Студия" readOnly="false" mandatory="true" editMaxLength="100"/>
+    <field name="editable" type="boolean" hidden="true"/>
+    <!-- Эти поля нужны для редактора -->
+    <field name="genre" type="string" header="Жанр" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="bulletin" type="string" header="Номер бюлетеня" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="dubbing" type="string" header="Дубляж" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="film_category" type="string" attrName="filmCategory" header="Категория" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="lang_orig" type="string" attrName="langOrig" header="Язык оригинала" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="name_orig" type="string" attrName="nameOrig" header="Оригинальное название" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="frmt" type="string" header="Формат" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="sernum" type="string" header="Количество серий" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="colornot" type="string" header="Цветной/Чернобелый" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="partnum" type="string" header="Количество частей" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="type_length" type="string" attrName="typeLength" header="Метраж (метров)" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="age_restr" type="string" attrName="ageRestr" header="Ограничение по возрасту" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="dur_hours" type="string" attrName="durHours" header="Длительность (часов)" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="dur_mins" type="string" attrName="durMins" header="Длительность (минут)" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="view_restr" type="string" attrName="viewRestr" header="Ограничения на просмотр" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
+    <field name="mproducer" type="string" header="Продюссер" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="mscrwriters" type="string" header="Сценаристы" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="mdirector" type="string" header="Режисер" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="mcomposer" type="string" header="Композитор" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="moperator" type="string" header="Оператор" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="martist" type="string" header="Художник" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="notetxt" type="string" header="Примечание" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="annotxt" type="string" header="Аннотация" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
+    <field name="deleted" type="boolean" header="Запись удалена" hidden="true" editor="true" readOnly="false"/>
+  </fields>
+</cursor>

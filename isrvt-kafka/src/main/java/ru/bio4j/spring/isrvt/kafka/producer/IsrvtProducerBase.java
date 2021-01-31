@@ -4,11 +4,12 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.bio4j.spring.commons.types.LogWrapper;
 
 public class IsrvtProducerBase<K, V> {
-    private static final LogWrapper LOG = LogWrapper.getLogger(IsrvtProducerBase.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IsrvtProducerBase.class);
 
     private final IsrvtProducerProperies properies;
     private final Producer<K, V> producer;
@@ -21,8 +22,8 @@ public class IsrvtProducerBase<K, V> {
     }
 
     public void send(K key, V message) {
-        LOG.debug(String.format("Try sending msg{key: %d; messageBody: %s} to topic: %s from service: %s...", key, message, properies.getTopicName(), properies.getClientId()));
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Try sending msg{key: %d; messageBody: %s} to topic: %s from service: %s...", key, message, properies.getTopicName(), properies.getClientId()));
         producer.send(new ProducerRecord(properies.getTopicName(), key, message));
-        LOG.debug(String.format("Sent msg{key: %d; messageBody: %s} to topic: %s from service: %s!", key, message, properies.getTopicName(), properies.getClientId()));
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Sent msg{key: %d; messageBody: %s} to topic: %s from service: %s!", key, message, properies.getTopicName(), properies.getClientId()));
     }
 }

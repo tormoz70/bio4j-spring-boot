@@ -1,8 +1,9 @@
 package ru.bio4j.spring.database.commons;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.api.*;
@@ -27,7 +28,7 @@ import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
  * Утилиты для работы с метаданными СУБД
  */
 public class DbUtils {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbUtils.class);
 
     private SqlTypeConverter converter;
     private RDBMSUtils rdbmsUtils;
@@ -527,7 +528,7 @@ public class DbUtils {
 
     public static ResultSet openSQL(final Connection conn, final String sql, final List<Param> params) {
         try {
-            LOG.debug("Try open: {}", getSQL2Execute(sql, params));
+            if(LOG.isDebugEnabled()) LOG.debug("Try open: {}", getSQL2Execute(sql, params));
             SQLNamedParametersStatement stmnt = DbNamedParametersStatement.prepareStatement(conn, sql, DbNamedParametersStatement.class);
             SQLParamSetter paramSetter = new DbSelectableParamSetter();
             paramSetter.setParamsToStatement(stmnt, params);

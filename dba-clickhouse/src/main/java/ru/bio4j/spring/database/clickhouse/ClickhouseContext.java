@@ -1,6 +1,7 @@
 package ru.bio4j.spring.database.clickhouse;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.*;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbUtils;
@@ -9,7 +10,7 @@ import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import javax.sql.DataSource;
 
 public class ClickhouseContext extends DbContextAbstract {
-    private static final LogWrapper LOG = LogWrapper.getLogger(ClickhouseContext.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClickhouseContext.class);
 
     public ClickhouseContext(final DataSource dataSource, final DataSourceProperties dataSourceProperties) {
         super(dataSource, dataSourceProperties);

@@ -1,7 +1,8 @@
 package ru.bio4j.spring.database.pgsql;
 
 import org.junit.*;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.*;
@@ -23,7 +24,7 @@ import java.util.List;
 
 //@Ignore
 public class SQLFactoryTest {
-    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest.class);
     //    private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";
     private static final String testDBDriverName = "org.postgresql.Driver";
@@ -192,7 +193,7 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((ctx) -> {
                 int leng1 = 0;
-                LOG.debug("conn: " + ctx.currentConnection());
+                if(LOG.isDebugEnabled()) LOG.debug("conn: " + ctx.currentConnection());
 
                 SQLStoredProc cmd = ctx.createStoredProc();
                 String storedProgName = "test_stored_prop";
@@ -225,7 +226,7 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((ctx) -> {
                 int leng1 = 0;
-                LOG.debug("conn: " + ctx.currentConnection());
+                if(LOG.isDebugEnabled()) LOG.debug("conn: " + ctx.currentConnection());
 
                 SQLStoredProc cmd = ctx.createStoredProc();
                 List<Param> prms;
@@ -285,7 +286,7 @@ public class SQLFactoryTest {
         try {
             long leng = context.execBatch((ctx) -> {
                 long leng1 = 0;
-                LOG.debug("conn: " + ctx.currentConnection());
+                if(LOG.isDebugEnabled()) LOG.debug("conn: " + ctx.currentConnection());
 
                 PgSQLUtilsImpl utl = new PgSQLUtilsImpl();
                 StoredProgMetadata md = utl.detectStoredProcParamsAuto("test_stored_inout", ctx.currentConnection(), null);
@@ -313,7 +314,7 @@ public class SQLFactoryTest {
         try {
             long leng = context.execBatch((ctx) -> {
                 long leng1 = 0;
-                LOG.debug("conn: " + ctx.currentConnection());
+                if(LOG.isDebugEnabled()) LOG.debug("conn: " + ctx.currentConnection());
 
                 SQLStoredProc cmd = ctx.createStoredProc();
 
@@ -343,7 +344,7 @@ public class SQLFactoryTest {
         try {
             int leng = context.execBatch((ctx) -> {
                 int leng1 = 0;
-                LOG.debug("conn: " + ctx.currentConnection());
+                if(LOG.isDebugEnabled()) LOG.debug("conn: " + ctx.currentConnection());
 
                 SQLStoredProc cmd = ctx.createStoredProc();
                 String storedProgName = "test_stored_prop";

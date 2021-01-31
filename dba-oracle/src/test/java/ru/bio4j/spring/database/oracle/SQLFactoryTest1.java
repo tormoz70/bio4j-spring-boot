@@ -5,13 +5,14 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextFactory;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 
 public class SQLFactoryTest1 extends TestCase {
-    private static final LogWrapper LOG = LogWrapper.getLogger(SQLFactoryTest1.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SQLFactoryTest1.class);
     private static final String testDBDriverName = "oracle.jdbc.driver.OracleDriver";
     private static final String testDBUrl = "jdbc:oracle:thin:@192.168.70.30:1521:EKBS02";
 //    private static final String testDBUrl = "jdbc:oracle:thin:@stat4-ora-dev:1521:MICEXDB";

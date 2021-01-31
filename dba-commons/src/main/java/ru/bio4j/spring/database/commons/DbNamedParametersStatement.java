@@ -1,6 +1,7 @@
 package ru.bio4j.spring.database.commons;
 
-import ru.bio4j.spring.commons.types.LogWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.utils.Regexs;
 import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.commons.utils.Strings;
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
 
 
 public class DbNamedParametersStatement implements SQLNamedParametersStatement {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbNamedParametersStatement.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbNamedParametersStatement.class);
     /** The statement this object is wrapping. */
     protected PreparedStatement statement;
 
@@ -284,13 +285,13 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
     }
 
     private void logBeforeWrite(String sql) throws SQLException {
-        LOG.debug("Try to execute (autocommit: {}) : {}", getConnection().getAutoCommit(), DbUtils.getSQL2Execute(sql, getParamsAsString()));
+        if(LOG.isDebugEnabled()) LOG.debug("Try to execute (autocommit: {}) : {}", getConnection().getAutoCommit(), DbUtils.getSQL2Execute(sql, getParamsAsString()));
     }
     private void logBeforeWrite() throws SQLException {
         logBeforeWrite(getOrigQuery());
     }
     private void logBeforeRead(String sql) throws SQLException {
-        LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(sql, getParamsAsString()));
+        if(LOG.isDebugEnabled()) LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(sql, getParamsAsString()));
     }
     private void logBeforeRead() throws SQLException {
         logBeforeWrite(getOrigQuery());

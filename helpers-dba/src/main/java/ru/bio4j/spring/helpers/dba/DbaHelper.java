@@ -3,6 +3,8 @@ package ru.bio4j.spring.helpers.dba;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.*;
@@ -35,7 +37,7 @@ import static ru.bio4j.spring.commons.utils.ABeans.createBeanFromJSONObject;
  * Адаптер для доступа к базе данных bio4j
  */
 public class DbaHelper {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbaHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbaHelper.class);
 
     private final SQLContext sqlContext;
     private final ExcelBuilder excelBuilder;
@@ -58,7 +60,7 @@ public class DbaHelper {
             try {
                 fs = Jecksons.getInstance().decodeFilterAndSorter(queryParams.jsonData);
             } catch (Exception e) {
-                LOG.debug(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
+                LOG.error(String.format("Ошибка при восстановлении объекта %s. Json: %s", FilterAndSorter.class.getSimpleName(), queryParams.jsonData), e);
             }
         }
         if(fs == null) {

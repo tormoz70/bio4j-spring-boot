@@ -1,7 +1,8 @@
 package ru.bio4j.spring.database.commons;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.Converter;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.Sqls;
 import ru.bio4j.spring.database.api.SQLNamedParametersStatement;
@@ -22,7 +23,7 @@ import java.util.List;
  * Засовывает значения из params в CallableStatement
  */
 public class DbCallableParamSetter implements SQLParamSetter {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbCallableParamSetter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbCallableParamSetter.class);
 
 //    private DbCommand owner;
     private SqlTypeConverter sqlTypeConverter = new SqlTypeConverterImpl();

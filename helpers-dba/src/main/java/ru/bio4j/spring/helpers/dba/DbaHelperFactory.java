@@ -1,8 +1,9 @@
 package ru.bio4j.spring.helpers.dba;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.ApplicationContextProvider;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
-import ru.bio4j.spring.commons.types.LogWrapper;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
@@ -14,7 +15,7 @@ import ru.bio4j.spring.model.config.props.DataSourceProperties;
  * Фабрика для создания DbaHelper
  */
 public class DbaHelperFactory {
-    private static final LogWrapper LOG = LogWrapper.getLogger(DbaHelperFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbaHelperFactory.class);
 
 
     private final ExcelBuilder excelBuilder;
