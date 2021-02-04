@@ -43,7 +43,7 @@ public class Utl {
      * @return fileName
      */
     public static String fileName(String filePath) {
-        if (Strings.isNullOrEmpty(filePath)) {
+        if (!Strings.isNullOrEmpty(filePath)) {
             int p = filePath.lastIndexOf(File.separator);
             if (p >= 0)
                 return filePath.substring(p + 1);

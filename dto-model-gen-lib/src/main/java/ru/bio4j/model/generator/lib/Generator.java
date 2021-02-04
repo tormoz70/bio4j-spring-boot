@@ -1,14 +1,6 @@
 package ru.bio4j.model.generator.lib;
 
-import org.apache.commons.lang3.Streams;
-import org.w3c.dom.Document;
-import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.database.commons.CursorParser;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +9,13 @@ public class Generator {
 
     private String modelSourceDir;
     private String modelOutputDir;
+    private String modelOutputPackage;
     private DtoGenerator dtoGenerator;
 
-    public void init(String modelSourceDir, String modelOutputDir) {
+    public void init(String modelSourceDir, String modelOutputDir, String modelOutputPackage) {
         this.modelSourceDir = modelSourceDir;
         this.modelOutputDir = modelOutputDir;
+        this.modelOutputPackage = modelOutputPackage;
         this.dtoGenerator = new DtoGenerator();
     }
 
@@ -30,12 +24,25 @@ public class Generator {
         return Arrays.stream(file.listFiles((current, name) -> new File(current, name).isFile() && name.toLowerCase().endsWith(".xml")))
                 .map(f -> f.getAbsolutePath()).collect(Collectors.toList());
     }
+    private static List<String> loadPaths(final String path) {
+        File file = new File(path);
+        return Arrays.stream(file.listFiles((current, name) -> new File(current, name).isDirectory() && !name.toLowerCase().equals(".") && !name.toLowerCase().equals("..")))
+                .map(f -> f.getAbsolutePath()).collect(Collectors.toList());
+    }
+
+    private void _generate(String fromPath) {
+        List<String> xmls = loadAllXmls(fromPath);
+        for(String path2xml : xmls) {
+            dtoGenerator.generate(modelSourceDir, path2xml, modelOutputPackage, modelOutputDir);
+        }
+        List<String> paths = loadPaths(fromPath);
+        for(String path : paths) {
+            _generate(path);
+        }
+    }
 
     public void generate() {
-        List<String> xmls = loadAllXmls(modelSourceDir);
-        for(String xml : xmls) {
-            dtoGenerator.generate(xml);
-        }
+        _generate(modelSourceDir);
     }
 
 }

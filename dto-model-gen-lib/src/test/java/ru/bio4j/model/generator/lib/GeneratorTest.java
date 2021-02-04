@@ -15,7 +15,8 @@ public class GeneratorTest {
         generator = spy(Generator.class);
         generator.init(
                 "src\\test\\resources\\model",
-                "src\\test\\resources\\srcs"
+                "src\\test\\resources\\srcs",
+                "test.dto.gen"
         );
     }
 

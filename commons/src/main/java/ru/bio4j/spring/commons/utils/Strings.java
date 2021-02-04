@@ -326,10 +326,10 @@ public class Strings {
     }
 
     public static InputStream openResourceAsStream(String filePath) throws IOException {
-        URL url = Strings.findResource(filePath);
-        if (url != null) {
-            return url.openStream();
-        }
+        if(Strings.resourceExists(filePath))
+            return Strings.openResourceAsStream(filePath);
+        if(Utl.fileExists(filePath))
+            return Utl.openFile(filePath);
         throw new IOException(String.format("File %s not found!", filePath));
     }
 
