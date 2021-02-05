@@ -1,4 +1,4 @@
-package test.dto.gen;
+package test.dto.gen.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.lang.Boolean;
@@ -15,7 +15,7 @@ public final class Films {
   private Long filmId;
 
   @ApiModelProperty(
-      value = "РќР°Р·РІР°РЅРёРµ С„РёР»СЊРјР°",
+      value = "Название фильма",
       required = true,
       hidden = false,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -23,7 +23,7 @@ public final class Films {
   private String filmName;
 
   @ApiModelProperty(
-      value = "Р“РѕРґ РІС‹РїСѓСЃРєР°",
+      value = "Год выпуска",
       required = true,
       hidden = false,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -31,7 +31,7 @@ public final class Films {
   private String prodYear;
 
   @ApiModelProperty(
-      value = "РЎС‚СЂР°РЅР°",
+      value = "Страна",
       required = true,
       hidden = false,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -39,7 +39,7 @@ public final class Films {
   private String madein;
 
   @ApiModelProperty(
-      value = "РЎС‚СѓРґРёСЏ",
+      value = "Студия",
       required = true,
       hidden = false,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -55,7 +55,7 @@ public final class Films {
   private Boolean editable;
 
   @ApiModelProperty(
-      value = "Р–Р°РЅСЂ",
+      value = "Жанр",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -63,7 +63,7 @@ public final class Films {
   private String genre;
 
   @ApiModelProperty(
-      value = "РќРѕРјРµСЂ Р±СЋР»РµС‚РµРЅСЏ",
+      value = "Номер бюлетеня",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -71,7 +71,7 @@ public final class Films {
   private String bulletin;
 
   @ApiModelProperty(
-      value = "Р”СѓР±Р»СЏР¶",
+      value = "Дубляж",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -79,7 +79,7 @@ public final class Films {
   private String dubbing;
 
   @ApiModelProperty(
-      value = "РљР°С‚РµРіРѕСЂРёСЏ",
+      value = "Категория",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -87,7 +87,7 @@ public final class Films {
   private String filmCategory;
 
   @ApiModelProperty(
-      value = "РЇР·С‹Рє РѕСЂРёРіРёРЅР°Р»Р°",
+      value = "Язык оригинала",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -95,7 +95,7 @@ public final class Films {
   private String langOrig;
 
   @ApiModelProperty(
-      value = "РћСЂРёРіРёРЅР°Р»СЊРЅРѕРµ РЅР°Р·РІР°РЅРёРµ",
+      value = "Оригинальное название",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -103,7 +103,7 @@ public final class Films {
   private String nameOrig;
 
   @ApiModelProperty(
-      value = "Р¤РѕСЂРјР°С‚",
+      value = "Формат",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -111,7 +111,7 @@ public final class Films {
   private String frmt;
 
   @ApiModelProperty(
-      value = "РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµСЂРёР№",
+      value = "Количество серий",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -119,7 +119,7 @@ public final class Films {
   private String sernum;
 
   @ApiModelProperty(
-      value = "Р¦РІРµС‚РЅРѕР№/Р§РµСЂРЅРѕР±РµР»С‹Р№",
+      value = "Цветной/Чернобелый",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -127,7 +127,7 @@ public final class Films {
   private String colornot;
 
   @ApiModelProperty(
-      value = "РљРѕР»РёС‡РµСЃС‚РІРѕ С‡Р°СЃС‚РµР№",
+      value = "Количество частей",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -135,7 +135,7 @@ public final class Films {
   private String partnum;
 
   @ApiModelProperty(
-      value = "РњРµС‚СЂР°Р¶ (РјРµС‚СЂРѕРІ)",
+      value = "Метраж (метров)",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -143,7 +143,7 @@ public final class Films {
   private String typeLength;
 
   @ApiModelProperty(
-      value = "РћРіСЂР°РЅРёС‡РµРЅРёРµ РїРѕ РІРѕР·СЂР°СЃС‚Сѓ",
+      value = "Ограничение по возрасту",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -151,7 +151,7 @@ public final class Films {
   private String ageRestr;
 
   @ApiModelProperty(
-      value = "Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (С‡Р°СЃРѕРІ)",
+      value = "Длительность (часов)",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -159,7 +159,7 @@ public final class Films {
   private String durHours;
 
   @ApiModelProperty(
-      value = "Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ (РјРёРЅСѓС‚)",
+      value = "Длительность (минут)",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -167,7 +167,7 @@ public final class Films {
   private String durMins;
 
   @ApiModelProperty(
-      value = "РћРіСЂР°РЅРёС‡РµРЅРёСЏ РЅР° РїСЂРѕСЃРјРѕС‚СЂ",
+      value = "Ограничения на просмотр",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -175,7 +175,7 @@ public final class Films {
   private String viewRestr;
 
   @ApiModelProperty(
-      value = "РџСЂРѕРґСЋСЃСЃРµСЂ",
+      value = "Продюссер",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -183,7 +183,7 @@ public final class Films {
   private String mproducer;
 
   @ApiModelProperty(
-      value = "РЎС†РµРЅР°СЂРёСЃС‚С‹",
+      value = "Сценаристы",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -191,7 +191,7 @@ public final class Films {
   private String mscrwriters;
 
   @ApiModelProperty(
-      value = "Р РµР¶РёСЃРµСЂ",
+      value = "Режисер",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -199,7 +199,7 @@ public final class Films {
   private String mdirector;
 
   @ApiModelProperty(
-      value = "РљРѕРјРїРѕР·РёС‚РѕСЂ",
+      value = "Композитор",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -207,7 +207,7 @@ public final class Films {
   private String mcomposer;
 
   @ApiModelProperty(
-      value = "РћРїРµСЂР°С‚РѕСЂ",
+      value = "Оператор",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -215,7 +215,7 @@ public final class Films {
   private String moperator;
 
   @ApiModelProperty(
-      value = "РҐСѓРґРѕР¶РЅРёРє",
+      value = "Художник",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -223,7 +223,7 @@ public final class Films {
   private String martist;
 
   @ApiModelProperty(
-      value = "РџСЂРёРјРµС‡Р°РЅРёРµ",
+      value = "Примечание",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -231,7 +231,7 @@ public final class Films {
   private String notetxt;
 
   @ApiModelProperty(
-      value = "РђРЅРЅРѕС‚Р°С†РёСЏ",
+      value = "Аннотация",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO
@@ -239,7 +239,7 @@ public final class Films {
   private String annotxt;
 
   @ApiModelProperty(
-      value = "Р—Р°РїРёСЃСЊ СѓРґР°Р»РµРЅР°",
+      value = "Запись удалена",
       required = false,
       hidden = true,
       accessMode = ApiModelProperty.AccessMode.AUTO

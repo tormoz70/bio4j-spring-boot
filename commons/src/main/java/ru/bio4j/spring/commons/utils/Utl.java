@@ -2,6 +2,7 @@ package ru.bio4j.spring.commons.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
@@ -21,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -477,20 +479,41 @@ public class Utl {
         storeString(text, path, "utf-8");
     }
 
-    public static InputStream openFile(String filePath) {
+    private static URL _findResource(String filePath) {
         try {
-            File file = new File(filePath);
-            if (file.exists()) {
-                InputStream inputStream = new FileInputStream(file);
-                return inputStream;
-            } else
-                throw new FileNotFoundException(String.format("File \"%s\" not found!", filePath));
-        } catch (IOException e) {
-            throw Utl.wrapErrorAsRuntimeException(e);
+            return new ClassPathResource(filePath).getURL();
+        } catch(IOException e) {
+            return null;
         }
     }
 
-    public static InputStream openFile(Path filePath) {
+    static InputStream _openFile(String filePath) throws IOException {
+        try {
+            File file = new File(filePath);
+            return new FileInputStream(file);
+        } catch (IOException e) {
+            try {
+                URL url = _findResource(filePath);
+                if (url != null) {
+                    return url.openStream();
+                } else {
+                    InputStream result = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+                    if(result != null)
+                        return result;
+                    else
+                        throw new IOException();
+                }
+            } catch(IOException e1) {
+                throw new FileNotFoundException(String.format("File \"%s\" not found!", filePath));
+            }
+        }
+    }
+
+    public static InputStream openFile(String filePath) throws IOException {
+        return _openFile(filePath);
+    }
+
+    public static InputStream openFile(Path filePath) throws IOException {
         return openFile(filePath.toString());
     }
 
@@ -500,14 +523,10 @@ public class Utl {
 
     public static String readFile(String filePath, String encoding) {
         try {
-            String rslt = null;
-            Path p = Paths.get(filePath);
-            if (Files.exists(p))
-                try (InputStream is = Utl.openFile(filePath)) {
-                    rslt = Utl.readStream(is, encoding);
-                }
-            else
-                throw new FileNotFoundException(String.format("Файл %s не наден!", filePath));
+            String rslt;
+            try (InputStream is = _openFile(filePath)) {
+                rslt = Utl.readStream(is, encoding);
+            }
             return rslt;
         } catch (IOException e) {
             throw Utl.wrapErrorAsRuntimeException(e);

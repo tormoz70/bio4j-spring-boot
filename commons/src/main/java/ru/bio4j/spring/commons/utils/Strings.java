@@ -314,38 +314,21 @@ public class Strings {
     }
 
     public static boolean resourceExists(String filePath) {
-        URL url = Strings.findResource(filePath);
-        if (url != null) {
-            try(InputStream ignored = url.openStream()) {
-                return true;
-            } catch(IOException e) {
-                return false;
-            }
+        try(InputStream ignored = Utl.openFile(filePath)) {
+            return true;
+        } catch(IOException e) {
+            return false;
         }
-        return false;
     }
 
     public static InputStream openResourceAsStream(String filePath) throws IOException {
-        if(Strings.resourceExists(filePath))
-            return Strings.openResourceAsStream(filePath);
-        if(Utl.fileExists(filePath))
-            return Utl.openFile(filePath);
-        throw new IOException(String.format("File %s not found!", filePath));
+	    return Utl.openFile(filePath);
     }
 
 
     public static String loadResourceAsString(String filePath) throws IOException {
         try (InputStream inputStream = openResourceAsStream(filePath)) {
             return Utl.readStream(inputStream);
-        }
-    }
-
-
-    public static URL findResource(String filePath) {
-	    try {
-            return new ClassPathResource(filePath).getURL();
-        } catch(IOException e) {
-	        return null;
         }
     }
 

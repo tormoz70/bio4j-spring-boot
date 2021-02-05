@@ -40,7 +40,8 @@
                 </executions>
                 <configuration>
                     <modelSourceDir>${project.basedir}/src/main/resources/model</modelSourceDir>
-                    <modelOutputDir>${project.build.sourceDirectory}</modelOutputDir>
+                    <modelOutputDir>${project.build.outputDirectory}</modelOutputDir>
+                    <modelOutputPackage>ru.bio4j.test.dto.gen</modelOutputPackage>
                 </configuration>
             </plugin>
         </plugins>

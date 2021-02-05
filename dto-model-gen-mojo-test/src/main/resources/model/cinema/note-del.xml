@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        multiselection="true">
+    <SQL action="execute">
+        <text>@cab4_orgs.current.vesion@.delete_orgnote</text>
+        <param type="integer" name="orgnoteId"/>
+        <param type="string" name="p_sys_curusr_roles"/>
+    </SQL>
+    <fields/>
+</cursor>

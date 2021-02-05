@@ -8,13 +8,13 @@ import static org.mockito.Mockito.spy;
 
 public class GeneratorTest {
 
-    private static Generator generator;
+    private static DtoGenerator dtoGenerator;
 
     @BeforeClass
     public static void beforeClass() {
-        generator = spy(Generator.class);
-        generator.init(
-                "src\\test\\resources\\model",
+        dtoGenerator = spy(DtoGenerator.class);
+        dtoGenerator.init(
+                "src\\test\\resources",
                 "src\\test\\resources\\srcs",
                 "test.dto.gen"
         );
@@ -22,7 +22,7 @@ public class GeneratorTest {
 
     @Test
     public void generateTest() {
-        generator.generate();
+        dtoGenerator.generate();
     }
 
 }

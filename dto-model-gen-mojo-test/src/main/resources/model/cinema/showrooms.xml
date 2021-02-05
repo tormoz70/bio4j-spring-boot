@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd">
+    <SQL action="select">
+        <text><![CDATA[
+select *
+from table(@cab4_sroom.current.vesion@.get_sroomact(:org_id, :showr_id, :ondate))
+        ]]></text>
+
+        <param type="integer" name="org_id"/>
+        <param type="integer" name="showr_id"/>
+        <param type="date" name="ondate"/>
+
+    </SQL>
+
+    <fields>
+        <field name="showr_id" type="integer" attrName="showrId" header="ID зала" pk="1" />
+        <field name="org_id" type="integer" attrName="orgId" hidden="true"/>
+        <field name="actdate" type="date" header="Действует с" format="dd.MM.yyyy"/>
+        <field name="sname" type="string" header="Название" width="150"/>
+        <field name="places" type="integer" header="Мест" width="100"/>
+        <field name="showrstat_id" type="integer" attrName="showrstatId" header="Состояние"  hidden="true"/>
+        <field name="state_name" type="string" attrName="stateName" header="Состояние" width="150"/>
+        <field name="showrstat_from" type="date" attrName="showrstatFrom" header="Дата начала состояния" format="dd.MM.yyyy"/>
+        <field name="showrstat_to" type="date" attrName="showrstatTo" header="Дата окончания состояния" format="dd.MM.yyyy"/>
+        <field name="state" type="string" hidden="true"/>
+        <field name="lastdatadate" type="date" header="Дата последней загрузки"/>
+        <field name="fksupported" type="boolean" header="Поддержан ФК" width="115"/>
+        <field name="npculture" type="boolean" header="НП Культура" width="115"/>
+        <field name="subsyear" type="string" header="Год поддержки" width="115"/>
+        <field name="digital" type="boolean" header="Цифровой" width="115"/>
+        <field name="autosroom" type="boolean" header="Автокинозал" width="115"/>
+    </fields>
+</cursor>

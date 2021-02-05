@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd">
+	<SQL action="select">
+		<text><![CDATA[
+select a.*
+  from table(@cab4_sroom.current.vesion@.get_sroomver(:showr_id, :ver_id)) a
+		]]></text>
+		<param type="integer" name="showr_id"/>
+		<param type="integer" name="ver_id"/>
+	</SQL>
+
+	<SQL action="execute">
+		<text>@cab4_sroom.current.vesion@.savever</text>
+		<param name="showrId" type="integer" direction="INOUT"/>
+		<param name="orgId" type="integer"/>
+		<param name="actdate" type="date"/>
+		<param name="sname" type="string"/>
+		<param name="places" type="integer"/>
+		<param name="fksupported" type="string"/>
+		<param name="npculture" type="string"/>
+		<param name="digital" type="boolean"/>
+		<param name="autosroom" type="boolean"/>
+		<param name="showrstatId" type="integer"/>
+
+		<param name="srvVendor" type="integer"/>
+		<param name="srvModel" type="string"/>
+		<param name="srvSerno" type="string"/>
+		<param name="prjVendor" type="integer"/>
+		<param name="prjModel" type="string"/>
+		<param name="prjSerno" type="string"/>
+
+		<param name="auaVendor" type="integer"/>
+		<param name="auaModel" type="string"/>
+		<param name="audVendor" type="integer"/>
+		<param name="audModel" type="string"/>
+
+		<param name="explaser" type="boolean"/>
+		<param name="exp3d" type="boolean"/>
+		<param name="expImax" type="boolean"/>
+		<param name="exp4dx" type="boolean"/>
+		<param name="expDvd" type="boolean"/>
+		<param name="exp2dk1" type="boolean"/>
+		<param name="exp2dk2" type="boolean"/>
+		<param name="exp2dk4" type="boolean"/>
+		<param name="expType" type="boolean"/>
+		<param name="installdt" type="date"/>
+
+		<param name="seatingType" type="string"/>
+		<param name="sofas" type="string"/>
+
+		<param name="opendate" type="date"/>
+		<param type="string" name="p_sys_curusr_roles"/>
+		<param name="subsyear" type="string"/>
+	</SQL>
+
+	<fields>
+		<field name="version_id" type="integer" attrName="versionId" pk="1" />
+		<field name="showr_id" type="integer" attrName="showrId"/>
+		<field name="org_id" type="integer" attrName="orgId"/>
+		<field name="actdate" type="date"/>
+		<field name="sname" type="string"/>
+		<field name="places" type="integer"/>
+		<field name="showrstat_id" type="integer" attrName="showrstatId"/>
+		<field name="state_name" type="string" attrName="stateName"/>
+		<field name="showrstat_from" type="date" attrName="showrstatFrom"/>
+		<field name="showrstat_to" type="date" attrName="showrstatTo"/>
+		<field name="state" type="string"/>
+		<field name="lastdatadate" type="date"/>
+		<field name="fksupported" type="boolean"/>
+		<field name="npculture" type="boolean"/>
+		<field name="digital" type="boolean"/>
+		<field name="autosroom" type="boolean"/>
+
+		<field name="srv_vendor" type="integer" attrName="srvVendor"/>
+		<field name="srv_model" type="string" attrName="srvModel"/>
+		<field name="srv_serno" type="string" attrName="srvSerno"/>
+
+		<field name="prj_vendor" type="integer" attrName="prjVendor"/>
+		<field name="prj_model" type="string" attrName="prjModel"/>
+		<field name="prj_serno" type="string" attrName="prjSerno"/>
+
+		<field name="aua_vendor" type="integer" attrName="auaVendor"/>
+		<field name="aua_model" type="string" attrName="auaModel"/>
+
+		<field name="aud_vendor" type="integer" attrName="audVendor"/>
+		<field name="aud_model" type="string" attrName="audModel"/>
+
+		<field name="explaser" type="boolean"/>
+		<field name="exp_3d" type="boolean" attrName="exp3d"/>
+		<field name="exp_imax" type="boolean" attrName="expImax"/>
+		<field name="exp_4dx" type="boolean" attrName="exp4dx"/>
+		<field name="exp_dvd" type="boolean" attrName="expDvd"/>
+		<field name="exp_2dk1" type="boolean" attrName="exp2dk1"/>
+		<field name="exp_2dk2" type="boolean" attrName="exp2dk2"/>
+		<field name="exp_2dk4" type="boolean" attrName="exp2dk4"/>
+		<field name="exp_type" type="boolean" attrName="expType"/>
+		<field name="installdt" type="date"/>
+		<field name="opendate" type="date"/>
+
+        <field name="seating_type" type="string" attrName="seatingType"/>
+        <field name="sofas" type="string"/>
+        <field name="subsyear" type="string"/>
+
+	</fields>
+</cursor>

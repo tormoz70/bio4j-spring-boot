@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        multiselection="true">
+    <SQL action="select">
+        <text><![CDATA[
+select *
+from table(@cab4_sroom.current.vesion@.get_sroomact(:org_id))
+where showrstat_id < 2
+        ]]></text>
+
+        <param type="integer" name="org_id"/>
+    </SQL>
+
+    <fields>
+        <field name="showr_id" type="integer" attrName="showrId" header="ID зала" hidden="true" pk="1" />
+        <field name="org_id" type="integer" attrName="orgId" header="ID кинотеатра" hidden="true"/>
+        <field name="actdate" type="date" header="Действует с" format="dd.MM.yyyy"/>
+        <field name="sname" type="string" header="Название" width="150"/>
+
+        <field name="aua_vendor" type="integer" attrName="auaVendor" hidden="true"/>
+        <field name="aua_vendor_name" type="string" attrName="auaVendorName" header="Производитель (аналоговое)" width="150"/>
+        <field name="aua_model" type="string" attrName="auaModel" header="Модель (аналоговое)" width="150"/>
+
+        <field name="aud_vendor" type="integer" attrName="audVendor" hidden="true"/>
+        <field name="aud_vendor_name" type="string" attrName="audVendorName" header="Производитель (цифровое)" width="150"/>
+        <field name="aud_model" type="string" attrName="audModel" header="Модель (цифровое)" width="150"/>
+    </fields>
+</cursor>

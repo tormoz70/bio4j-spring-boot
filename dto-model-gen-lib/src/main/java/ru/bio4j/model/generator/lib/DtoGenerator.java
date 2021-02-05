@@ -1,91 +1,48 @@
 package ru.bio4j.model.generator.lib;
 
-import com.squareup.javapoet.*;
-import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import ru.bio4j.spring.commons.converter.MetaTypeConverter;
-import ru.bio4j.spring.commons.utils.Strings;
-import ru.bio4j.spring.commons.utils.Utl;
-import ru.bio4j.spring.database.api.SQLDefinition;
-import ru.bio4j.spring.database.commons.CursorParser;
-import ru.bio4j.spring.model.transport.MetaType;
-import ru.bio4j.spring.model.transport.jstore.Field;
-
-import javax.lang.model.element.Modifier;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DtoGenerator {
-    private static Logger LOG = LoggerFactory.getLogger(DtoGenerator.class);
 
-    private TypeSpec createClass(String name, SQLDefinition cursor) {
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(name)
-            .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
-        List<FieldSpec> fieldSpecs = new ArrayList<>();
-        List<MethodSpec> gettersetterSpecs = new ArrayList<>();
-        if(cursor.getFields().size() > 0) {
-            for(Field field : cursor.getFields()) {
-                String fieldName = Utl.nvl(field.getAttrName(), field.getName());
-                TypeName typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
-                AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(ApiModelProperty.class)
-                        .addMember("value", "$S", field.getTitle())
-                        .addMember("required", "$L", field.isMandatory())
-                        .addMember("hidden", "$L", field.isHidden())
-                        .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
-                                field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO);
-                fieldSpecs.add(FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
-                        .addAnnotation(annotationSpecBuilder.build())
-                        .build());
-                gettersetterSpecs.add(MethodSpec.methodBuilder("set" + StringUtils.capitalize(fieldName))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(typeName, "value")
-                        .addStatement("this.$N = value", fieldName)
-                        .build());
-                gettersetterSpecs.add(MethodSpec.methodBuilder("get" + StringUtils.capitalize(fieldName))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addStatement("return this.$N", fieldName)
-                        .returns(typeName).build());
-            }
-        }
-        return classBuilder.addFields(fieldSpecs)
-                    .addMethods(gettersetterSpecs)
-                    .build();
+    private String modelSourceDir;
+    private String modelOutputDir;
+    private String modelOutputPackage;
+    private TypeGenerator typeGenerator;
+
+    public void init(String modelSourceDir, String modelOutputDir, String modelOutputPackage) {
+        this.modelSourceDir = modelSourceDir;
+        this.modelOutputDir = modelOutputDir;
+        this.modelOutputPackage = modelOutputPackage;
+        this.typeGenerator = new TypeGenerator();
     }
 
-    public void generate(String rootPath, String path2xml, String packageName, String outputPath) {
-        String fullRootPath = new File(rootPath).getAbsolutePath();
-        String xmlFileName = Utl.fileName(path2xml);
-        String xmlFilePath = path2xml.substring(0, path2xml.length() - xmlFileName.length() - 1);
-        String subPackage = xmlFilePath.substring(fullRootPath.length()).replace("/", ".");
-        if(subPackage.length() > 0) subPackage = subPackage.substring(1);
-        String javaClassName = StringUtils.capitalize(Utl.fileNameWithoutExt(Utl.fileName(path2xml)));
-        try (InputStream inputStream = Strings.openResourceAsStream(path2xml)) {
-            SQLDefinition cursor = CursorParser.pars(inputStream, javaClassName);
-            File outputFolder = new File(outputPath);
-            String outputPkg = !Strings.isNullOrEmpty(subPackage) ? packageName.concat(".").concat(subPackage) : packageName;
-            String outputFileName = outputPkg.replace(".", "/").concat("/").concat(javaClassName).concat(".java");
-            File outputJavaFile = new File(outputFolder, outputFileName);
-            Path dir2Cre = outputJavaFile.toPath().getParent();
-            Files.createDirectories(dir2Cre);
-            try (FileWriter writer = new FileWriter(outputJavaFile.getAbsolutePath())) {
-                TypeSpec typeSpec = createClass(javaClassName, cursor);
-                JavaFile.builder(packageName, typeSpec).build().writeTo(writer);
-            }
-        } catch (IOException e) {
-            LOG.error(e.toString());
-        }
-
+    private static List<String> loadAllXmls(final String path) {
+        File file = new File(path);
+        return Arrays.stream(file.listFiles((current, name) -> new File(current, name).isFile() && name.toLowerCase().endsWith(".xml")))
+                .map(f -> f.getAbsolutePath()).collect(Collectors.toList());
     }
+    private static List<String> loadPaths(final String path) {
+        File file = new File(path);
+        return Arrays.stream(file.listFiles((current, name) -> new File(current, name).isDirectory() && !name.toLowerCase().equals(".") && !name.toLowerCase().equals("..")))
+                .map(f -> f.getAbsolutePath()).collect(Collectors.toList());
+    }
+
+    private void _generate(String fromPath) {
+        List<String> xmls = loadAllXmls(fromPath);
+        for(String path2xml : xmls) {
+            typeGenerator.generate(modelSourceDir, path2xml, modelOutputPackage, modelOutputDir);
+        }
+        List<String> paths = loadPaths(fromPath);
+        for(String path : paths) {
+            _generate(path);
+        }
+    }
+
+    public void generate() {
+        _generate(modelSourceDir);
+    }
+
 }

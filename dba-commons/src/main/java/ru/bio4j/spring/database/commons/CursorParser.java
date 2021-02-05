@@ -282,7 +282,7 @@ public class CursorParser {
     private static String PATTERN_EXTRACT_FILE_NAME = "(?<=\\{text-file:)(\\w|-)+\\.sql(?=\\})";
 
     private static String tryLoadSQL(final String bioCode, String sqlText) {
-        String separator = Utl.DEFAULT_BIO_PATH_SEPARATOR;
+        String separator = File.separator;
         String bioParentPath = Utl.extractBioParentPath(bioCode, separator);
         Matcher m = Regexs.match(sqlText, PATTERN_EXTRACT_FILE_NAME, Pattern.CASE_INSENSITIVE);
         if (m.find()) {
@@ -321,20 +321,13 @@ public class CursorParser {
     }
 
     private static Document loadXmlDocumentFromRes(final String bioCode) {
-        String path = Utl.extractBioPath(bioCode);
-        URL url = Strings.findResource(path + ".xml");
-        if (url != null) {
-            LOG.debug("Loading cursor spec from \"{}\"", path + ".xml");
-            try {
-                try (InputStream inputStream = url.openStream()) {
-                    Document document = Utl.loadXmlDocument(inputStream);
-                    return document;
-                }
-            } catch(IOException e) {
-                throw Utl.wrapErrorAsRuntimeException(e);
-            }
+        String path = Utl.extractBioPath(bioCode) + ".xml";
+        LOG.debug("Loading cursor spec from \"{}\"", path);
+        try (InputStream inputStream = Utl.openFile(path)) {
+            return Utl.loadXmlDocument(inputStream);
+        } catch(IOException e) {
+            throw Utl.wrapErrorAsRuntimeException(e);
         }
-        return null;
     }
 
     private static String buildPath(String path, String bioCode, String extension) {
@@ -347,6 +340,8 @@ public class CursorParser {
     }
 
     public static SQLDefinition pars(final Document document, final String bioCode) {
+        if(!document.getDocumentElement().getNodeName().equals("cursor"))
+            return null;
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
         Element exportTitleElem = Doms.findElem(document.getDocumentElement(), "/cursor/exportTitle");
         Boolean readOnly = Doms.getAttribute(document.getDocumentElement(), "readOnly", true, Boolean.class);
@@ -380,7 +375,7 @@ public class CursorParser {
     public static SQLDefinition pars(final String bioCode) {
         Document document = loadXmlDocumentFromRes(bioCode);
         if (document == null)
-            throw new BioSQLException(String.format("Описание информационного объекта %s не найдено в системе!", bioCode));
+            throw new BioSQLException(String.format("Ошибка при загрузке информационного объекта %s!", bioCode));
         return pars(document, bioCode);
     }
 
@@ -393,26 +388,8 @@ public class CursorParser {
 
     public static SQLDefinition pars(final String contentRootPath, final String bioCode) {
         Document document = loadXmlDocumentFromPath(contentRootPath, bioCode);
-        SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
-        Element exportTitleElem = Doms.findElem(document.getDocumentElement(), "/cursor/exportTitle");
-        if (exportTitleElem != null)
-            cursor.setExportTitle(exportTitleElem.getTextContent());
-        addColsFromXml(cursor, document); // добавляем колонки из XML
-        List<Element> sqlTextElems = Doms.findElems(document.getDocumentElement(), "/cursor/SQL");
-        for (Element sqlElem : sqlTextElems) {
-            SQLType curType = Doms.getAttribute(sqlElem, "action", SQLType.SELECT, SQLType.class);
-            String sql = tryLoadSQL(contentRootPath, bioCode, sqlElem.getTextContent().trim());
-            SQLDef sqlDef;
-            if (curType == SQLType.SELECT)
-                sqlDef = new SQLDefinitionImpl.SelectSQLDefImpl(sql);
-            else
-                sqlDef = new SQLDefinitionImpl.UpdelexSQLDefImpl(sql);
-            cursor.setSqlDef(curType, sqlDef);
-
-            addParamsFromSQLBody(sqlDef); // добавляем переменные из SQL
-            addParamsFromXml(sqlDef, sqlElem); // добавляем переменные из XML
-        }
-        //LOG.debug("BioSQLDefinitionImpl parsed: \n{}", Utl.buildBeanStateInfo(cursor, "Cursor", "  "));
-        return cursor;
+        if (document == null)
+            throw new BioSQLException(String.format("Ошибка при загрузке информационного объекта %s!", bioCode));
+        return pars(document, bioCode);
     }
 }

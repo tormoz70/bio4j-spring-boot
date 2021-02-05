@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd">
+    <SQL action="execute">
+        <text>@cab4_orgs.current.vesion@.edit_cinema</text>
+
+        <param type="integer" name="idOrg" direction="INOUT"/>
+        <param type="string" name="orgname"/>
+        <param type="string" name="orgtype"/>
+        <param type="string" name="kladrCode"/>
+        <param type="string" name="address"/>
+        <param type="integer" name="holdingId"/>
+        <param type="string" name="email"/>
+        <param type="string" name="dogNum"/>
+        <param type="date" name="dogDate"/>
+        <param type="string" name="phoneFax"/>
+        <param type="string" name="responsPerson"/>
+        <param type="string" name="glavbuchName"/>
+        <param type="string" name="glavbuchEmail"/>
+        <param type="string" name="glavbuchPhone"/>
+        <param type="string" name="autoinfoPhone"/>
+        <param type="string" name="orgWww"/>
+        <param type="integer" name="automatic"/>
+        <param type="integer" name="originalDog"/>
+        <param type="integer" name="location"/>
+        <param type="integer" name="test"/>
+        <param type="integer" name="idVnd"/>
+        <param type="integer" name="timeZone"/>
+        <param type="string" name="comments"/>
+        <param type="string" name="stateMat"/>
+        <param type="string" name="registred"/>
+        <param type="string" name="modern"/>
+        <param type="string" name="verstate"/>
+        <param type="integer" name="sroomCnt"/>
+        <param type="integer" name="splaceCnt"/>
+        <param type="integer" name="spaceTtl"/>
+        <param type="integer" name="silencePeriod"/>
+
+        <param type="string" name="directorName"/>
+        <param type="integer" name="repertId"/>
+        <param type="integer" name="regularId"/>
+        <param type="string" name="p_sys_curusr_roles"/>
+
+        <param type="string" name="dataisvalid"/>
+        <param type="string" name="emails"/>
+        <param type="date" name="regdateOverride"/>
+        <param type="string" name="autosendaddrs"/>
+        <param type="string" name="isonline"/>
+        <param type="integer" name="operatorStateId"/>
+        <param type="string" name="refOrgIds"/>
+    </SQL>
+
+    <fields/>
+</cursor>

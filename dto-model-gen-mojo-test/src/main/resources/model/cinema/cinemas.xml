@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        multiselection="true">
+    <SQL action="select">
+        <text><![CDATA[{text-file:cinemas.sql}]]></text>
+        <param type="integer" name="parent_org_id"/>
+        <param type="integer" name="nation_id"/>
+        <param type="string" name="region_id"/>
+<!--        <param type="string" name="region"/>-->
+        <param type="string" name="nas_punkt"/>
+        <param type="string" name="street_name"/>
+        <param type="string" name="hldname"/>
+        <param type="string" name="orgname"/>
+        <param type="string" name="email"/>
+        <param type="boolean" name="test"/>
+        <param type="boolean" name="liquidate"/>
+        <param type="boolean" name="automatic"/>
+        <param type="boolean" name="original_dog"/>
+        <param type="boolean" name="isreported"/>
+        <param type="boolean" name="whereisdata"/>
+        <param type="integer" name="id_prop"/>
+<!--        <param type="string" name="prop"/>-->
+        <param type="integer" name="id_vnd"/>
+<!--        <param type="string" name="vnd"/>-->
+        <param type="string" name="orgtype"/>
+<!--        <param type="string" name="orgtype_name"/>-->
+        <param type="string" name="orgname_jur"/>
+        <param type="string" name="inn"/>
+<!--        <param type="boolean" name="registred"/>-->
+        <param type="boolean" name="fksupported"/>
+        <param type="boolean" name="npculture"/>
+<!--        <param type="boolean" name="modern"/>-->
+<!--        <param type="boolean" name="verSt0"/>-->
+<!--        <param type="boolean" name="verSt1"/>-->
+<!--        <param type="boolean" name="verSt2"/>-->
+<!--        <param type="boolean" name="verSt9"/>-->
+        <param type="string" name="verState"/>
+        <param type="string" name="mngmntform_caption"/>
+        <param type="string" name="subsidyear"/>
+        <param type="boolean" name="operator_state_id"/>
+    </SQL>
+
+    <fields>
+        <field name="orgname" type="string" header="Кинотеатр" align="left"/>
+        <field name="id_org" type="integer" attrName="idOrg" header="ID" pk="1" format="0"/>
+        <field name="orgtype_name" type="string" attrName="orgtypeName" header="Тип"/>
+        <field name="time_zone" type="integer" attrName="timeZone" header="Часовой пояс"/>
+        <field name="ownership" type="string" header="Ф/С"/>
+        <field name="holding_id" type="integer" attrName="holdingId" header="ID Киносети"/>
+        <field name="hldname" type ="string" header="Киносеть" width="150"/>
+        <field name="region" type="string" header="Регион" width="150" align="left"/>
+        <field name="nas_punkt" type="string" attrName="nasPunkt" header="Нас. пункт" width="150" align="left"/>
+        <field name="people_cnt" type="integer" attrName="peopleCnt" header="Кол-во\nжителей" width="90" align="right"/>
+        <field name="street_name" type="string" attrName="streetName" header="Улица,Дом" width="150" align="left"/>
+        <field name="email" type="string" header="E-mail"/>
+        <field name="email_hld" type="string" attrName="emailHld" header="E-mail киносети"/>
+        <field name="automatic" type="boolean" header="Билетная \nсистема"/>
+        <field name="automatic_str" type="string" attrName="automaticStr" generate="false"/>
+        <field name="modern" type="boolean" header="Современный"/>
+        <field name="isonline" type="boolean" header="Online"/>
+        <field name="original_dog" type="boolean" attrName="originalDog" header="Рег. карта" align="center"/>
+        <field name="original_dog_str" type="string" attrName="originalDogStr" generate="false"/>
+        <field name="isreported" type="boolean" header="Отчитывается" align="center"/>
+        <field name="isreported_str" type="string" attrName="isreportedStr" generate="false"/>
+        <field name="dataisvalid_str" type="string" attrName="dataisvalidStr" header="Цифровой"/>
+        <field name="whereisdata" type="boolean" header="Молчит 7 дней" align="center"/>
+        <field name="last_upld" type="date" attrName="lastUpld" header="Поледняя загрузка"/>
+        <field name="test" type="boolean" header="Тестовый" align="center"/>
+        <field name="registred" type="boolean" header="Зарегистрирован" align="center"/>
+        <field name="test_str" type="string" attrName="testStr" generate="false"/>
+        <field name="liquidate" type="boolean" hidden="true"/>
+        <field name="dog_num" type="string" attrName="dogNum" header="Рег. номер"/>
+        <field name="dog_date" type="date" attrName="dogDate" format="dd.MM.yyyy" header="Дата регистрации"/>
+        <field name="reg_date" type="date" attrName="regDate" format="dd.MM.yyyy" header="Дата ввода"/>
+        <field name="locname" type="string" header="Размещение"/>
+        <field name="state" type="integer" hidden="true"/>
+        <field name="statename" type="string" header="Состояние"/>
+        <field name="state_date" type="date" attrName="stateDate" format="dd.MM.yyyy" header="Дата состояния"/>
+        <field name="closereason_id" type="integer"  attrName="closereasonId" hidden="true"/>
+        <field name="closereason_name" type="string" attrName="closereasonName" header="Прим. к состоянию"/>
+        <field name="operator_state_id" type="boolean" attrName="operatorStateId" header="Закрыт оператором"/>
+        <field name="operator_state_id_str" type="string" attrName="operatorStateIdStr" generate="false"/>
+        <field name="respons_person" type ="string" attrName="responsPerson" header="Ответственное лицо"/>
+        <field name="phone_fax" type ="string" attrName="phoneFax" header="Телефон/факс"/>
+        <field name="id_k1" type="boolean" attrName="idK1" header="2D-1K"/>
+        <field name="id_k1_str" type="string" attrName="idK1Str" generate="false"/>
+        <field name="id_k2" type="boolean" attrName="idK2" header="2D-2K"/>
+        <field name="id_k2_str" type="string" attrName="idK2Str" generate="false"/>
+        <field name="id_k4" type="boolean" attrName="idK4" header="2D-4K"/>
+        <field name="id_k4_str" type="string" attrName="idK4Str" generate="false"/>
+        <field name="id_3d" type="boolean" attrName="id3d" header="3D"/>
+        <field name="id_3d_str" type="string" attrName="id3dStr" generate="false"/>
+        <field name="imax" type="boolean" header="IMAX"/>
+        <field name="imax_str" type="string" attrName="imaxStr" generate="false"/>
+        <field name="id_plenka" type="boolean" attrName="idPlenka" header="Пленка"/>
+        <field name="id_plenka_str" type="string" attrName="idPlenkaStr" generate="false"/>
+        <field name="analogsnd" type="boolean" header="Аналог. звук"/>
+        <field name="analogsnd_str" type="string" attrName="analogsndStr" generate="false"/>
+        <field name="digitsnd" type="boolean" header="Цифровой звук"/>
+        <field name="digitsnd_str" type="string" attrName="digitsndStr" generate="false"/>
+        <field name="vndname" type="string" header="Поставщик ПО"/>
+        <field name="orgname_jur" type="string" attrName="orgnameJur" header="Наименование юр. лица"/>
+        <field name="suspended" type="date" format="dd.MM.yyyy" header="Приостановлен до"/>
+        <field name="verstatename" type="string" header="Состояние выверки"/>
+        <field name="sroom_cnt" type="integer" attrName="sroomCnt" header="Кинозалов\nвсего"/>
+        <field name="splace_cnt" type="integer" attrName="splaceCnt" header="Мест всего"/>
+        <field name="space_ttl" type="decimal" attrName="spaceTtl" header="Площадь общая"/>
+        <field name="recid_io" type="integer" attrName="recidIo" header="Строка в исх. файле"/>
+        <field name="silence_period" type="integer" attrName="silencePeriod" header="Допустипый период молчания"/>
+        <field name="inn" type="string" header="ИНН"/>
+        <field name="last_chng_usr" type="string" attrName="lastChngUsr" generate="false"/>
+        <field name="last_chng_date" type="date" attrName="lastChngDate" generate="false"/>
+        <field name="last_chng_act" type="clob" attrName="lastChngAct" generate="false"/>
+        <field name="comments" type="string" generate="false"/>
+        <field name="post_index" type="string" attrName="postIndex" generate="false"/>
+        <field name="address_jur" type="string" attrName="addressJur" generate="false"/>
+        <field name="ogrn" type="string" generate="false"/>
+        <field name="autoinfo_phone" type="string" attrName="autoinfoPhone" generate="false"/>
+        <field name="org_www" type="string" attrName="orgWww" generate="false"/>
+        <field name="srooms" type="string" generate="false"/>
+        <field name="places" type="string" generate="false"/>
+        <field name="emails" type="string" generate="false"/>
+        <field name="mngmntform_id" type="string"  attrName="mngmntformId" hidden="true"/>
+        <field name="mngmntform_caption" type="string" attrName="mngmntformCaption" header="Форма управления"/>
+        <field name="subsidyear" type="string" header="Год субсидирования"/>
+        <field name="nation_name" type="string" header="Страна"/>
+        <field name="nation_id" type="integer" attrName="nationId" header="ID Страны" hidden="true"/>
+        <field name="fksupported" type="boolean" header="Поддержан ФК"/>
+        <field name="npculture" type="boolean" header="НП Культура"/>
+        <field name="org2orgrefs" type="string" generate="false"/>
+        <field name="fdstr_aname" type="string" attrName="fdstrAname" generate="false"/>
+        <field name="np_separate_name" type="string" attrName="npSeparateName" generate="false"/>
+        <field name="np_separate_type" type="string" attrName="npSeparateType" generate="false"/>
+        <field name="autosroom_cnt" type="integer" attrName="autosroomCnt" header="Автокинозалов"/>
+    </fields>
+</cursor>

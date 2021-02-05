@@ -14,7 +14,16 @@ public class CursorParserTest {
     public void toStringTest() throws Exception {
         InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("rcard.xml");
         Document document = Utl.loadXmlDocument(inputStream);
-        SQLDefinition cursor = CursorParser.pars(document, "eve.rcard");
+        SQLDefinition cursor = CursorParser.pars(document, "rcard");
+        String out = cursor.toString();
+        System.out.println(out);
+    }
+
+    @Test
+    public void toStringTest1() throws Exception {
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("bios//curTopAll.xml");
+        Document document = Utl.loadXmlDocument(inputStream);
+        SQLDefinition cursor = CursorParser.pars(document, "bios.curTopAll");
         String out = cursor.toString();
         System.out.println(out);
     }

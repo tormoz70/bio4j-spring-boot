@@ -17,12 +17,15 @@ public class GeneratorMojo extends AbstractMojo {
     private String modelSourceDir;
     @Parameter(required = true)
     private String modelOutputDir;
+    @Parameter(required = true)
+    private String modelOutputPackage;
 
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info(String.format("modelSourceDir: {}", modelSourceDir));
         getLog().info(String.format("modelOutputDir: {}", modelOutputDir));
+        getLog().info(String.format("modelOutputPackage: {}", modelOutputPackage));
 
     }
 }
