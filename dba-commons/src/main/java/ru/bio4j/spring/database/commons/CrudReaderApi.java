@@ -712,6 +712,26 @@ public class CrudReaderApi {
         return result;
     }
 
+    public static <T> List<T> loadRecordExt(
+            final Object pkValue,
+            final List<Param> params,
+            final SQLContext context, final SQLDefinition cursor,
+            final User user,
+            final Class<T> beanType) {
+        Field pkField = cursor.getSelectSqlDef().findPk();
+        if(pkField == null)
+            throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
+        cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
+        preparePkParamValue(params, pkField);
+        List<Param> pres = Paramus.clone(params);
+        List<Param> p = preparePkParamValue(pkValue, pkField);
+        Paramus.applyParams(pres, p, false, true);
+        List<T> result = context.execBatch((conn) -> {
+            return readStoreDataExt(pres, context, cursor, beanType);
+        }, user);
+        return result;
+    }
+
     public static <T> T loadFirstRecordExt(
             final List<Param> params,
             final SQLContext context, final SQLDefinition cursor,

@@ -607,6 +607,29 @@ public class DbaHelper {
         }
         return new ArrayList<>();
     }
+    /**
+     * Возвращает все записи по ID
+     * @param bioCode
+     * @param id
+     * @param params
+     * @param user
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> loadBean(
+            final String bioCode,
+            final Object id,
+            final List<Param> params,
+            final User user,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        if(id != null) {
+            return CrudReaderApi.loadRecordExt(id, params, context, sqlDefinition, user, beanType);
+        }
+        return new ArrayList<>();
+    }
 
     /**
      * Возвращает все записи по ID (в текущей сессии, для текущего пользователя)
