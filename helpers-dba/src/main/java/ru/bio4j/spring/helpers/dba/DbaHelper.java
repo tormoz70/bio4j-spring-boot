@@ -626,7 +626,7 @@ public class DbaHelper {
             final User user,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         if(id != null) {
             return CrudReaderApi.loadRecordExt(id, params, context, sqlDefinition, user, beanType);
         }
