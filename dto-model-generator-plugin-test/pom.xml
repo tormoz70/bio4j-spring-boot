@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>bio4j-spring-boot</artifactId>
+        <groupId>ru.bio4j.spring</groupId>
+        <version>2.4.19-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>dto-model-generator-plugin-test</artifactId>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>ru.bio4j.spring</groupId>
+                <artifactId>dto-model-generator-plugin</artifactId>
+                <version>${project.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-model</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <modelSourceDir>${project.basedir}/src/main/resources</modelSourceDir>
+                    <modelOutputDir>${project.basedir}/target/generated-sources/java</modelOutputDir>
+                    <modelOutputPackage>ru.bio4j.test.dto.gen</modelOutputPackage>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>ru.bio4j.spring</groupId>
+                        <artifactId>bio4j-spring-commons-lib</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>ru.bio4j.spring</groupId>
+                        <artifactId>bio4j-spring-dba-commons-lib</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.squareup</groupId>
+                        <artifactId>javapoet</artifactId>
+                        <version>${javapoet.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.commons</groupId>
+                        <artifactId>commons-text</artifactId>
+                        <version>${commons-text.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+    </dependencies>
+
+</project>

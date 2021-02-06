@@ -91,7 +91,7 @@ public class DbaHelper {
         result.queryParams = wrappedRequest(request).getBioQueryParams();
         result.params = _extractBioParams(result.queryParams);
         result.context = getSqlContext();
-        result.sqlDefinition = CursorParser.pars(bioCode);
+        result.sqlDefinition = CursorParser.getInstance().pars(bioCode);
         result.filterAndSorter = _createFilterAndSorter(result.queryParams);
         result.user = wrappedRequest(request).getUser();
         return result;
@@ -132,7 +132,7 @@ public class DbaHelper {
      * Возвращает оопределение запроса по коду
      */
     public SQLDefinition getSQLDefinition(String bioCode) {
-        SQLDefinition cursor = CursorParser.pars(bioCode);
+        SQLDefinition cursor = CursorParser.getInstance().pars(bioCode);
         if(cursor == null)
             throw Utl.wrapErrorAsRuntimeException(String.format("Cursor \"%s\" not found in service \"%s\"!", bioCode, this.getClass().getName()));
         prepareSQL(cursor);
@@ -163,7 +163,7 @@ public class DbaHelper {
             ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAll(prms,
@@ -214,7 +214,7 @@ public class DbaHelper {
     ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadAll(prms,
                 filterAndSorter != null ? filterAndSorter.getFilter() : null,
                 filterAndSorter != null ? filterAndSorter.getSorter() : null,
@@ -255,7 +255,7 @@ public class DbaHelper {
     ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadAll0(prms,
                 filterAndSorter != null ? filterAndSorter.getFilter() : null,
                 filterAndSorter != null ? filterAndSorter.getSorter() : null,
@@ -385,7 +385,7 @@ public class DbaHelper {
             final FilterAndSorter filterAndSorter) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
         if(pageSize == 0)
             return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
@@ -436,7 +436,7 @@ public class DbaHelper {
             final FilterAndSorter filterAndSorter) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
     }
     public <T> List<T> loadAllExt(
@@ -483,7 +483,7 @@ public class DbaHelper {
     ) {
         final List<Param> prms = DbUtils.decodeParams(params);
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadAll0Ext(prms,
                 filterAndSorter != null ? filterAndSorter.getFilter() : null,
                 filterAndSorter != null ? filterAndSorter.getSorter() : null,
@@ -528,7 +528,7 @@ public class DbaHelper {
             final User usr,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        final SQLDefinition cursorDef = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadFirstRecordExt(params, context, cursorDef, usr, beanType);
     }
     public <T> T loadFirstBean(
@@ -537,7 +537,7 @@ public class DbaHelper {
             final User usr,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        final SQLDefinition cursorDef = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadFirstRecordExt(filter, context, cursorDef, usr, beanType);
     }
 
@@ -554,7 +554,7 @@ public class DbaHelper {
             final List<Param> params,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        final SQLDefinition cursorDef = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadFirstRecord0Ext(params, context, cursorDef, beanType);
     }
     public <T> T loadFirstBeanLocal(
@@ -562,7 +562,7 @@ public class DbaHelper {
             final Filter filter,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition cursorDef = CursorParser.pars(bioCode);
+        final SQLDefinition cursorDef = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.loadFirstRecord0Ext(filter, context, cursorDef, beanType);
     }
 
@@ -603,7 +603,7 @@ public class DbaHelper {
             final User user,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         if(id != null) {
             return CrudReaderApi.loadRecordExt(id, context, sqlDefinition, user, beanType);
         }
@@ -646,7 +646,7 @@ public class DbaHelper {
             final Object id,
             final Class<T> beanType) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         if(id != null) {
             return CrudReaderApi.loadRecord0Ext(id, context, sqlDefinition, beanType);
         }
@@ -679,7 +679,7 @@ public class DbaHelper {
      */
     public Metadata getMetadata(final String bioCode) {
         Metadata rslt = new Metadata();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         StoreMetadata metadata = new StoreMetadata();
         metadata.setReadonly(sqlDefinition.getReadOnly());
         metadata.setMultiSelection(sqlDefinition.getMultiSelection());
@@ -760,7 +760,7 @@ public class DbaHelper {
             final Object params,
             final User user) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         CrudWriterApi.execSQL(params, context, sqlDefinition, user);
     }
 
@@ -797,7 +797,7 @@ public class DbaHelper {
             final T defaultValue,
             final User user) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.selectScalar(params, context, sqlDefinition, clazz, defaultValue, user);
     }
     public <T> T selectScalar(
@@ -808,7 +808,7 @@ public class DbaHelper {
             final T defaultValue,
             final User user) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return CrudReaderApi.selectScalar(params, context, sqlDefinition, fieldName, clazz, defaultValue, user);
     }
 
@@ -851,7 +851,7 @@ public class DbaHelper {
             final String bioCode,
             final Object params) {
         final SQLContext context = getSqlContext();
-        final SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         CrudWriterApi.execSQL0(params, context, sqlDefinition);
     }
 

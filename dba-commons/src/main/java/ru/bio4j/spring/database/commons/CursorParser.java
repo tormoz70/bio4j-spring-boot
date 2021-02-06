@@ -6,6 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import ru.bio4j.spring.commons.converter.Converter;
+import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.*;
@@ -34,6 +35,26 @@ import java.util.regex.Pattern;
 public class CursorParser {
     private static final Logger LOG = LoggerFactory.getLogger(CursorParser.class);
 
+    /**
+     * Экземпляр класса.
+     */
+    private static CursorParser instance;
+
+    public static CursorParser getInstance() {
+        if (instance == null)
+            synchronized (CursorParser.class) {
+                if (instance == null)
+                    createCursorParser();
+            }
+        return instance;
+    }
+
+    private static void createCursorParser() {
+        instance = new CursorParser();
+    }
+
+    private CursorParser() {
+    }
 
     private static final String ATTRS_DELIMITER = ";";
     private static final String ATTRS_KEYVALUE_DELIMITER = ":";
@@ -43,7 +64,9 @@ public class CursorParser {
     private static final String REGEX_ATTRS = "(?<=/\\*\\$\\{).*(?=\\}\\*/)";
     private static final String REGEX_PARAM_KILLDEBUG = "debug:\\*/.*/\\*";
 
-    private static Param parseParam(String paramDef) {
+    private CursorSqlResolver cursorSqlResolver;
+
+    private Param parseParam(String paramDef) {
         String attrsList = Regexs.find(paramDef, REGEX_ATTRS, 0);
         attrsList = Regexs.replace(attrsList, REGEX_PARAM_KILLDEBUG, "", Pattern.CASE_INSENSITIVE + Pattern.MULTILINE);
         String[] attrs = Strings.split(attrsList, ATTRS_DELIMITER);
@@ -76,7 +99,7 @@ public class CursorParser {
     private static final String REGEX_QUOTES_REPLACER = "\\\\\"";
     private static final String QUOTES_PLACEHOLDER = "\\$quote\\$";
 
-    private static void parseCol(List<Field> cols, String colDef) {
+    private void parseCol(List<Field> cols, String colDef) {
         String attrsList = Regexs.find(colDef, REGEX_ATTRS, Pattern.CASE_INSENSITIVE + Pattern.MULTILINE + Pattern.DOTALL);
         // Заменяем все внутренние(экранированные) ковычки на QUOTES_PLACEHOLDER
         attrsList = Regexs.replace(attrsList, REGEX_QUOTES_REPLACER, QUOTES_PLACEHOLDER, Pattern.CASE_INSENSITIVE + Pattern.MULTILINE);
@@ -148,7 +171,7 @@ public class CursorParser {
         }
     }
 
-    private static void addParamsFromXml(final SQLDef sqlDef, final Element sqlElem) {
+    private void addParamsFromXml(final SQLDef sqlDef, final Element sqlElem) {
         NodeList paramNodes = sqlElem.getElementsByTagName("param");
         try (Paramus p = Paramus.set(sqlDef.getParamDeclaration());) {
             for (int i = 0; i < paramNodes.getLength(); i++) {
@@ -178,7 +201,7 @@ public class CursorParser {
         }
     }
 
-    private static void addParamsFromSQLBody(final SQLDef sqlDef) {
+    private void addParamsFromSQLBody(final SQLDef sqlDef) {
         final String sql = sqlDef.getSql();
         final StringBuffer out = new StringBuffer(sql.length());
         final List<String> paramsNames = Sqls.extractParamNamesFromSQL(sql);
@@ -279,43 +302,6 @@ public class CursorParser {
         }
     }
 
-    private static String PATTERN_EXTRACT_FILE_NAME = "(?<=\\{text-file:)(\\w|-)+\\.sql(?=\\})";
-
-    private static String tryLoadSQL(final String bioCode, String sqlText) {
-        String separator = File.separator;
-        String bioParentPath = Utl.extractBioParentPath(bioCode, separator);
-        Matcher m = Regexs.match(sqlText, PATTERN_EXTRACT_FILE_NAME, Pattern.CASE_INSENSITIVE);
-        if (m.find()) {
-            String sqlFileName = bioParentPath + (Strings.isNullOrEmpty(bioParentPath) ? "" : separator) + m.group();
-            try {
-                sqlText = Strings.loadResourceAsString(sqlFileName);
-            } catch (IOException e) {
-                throw Utl.wrapErrorAsRuntimeException(String.format("The %s file referenced by %s is not found in resources!", sqlFileName, bioCode));
-            }
-        }
-        return sqlText;
-    }
-
-    private static String tryLoadSQL(final String contentPath, final String bioCode, String sqlText) {
-        String separator = File.separator;
-        Matcher m = Regexs.match(sqlText, PATTERN_EXTRACT_FILE_NAME, Pattern.CASE_INSENSITIVE);
-        if (m.find()) {
-            String sqlFileName = Utl.extractBioParentPath(bioCode) + separator + m.group();
-            Path p = Paths.get(sqlFileName);
-            try {
-                if (Files.exists(p))
-                    try (InputStream is = Utl.openFile(sqlFileName)) {
-                        sqlText = Utl.readStream(is);
-                    }
-                else
-                    throw new IOException(String.format("The %s file referenced by %s is not found in resources!", sqlFileName, bioCode));
-            } catch(IOException e) {
-                throw Utl.wrapErrorAsRuntimeException(e);
-            }
-        }
-        return sqlText;
-    }
-
     private static Document loadXmlDocumentFromInputStream(final InputStream inputStream) {
         return Utl.loadXmlDocument(inputStream);
     }
@@ -339,7 +325,7 @@ public class CursorParser {
         return Utl.loadXmlDocument(path);
     }
 
-    public static SQLDefinition pars(final Document document, final String bioCode) {
+    public SQLDefinition pars(final Document document, final String bioCode) {
         if(!document.getDocumentElement().getNodeName().equals("cursor"))
             return null;
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
@@ -356,7 +342,7 @@ public class CursorParser {
         for (Element sqlElem : sqlTextElems) {
             SQLType curType = Doms.getAttribute(sqlElem, "action", SQLType.SELECT, SQLType.class);
             String sql = sqlElem.getTextContent().trim();
-            sql = tryLoadSQL(bioCode, sql);
+            sql = getCursorSqlResolver().tryLoadSQL(bioCode, sql);
             SQLDef sqlDef;
             if (curType == SQLType.SELECT) {
                 sqlDef = new SQLDefinitionImpl.SelectSQLDefImpl(sql);
@@ -372,24 +358,34 @@ public class CursorParser {
         return cursor;
     }
 
-    public static SQLDefinition pars(final String bioCode) {
+    public SQLDefinition pars(final String bioCode) {
         Document document = loadXmlDocumentFromRes(bioCode);
         if (document == null)
             throw new BioSQLException(String.format("Ошибка при загрузке информационного объекта %s!", bioCode));
         return pars(document, bioCode);
     }
 
-    public static SQLDefinition pars(final InputStream stream, final String bioCode) {
+    public SQLDefinition pars(final InputStream stream, final String bioCode) {
         Document document = loadXmlDocumentFromInputStream(stream);
         if (document == null)
             throw new BioSQLException(String.format("Ошибка при загрузке информационного объекта %s!", bioCode));
         return pars(document, bioCode);
     }
 
-    public static SQLDefinition pars(final String contentRootPath, final String bioCode) {
+    public SQLDefinition pars(final String contentRootPath, final String bioCode) {
         Document document = loadXmlDocumentFromPath(contentRootPath, bioCode);
         if (document == null)
             throw new BioSQLException(String.format("Ошибка при загрузке информационного объекта %s!", bioCode));
         return pars(document, bioCode);
+    }
+
+    private CursorSqlResolver getCursorSqlResolver() {
+        if(cursorSqlResolver == null)
+            cursorSqlResolver = new DefaultCursorSqlResolver();
+        return cursorSqlResolver;
+    }
+
+    public void setCursorSqlResolver(CursorSqlResolver cursorSqlResolver) {
+        this.cursorSqlResolver = cursorSqlResolver;
     }
 }

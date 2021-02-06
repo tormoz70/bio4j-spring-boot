@@ -28,6 +28,8 @@
         <junit.version>4.13.1</junit.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <logback.version>1.2.3</logback.version>
+        <javapoet.version>1.13.0</javapoet.version>
+        <commons-text.version>1.9</commons-text.version>
 	</properties>
 
 
@@ -279,9 +281,19 @@
                 <version>1.14</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
                 <version>${org.apache.poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>${javapoet.version}</version>
             </dependency>
 
             <dependency>
@@ -434,9 +446,9 @@
 
 		<module>isrvt-kafka</module>
 
-        <module>dto-model-gen-mojo</module>
-        <module>dto-model-gen-mojo-test</module>
-        <module>dto-model-gen-lib</module>
+        <module>dto-model-generator-plugin</module>
+        <module>dto-model-generator-plugin-test</module>
+        <module>dto-model-generator-lib</module>
     </modules>
 
 </project>

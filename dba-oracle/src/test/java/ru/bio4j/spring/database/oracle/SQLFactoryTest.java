@@ -878,7 +878,7 @@ public class SQLFactoryTest {
     @Test
     public void testCursorParser() {
         try {
-            CursorParser.pars("bios.movies1");
+            CursorParser.getInstance().pars("bios.movies1");
         } catch (Exception e) {
             Assert.assertTrue(e.getMessage().contains("is not found"));
         }
@@ -896,7 +896,7 @@ public class SQLFactoryTest {
                         .build(),
                 OracleContext.class);
 
-        SQLDefinition sqlDefinition = CursorParser.pars("bios.movies");
+        SQLDefinition sqlDefinition = CursorParser.getInstance().pars("bios.movies");
         List<Param> prms = Paramus.createParams(
                 "searchString", "икс",
                 Rest2sqlParamNames.PAGINATION_PARAM_PAGE, "last",

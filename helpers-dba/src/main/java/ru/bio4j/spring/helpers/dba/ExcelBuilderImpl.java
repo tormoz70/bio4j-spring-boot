@@ -156,13 +156,13 @@ public class ExcelBuilderImpl implements ExcelBuilder {
 
     @Override
     public HSSFWorkbook toExcel(List<ABean> rows, String bioCode, boolean rnumEnabled) {
-        SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return toExcel(rows, sqlDefinition, rnumEnabled);
     }
 
     @Override
     public HSSFWorkbook toExcel(List<ABean> rows, String bioCode) {
-        SQLDefinition sqlDefinition = CursorParser.pars(bioCode);
+        SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
         return toExcel(rows, sqlDefinition);
     }
 

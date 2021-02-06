@@ -152,7 +152,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor2() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
+            SQLDefinition sqlDefinition = CursorParser.getInstance().pars("bios.data0");
             BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, null, context, sqlDefinition, null,
                     CrudOptions.builder()
                         .forceCalcCount(true)
@@ -174,7 +174,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor22() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
+            SQLDefinition sqlDefinition = CursorParser.getInstance().pars("bios.data0");
             List<Total> totals = new ArrayList<>();
             totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
             totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
@@ -204,7 +204,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor23() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("bios.data0");
+            SQLDefinition sqlDefinition = CursorParser.getInstance().pars("bios.data0");
             List<Total> totals = new ArrayList<>();
             totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
             totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
@@ -229,9 +229,9 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor3() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("data0minmax");
+            SQLDefinition sqlDefinition = CursorParser.getInstance().pars("data0minmax");
             ABean rstMinMax = CrudReaderApi.loadFirstRecordExt(context, sqlDefinition, null, ABean.class);
-            sqlDefinition = CursorParser.pars("bios.data0");
+            sqlDefinition = CursorParser.getInstance().pars("bios.data0");
             List<Sort> sorts = new ArrayList<>();
             sorts.add(Sort.builder()
                     .fieldName("summ")
@@ -261,7 +261,7 @@ public class SQLFactoryTest {
     @Test
     public void testSQLCommandOpenCursor4() {
         try {
-            SQLDefinition sqlDefinition = CursorParser.pars("bios.testDT");
+            SQLDefinition sqlDefinition = CursorParser.getInstance().pars("bios.testDT");
             List<Param> params = Paramus.createParams();
             Paramus.setParamValue(params, "periodStart", DateTimeParser.getInstance().parse("2009-01-01"));
             Paramus.setParamValue(params, "periodEnd", DateTimeParser.getInstance().parse("2009-01-02"));
