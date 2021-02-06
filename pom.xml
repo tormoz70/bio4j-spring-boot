@@ -446,9 +446,9 @@
 
 		<module>isrvt-kafka</module>
 
+        <module>dto-model-generator-lib</module>
         <module>dto-model-generator-plugin</module>
         <module>dto-model-generator-plugin-test</module>
-        <module>dto-model-generator-lib</module>
     </modules>
 
 </project>
