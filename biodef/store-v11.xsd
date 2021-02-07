@@ -222,6 +222,11 @@
                                                     <xs:documentation>Если true, то не генерить в dto</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="dtoJsonIgnore" type="xs:boolean">
+                                                <xs:annotation>
+                                                    <xs:documentation>Если true, то добавить в dto @JsonIgnore</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
                                             <xs:attribute name="showTooltip" type="xs:boolean">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, отображать всплывающую подсказаку с полным текстом ячейки</xs:documentation>

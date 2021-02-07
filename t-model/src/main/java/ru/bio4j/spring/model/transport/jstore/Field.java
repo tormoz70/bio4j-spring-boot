@@ -40,6 +40,9 @@ public class Field implements Serializable {
     /** Не генерить в dto */
     private boolean dtoSkip;
 
+    /** добавить в dto @JsonIgnore */
+    private boolean dtoJsonIgnore;
+
     /** Фильтрация */
     private boolean filter;
 
@@ -363,6 +366,14 @@ public class Field implements Serializable {
         this.dtoSkip = dtoSkip;
     }
 
+    public boolean isDtoJsonIgnore() {
+        return dtoJsonIgnore;
+    }
+
+    public void setDtoJsonIgnore(boolean dtoJsonIgnore) {
+        this.dtoJsonIgnore = dtoJsonIgnore;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -399,12 +410,14 @@ public class Field implements Serializable {
                 Objects.equals(looReference, field.looReference) &&
                 fixed == field.fixed &&
                 Objects.equals(dtoDocumentation, field.dtoDocumentation) &&
-                dtoSkip == field.dtoSkip;
+                dtoSkip == field.dtoSkip &&
+                dtoJsonIgnore == field.dtoJsonIgnore;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sort, sorter,
-                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference, dtoDocumentation, dtoSkip);
+                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference,
+                dtoDocumentation, dtoSkip, dtoJsonIgnore);
     }
 }

@@ -1,5 +1,6 @@
 package ru.bio4j.model.generator.lib;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.squareup.javapoet.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -49,9 +50,11 @@ public class TypeGenerator {
                         .addMember("hidden", "$L", field.isHidden())
                         .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
                                 field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO);
-                fieldSpecs.add(FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
-                        .addAnnotation(fieldAnnotationBuilder.build())
-                        .build());
+                FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
+                        .addAnnotation(fieldAnnotationBuilder.build());
+                if(field.isDtoJsonIgnore())
+                    fieldSpecBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build());
+                fieldSpecs.add(fieldSpecBuilder.build());
                 gettersetterSpecs.add(MethodSpec.methodBuilder("set" + StringUtils.capitalize(fieldName))
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(typeName, "value")
