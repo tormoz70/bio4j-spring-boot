@@ -15,6 +15,12 @@ import java.util.function.Predicate;
 
 public class SQLDefinitionImpl implements SQLDefinition {
 
+    public Boolean getDtoSkip() {
+        return dtoSkip;
+    }
+    public void setDtoSkip(Boolean dtoSkip) {
+        this.dtoSkip = dtoSkip;
+    }
     public String getDtoName() {
         return dtoName;
     }
@@ -180,6 +186,7 @@ public class SQLDefinitionImpl implements SQLDefinition {
 
     private final String bioCode;
 
+    private Boolean dtoSkip;
     private String dtoName;
     private String dtoDocumentation;
     private String exportTitle;

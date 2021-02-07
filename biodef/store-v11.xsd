@@ -217,6 +217,11 @@
                                                     <xs:documentation>Если true, то это скрытая колонка в DataGrid</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="dtoSkip" type="xs:boolean">
+                                                <xs:annotation>
+                                                    <xs:documentation>Если true, то не генерить в dto</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
                                             <xs:attribute name="showTooltip" type="xs:boolean">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, отображать всплывающую подсказаку с полным текстом ячейки</xs:documentation>
@@ -428,6 +433,11 @@
             <xs:attribute name="dtoName" type="xs:string">
                 <xs:annotation>
                     <xs:documentation>Имя класса, которой которое использует dto-generator, если не определено, то он сам генерит из имени файла</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="dtoSkip" type="xs:boolean">
+                <xs:annotation>
+                    <xs:documentation>true - не генерить Dto</xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>

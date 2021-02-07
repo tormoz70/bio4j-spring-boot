@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        multiselection="true" dtoName="Note" dtoSkip="true">
+    <SQL action="select">
+        <text><![CDATA[
+SELECT a.orgnote_id, a.org_id, a.usr_uid, a.credate, a.evedate, a.anote
+  FROM fk_org.orgnote a
+ WHERE a.deleted = '0'
+   AND a.org_id = :org_id
+   /*@{cutempty}*/AND a.orgnote_id = :orgnote_id/*{cutempty}@*/
+        ]]></text>
+
+        <param type="integer" name="org_id"/>
+        <param type="integer" name="orgnote_id"/>
+    </SQL>
+
+    <SQL action="execute">
+        <text>@cab4_orgs.current.vesion@.edit_orgnote</text>
+        <param type="integer" name="orgnoteId" direction="INOUT"/>
+        <param type="integer" name="orgId"/>
+        <param type="string" name="p_sys_curusr_uid"/>
+        <param type="string" name="p_sys_curusr_roles"/>
+        <param type="date" name="evedate"/>
+        <param type="clob" name="anote"/>
+    </SQL>
+
+    <fields>
+        <field name="orgnote_id" type="integer" attrName="orgnoteId" header="ID" hidden="true" pk="1"/>
+        <field name="org_id" type="integer" attrName="orgId" header="ID кинотеатра" hidden="true"/>
+        <field name="usr_uid" type="string" attrName="usrUid" header="UID пользователя-автора" hidden="true"/>
+        <field name="credate" type="date" header="Дата/время создания" format="dd.MM.yyyy HH:mm:ss" width="100"/>
+        <field name="evedate" type="date" header="Дата события" format="dd.MM.yyyy" width="80"/>
+        <field name="anote" type="string" header="Описание события" width="320"/>
+    </fields>
+</cursor>

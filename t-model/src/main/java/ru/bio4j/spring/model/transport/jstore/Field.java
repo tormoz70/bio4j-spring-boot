@@ -37,6 +37,9 @@ public class Field implements Serializable {
     /** Не отображать */
     private boolean hidden;
 
+    /** Не генерить в dto */
+    private boolean dtoSkip;
+
     /** Фильтрация */
     private boolean filter;
 
@@ -352,6 +355,14 @@ public class Field implements Serializable {
         this.dtoDocumentation = dtoDocumentation;
     }
 
+    public boolean isDtoSkip() {
+        return dtoSkip;
+    }
+
+    public void setDtoSkip(boolean dtoSkip) {
+        this.dtoSkip = dtoSkip;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -387,12 +398,13 @@ public class Field implements Serializable {
                 editor == field.editor &&
                 Objects.equals(looReference, field.looReference) &&
                 fixed == field.fixed &&
-                Objects.equals(dtoDocumentation, field.dtoDocumentation);
+                Objects.equals(dtoDocumentation, field.dtoDocumentation) &&
+                dtoSkip == field.dtoSkip;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sort, sorter,
-                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference, dtoDocumentation);
+                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference, dtoDocumentation, dtoSkip);
     }
 }

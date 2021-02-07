@@ -39,6 +39,8 @@ public class TypeGenerator {
         List<MethodSpec> gettersetterSpecs = new ArrayList<>();
         if(cursor.getFields().size() > 0) {
             for(Field field : cursor.getFields()) {
+                if(field.isDtoSkip())
+                    continue;
                 String fieldName = Utl.nvl(field.getAttrName(), field.getName());
                 TypeName typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
                 AnnotationSpec.Builder fieldAnnotationBuilder = AnnotationSpec.builder(ApiModelProperty.class)
@@ -72,7 +74,7 @@ public class TypeGenerator {
     }
 
     public static String buildTypeName(String fileName) {
-        return WordUtils.capitalize(fileName, '-').replaceAll("\\-", "");
+        return WordUtils.capitalize(fileName, '-','_').replaceAll("\\-", "").replaceAll("_", "");
     }
 
     public void generate(String rootPath, String path2xml, String packageName, String outputPath) {
@@ -87,7 +89,7 @@ public class TypeGenerator {
             String bioCode = !Strings.isNullOrEmpty(subPackage) ? subPackage.concat(".").concat(javaClassName) : javaClassName;
 
             SQLDefinition cursor = CursorParser.getInstance().pars(inputStream, bioCode);
-            if(cursor != null && cursor.getFields().size() > 0) {
+            if(cursor != null && cursor.getFields().size() > 0 && !cursor.getDtoSkip()) {
                 if(!Strings.isNullOrEmpty(cursor.getDtoName())) {
                     javaClassName = cursor.getDtoName();
                 }

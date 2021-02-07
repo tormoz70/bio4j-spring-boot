@@ -254,6 +254,7 @@ public class CursorParser {
                 field.setMetaType(Converter.toType(Doms.getAttribute(fieldElem, "type", "string", String.class), MetaType.class));
                 field.setAlign(Converter.toType(Doms.getAttribute(fieldElem, "align", "left", String.class), Alignment.class));
                 field.setHidden(Converter.toType(Doms.getAttribute(fieldElem, "hidden", "false", String.class), boolean.class));
+                field.setDtoSkip(Converter.toType(Doms.getAttribute(fieldElem, "dtoSkip", "false", String.class), boolean.class));
                 field.setFilter(Converter.toType(Doms.getAttribute(fieldElem, "filter", "false", String.class), boolean.class));
                 field.setShowTooltip(Converter.toType(Doms.getAttribute(fieldElem, "showTooltip", "false", String.class), boolean.class));
                 field.setDefaultVal(Doms.getAttribute(fieldElem, "defaultVal", null, String.class));
@@ -330,6 +331,7 @@ public class CursorParser {
             return null;
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
         cursor.setDtoName(Doms.getAttribute(document.getDocumentElement(), "dtoName", null, String.class));
+        cursor.setDtoSkip(Doms.getAttribute(document.getDocumentElement(), "dtoSkip", false, Boolean.class));
         Element dtoDocElem = Doms.findElem(document.getDocumentElement(), "/cursor/dtoDocumentation");
         if(dtoDocElem != null)
             cursor.setDtoDocumentation(dtoDocElem.getTextContent());

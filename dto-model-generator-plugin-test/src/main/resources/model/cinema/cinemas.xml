@@ -47,7 +47,7 @@
         <field name="orgname" type="string" header="Кинотеатр" align="left">Название кинотеатра</field>
         <field name="id_org" type="integer" attrName="idOrg" header="ID" pk="1" format="0"/>
         <field name="orgtype_name" type="string" attrName="orgtypeName" header="Тип"/>
-        <field name="time_zone" type="integer" attrName="timeZone" header="Часовой пояс"/>
+        <field name="time_zone" type="integer" attrName="timeZone" header="Часовой пояс" dtoSkip="true"/>
         <field name="ownership" type="string" header="Ф/С"/>
         <field name="holding_id" type="integer" attrName="holdingId" header="ID Киносети"/>
         <field name="hldname" type ="string" header="Киносеть" width="150"/>

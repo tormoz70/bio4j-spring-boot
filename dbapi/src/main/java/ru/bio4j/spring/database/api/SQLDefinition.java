@@ -13,6 +13,7 @@ import java.util.List;
 
 public interface SQLDefinition extends Serializable {
 
+    Boolean getDtoSkip();
     String getDtoName();
     String getDtoDocumentation();
 
