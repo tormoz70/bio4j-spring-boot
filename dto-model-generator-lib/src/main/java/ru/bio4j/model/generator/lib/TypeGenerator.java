@@ -1,6 +1,7 @@
 package ru.bio4j.model.generator.lib;
 
 import com.squareup.javapoet.*;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringUtils;
@@ -40,14 +41,14 @@ public class TypeGenerator {
             for(Field field : cursor.getFields()) {
                 String fieldName = Utl.nvl(field.getAttrName(), field.getName());
                 TypeName typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
-                AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(ApiModelProperty.class)
+                AnnotationSpec.Builder fieldAnnotationBuilder = AnnotationSpec.builder(ApiModelProperty.class)
                         .addMember("value", "$S", field.getDtoDocumentation())
                         .addMember("required", "$L", field.isMandatory())
                         .addMember("hidden", "$L", field.isHidden())
                         .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
                                 field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO);
                 fieldSpecs.add(FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
-                        .addAnnotation(annotationSpecBuilder.build())
+                        .addAnnotation(fieldAnnotationBuilder.build())
                         .build());
                 gettersetterSpecs.add(MethodSpec.methodBuilder("set" + StringUtils.capitalize(fieldName))
                         .addModifiers(Modifier.PUBLIC)
@@ -60,9 +61,14 @@ public class TypeGenerator {
                         .returns(typeName).build());
             }
         }
-        return classBuilder.addFields(fieldSpecs)
-                    .addMethods(gettersetterSpecs)
-                    .build();
+        TypeSpec.Builder resultBuilder = classBuilder.addFields(fieldSpecs)
+                .addMethods(gettersetterSpecs);
+        if(!Strings.isNullOrEmpty(cursor.getDtoDocumentation())) {
+            AnnotationSpec.Builder typeAnnotationBuilder = AnnotationSpec.builder(ApiModel.class)
+                    .addMember("description", "$S", cursor.getDtoDocumentation());
+            resultBuilder.addAnnotation(typeAnnotationBuilder.build());
+        }
+        return resultBuilder.build();
     }
 
     public static String buildTypeName(String fileName) {

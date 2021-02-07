@@ -3,6 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
         multiselection="true" dtoName="Cinema">
+    <dtoDocumentation>Описание кинотеатра</dtoDocumentation>
     <SQL action="select">
         <text><![CDATA[{text-file:cinemas.sql}]]></text>
         <param type="integer" name="parent_org_id"/>

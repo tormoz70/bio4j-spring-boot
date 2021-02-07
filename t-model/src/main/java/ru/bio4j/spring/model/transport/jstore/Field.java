@@ -28,7 +28,7 @@ public class Field implements Serializable {
     /** Заголовок */
     private String title;
 
-    /** Документация для своггера */
+    /** Документация для swagger */
     private String dtoDocumentation;
 
     /** Отображать всплывающую подсказаку с полным текстом ячейки */

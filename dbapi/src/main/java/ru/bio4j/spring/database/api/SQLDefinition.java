@@ -14,6 +14,7 @@ import java.util.List;
 public interface SQLDefinition extends Serializable {
 
     String getDtoName();
+    String getDtoDocumentation();
 
     String getExportTitle();
     void setExportTitle(String exportTitle);

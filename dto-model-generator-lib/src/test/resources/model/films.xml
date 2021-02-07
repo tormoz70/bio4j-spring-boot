@@ -3,6 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
         dtoName="Film">
+    <dtoDocumentation>Описание фильма</dtoDocumentation>
 	<SQL action="select">
 		<text><![CDATA[
 SELECT a.film_id, a.name_rus as film_name, a.prod_year, a.madein, a.studia,

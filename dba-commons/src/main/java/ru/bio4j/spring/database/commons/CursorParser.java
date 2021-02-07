@@ -330,6 +330,9 @@ public class CursorParser {
             return null;
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
         cursor.setDtoName(Doms.getAttribute(document.getDocumentElement(), "dtoName", null, String.class));
+        Element dtoDocElem = Doms.findElem(document.getDocumentElement(), "/cursor/dtoDocumentation");
+        if(dtoDocElem != null)
+            cursor.setDtoDocumentation(dtoDocElem.getTextContent());
         Element exportTitleElem = Doms.findElem(document.getDocumentElement(), "/cursor/exportTitle");
         Boolean readOnly = Doms.getAttribute(document.getDocumentElement(), "readOnly", true, Boolean.class);
         cursor.setReadOnly(readOnly);

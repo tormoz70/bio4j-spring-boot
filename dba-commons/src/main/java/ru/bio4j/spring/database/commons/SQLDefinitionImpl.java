@@ -21,6 +21,12 @@ public class SQLDefinitionImpl implements SQLDefinition {
     public void setDtoName(String dtoName) {
         this.dtoName = dtoName;
     }
+    public String getDtoDocumentation() {
+        return dtoDocumentation;
+    }
+    public void setDtoDocumentation(String dtoDocumentation) {
+        this.dtoDocumentation = dtoDocumentation;
+    }
 
     public String getExportTitle() {
         return exportTitle;
