@@ -610,7 +610,8 @@ public class DbaHelper {
         return new ArrayList<>();
     }
     /**
-     * Возвращает все записи по ID
+     * Возвращает все записи по ID, здесь можно использовать тотже bio который используется для запроса списка объектов
+     * при этом автоматом будет подставлено условие where "pk-field" = "id-param-value"
      * @param bioCode
      * @param id
      * @param params

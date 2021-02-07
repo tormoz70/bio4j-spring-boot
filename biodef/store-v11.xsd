@@ -227,6 +227,16 @@
                                                     <xs:documentation>Если true, то добавить в dto @JsonIgnore</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
+                                            <xs:attribute name="dtoApiHidden" type="xs:boolean">
+                                                <xs:annotation>
+                                                    <xs:documentation>Если true, то не публиковать в swagger, по умолчанию берет значение из hidden</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                            <xs:attribute name="dtoAsList" type="xs:boolean">
+                                                <xs:annotation>
+                                                    <xs:documentation>Если true, генерить в dto как List of type</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:attribute>
                                             <xs:attribute name="showTooltip" type="xs:boolean">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, отображать всплывающую подсказаку с полным текстом ячейки</xs:documentation>

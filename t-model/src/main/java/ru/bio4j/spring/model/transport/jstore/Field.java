@@ -43,6 +43,12 @@ public class Field implements Serializable {
     /** добавить в dto @JsonIgnore */
     private boolean dtoJsonIgnore;
 
+    /** не публиковать в swagger */
+    private boolean dtoApiHidden;
+
+    /** генерить в dto как List of type */
+    private boolean dtoAsList;
+
     /** Фильтрация */
     private boolean filter;
 
@@ -374,6 +380,22 @@ public class Field implements Serializable {
         this.dtoJsonIgnore = dtoJsonIgnore;
     }
 
+    public boolean isDtoApiHidden() {
+        return dtoApiHidden;
+    }
+
+    public void setDtoApiHidden(boolean dtoApiHidden) {
+        this.dtoApiHidden = dtoApiHidden;
+    }
+
+    public boolean isDtoAsList() {
+        return dtoAsList;
+    }
+
+    public void setDtoAsList(boolean dtoAsList) {
+        this.dtoAsList = dtoAsList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -411,13 +433,15 @@ public class Field implements Serializable {
                 fixed == field.fixed &&
                 Objects.equals(dtoDocumentation, field.dtoDocumentation) &&
                 dtoSkip == field.dtoSkip &&
-                dtoJsonIgnore == field.dtoJsonIgnore;
+                dtoJsonIgnore == field.dtoJsonIgnore &&
+                dtoApiHidden == field.dtoApiHidden &&
+                dtoAsList == field.dtoAsList;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sort, sorter,
                 nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference,
-                dtoDocumentation, dtoSkip, dtoJsonIgnore);
+                dtoDocumentation, dtoSkip, dtoJsonIgnore, dtoApiHidden, dtoAsList);
     }
 }

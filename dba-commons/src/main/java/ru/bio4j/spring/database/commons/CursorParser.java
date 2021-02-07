@@ -256,6 +256,12 @@ public class CursorParser {
                 field.setHidden(Converter.toType(Doms.getAttribute(fieldElem, "hidden", "false", String.class), boolean.class));
                 field.setDtoSkip(Converter.toType(Doms.getAttribute(fieldElem, "dtoSkip", "false", String.class), boolean.class));
                 field.setDtoJsonIgnore(Converter.toType(Doms.getAttribute(fieldElem, "dtoJsonIgnore", "false", String.class), boolean.class));
+                String isDtoHidden = Doms.getAttribute(fieldElem, "dtoApiHidden", null, String.class);
+                if(Strings.isNullOrEmpty(isDtoHidden))
+                    field.setDtoApiHidden(field.isHidden());
+                else
+                    field.setDtoApiHidden(Converter.toType(isDtoHidden, boolean.class));
+                field.setDtoAsList(Converter.toType(Doms.getAttribute(fieldElem, "dtoAsList", "false", String.class), boolean.class));
                 field.setFilter(Converter.toType(Doms.getAttribute(fieldElem, "filter", "false", String.class), boolean.class));
                 field.setShowTooltip(Converter.toType(Doms.getAttribute(fieldElem, "showTooltip", "false", String.class), boolean.class));
                 field.setDefaultVal(Doms.getAttribute(fieldElem, "defaultVal", null, String.class));

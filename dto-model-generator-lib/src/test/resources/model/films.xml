@@ -25,6 +25,7 @@ ORDER BY film_name
     <field name="madein" type="string" header="Страна" readOnly="false" mandatory="true" editMaxLength="100" dtoJsonIgnore="true"/>
     <field name="studia" type="string" header="Студия" readOnly="false" mandatory="true" editMaxLength="100"/>
     <field name="editable" type="boolean" hidden="true"/>
+    <field name="editableList" type="boolean" dtoAsList="true" hidden="true" dtoApiHidden="false"/>
     <!-- Эти поля нужны для редактора -->
     <field name="genre" type="string" header="Жанр" hidden="true" editor="true" readOnly="false" editMaxLength="100" dtoSkip="true"/>
     <field name="bulletin" type="string" header="Номер бюлетеня" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>

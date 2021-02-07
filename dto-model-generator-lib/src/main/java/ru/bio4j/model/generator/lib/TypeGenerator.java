@@ -43,11 +43,15 @@ public class TypeGenerator {
                 if(field.isDtoSkip())
                     continue;
                 String fieldName = Utl.nvl(field.getAttrName(), field.getName());
-                TypeName typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
+                TypeName typeName;
+                if(field.isDtoAsList())
+                    typeName = ParameterizedTypeName.get(List.class, MetaTypeConverter.write(field.getMetaType()));
+                else
+                    typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
                 AnnotationSpec.Builder fieldAnnotationBuilder = AnnotationSpec.builder(ApiModelProperty.class)
                         .addMember("value", "$S", field.getDtoDocumentation())
                         .addMember("required", "$L", field.isMandatory())
-                        .addMember("hidden", "$L", field.isHidden())
+                        .addMember("hidden", "$L", field.isDtoApiHidden())
                         .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
                                 field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO);
                 FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
