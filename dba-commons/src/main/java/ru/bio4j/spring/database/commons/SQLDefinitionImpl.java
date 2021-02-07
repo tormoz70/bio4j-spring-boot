@@ -15,6 +15,13 @@ import java.util.function.Predicate;
 
 public class SQLDefinitionImpl implements SQLDefinition {
 
+    public String getDtoName() {
+        return dtoName;
+    }
+    public void setDtoName(String dtoName) {
+        this.dtoName = dtoName;
+    }
+
     public String getExportTitle() {
         return exportTitle;
     }
@@ -167,6 +174,8 @@ public class SQLDefinitionImpl implements SQLDefinition {
 
     private final String bioCode;
 
+    private String dtoName;
+    private String dtoDocumentation;
     private String exportTitle;
 
     private Boolean multiSelection;

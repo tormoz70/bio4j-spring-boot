@@ -28,6 +28,9 @@ public class Field implements Serializable {
     /** Заголовок */
     private String title;
 
+    /** Документация для своггера */
+    private String dtoDocumentation;
+
     /** Отображать всплывающую подсказаку с полным текстом ячейки */
     private boolean showTooltip;
 
@@ -341,6 +344,14 @@ public class Field implements Serializable {
         this.fixed = fixed;
     }
 
+    public String getDtoDocumentation() {
+        return dtoDocumentation;
+    }
+
+    public void setDtoDocumentation(String dtoDocumentation) {
+        this.dtoDocumentation = dtoDocumentation;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -375,12 +386,13 @@ public class Field implements Serializable {
                 Objects.equals(editMaxLength, field.editMaxLength) &&
                 editor == field.editor &&
                 Objects.equals(looReference, field.looReference) &&
-                fixed == field.fixed;
+                fixed == field.fixed &&
+                Objects.equals(dtoDocumentation, field.dtoDocumentation);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, name, attrName, format, align, title, showTooltip, hidden, filter, readonly, mandatory, pk, useNull, width, defaultVal, sort, sorter,
-                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference);
+                nullsPosition, tooltip, metaType, expEnabled, expFormat, expWidth, textLocality, aggregate, looCaption, editMaxLength, editor, looReference, dtoDocumentation);
     }
 }

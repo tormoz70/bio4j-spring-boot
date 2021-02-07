@@ -6,7 +6,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import ru.bio4j.spring.commons.converter.Converter;
-import ru.bio4j.spring.commons.converter.DateTimeParser;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
 import ru.bio4j.spring.commons.types.Paramus;
 import ru.bio4j.spring.commons.utils.*;
@@ -22,14 +21,9 @@ import ru.bio4j.spring.model.transport.jstore.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CursorParser {
@@ -109,7 +103,7 @@ public class CursorParser {
             throw new IllegalArgumentException("Attribute \"col.name\" not found in descriptor!");
         name = Strings.split(name, ".")[1].trim().toLowerCase();
 
-        Field col = findCol(name, cols);
+        Field col = findField(name, cols);
         if (col == null) {
             col = new Field();
             cols.add(col);
@@ -217,7 +211,7 @@ public class CursorParser {
         }
     }
 
-    private static Field findCol(final String name, final List<Field> cols) {
+    private static Field findField(final String name, final List<Field> cols) {
         return Lists.first(cols, new Predicate<Field>() {
             @Override
             public boolean test(Field item) {
@@ -226,57 +220,63 @@ public class CursorParser {
         });
     }
 
-    private static void addColsFromXml(final SQLDefinitionImpl cursor, final Document document) {
+    private static void addFieldsFromXml(final SQLDefinitionImpl cursor, final Document document) {
         Element sqlElem = Doms.findElem(document, "/cursor/fields");
         NodeList fieldNodes = sqlElem.getElementsByTagName("field");
         List<Field> fields = cursor.getFields();
         for (int i = 0; i < fieldNodes.getLength(); i++) {
-            Element paramElem = (Element) fieldNodes.item(i);
-            boolean generate = Converter.toType(Doms.getAttribute(paramElem, "generate", "true", String.class), boolean.class);
+            Element fieldElem = (Element) fieldNodes.item(i);
+            boolean generate = Converter.toType(Doms.getAttribute(fieldElem, "generate", "true", String.class), boolean.class);
             if (generate) {
-                String fieldName = Doms.getAttribute(paramElem, "name", "", String.class);
-                String attrName = Doms.getAttribute(paramElem, "attrName", null, String.class);
-                Field col = findCol(fieldName, fields);
-                if (col == null) {
-                    col = new Field();
-                    fields.add(col);
-                    col.setName(fieldName);
-                    col.setAttrName(attrName);
+                String fieldName = Doms.getAttribute(fieldElem, "name", "", String.class);
+                String attrName = Doms.getAttribute(fieldElem, "attrName", null, String.class);
+                Field field = findField(fieldName, fields);
+                if (field == null) {
+                    field = new Field();
+                    fields.add(field);
+                    field.setName(fieldName);
+                    field.setAttrName(attrName);
                 }
-                col.setId(i + 1);
-                col.setFormat(Doms.getAttribute(paramElem, "format", null, String.class));
-                String header = Doms.getAttribute(paramElem, "header", null, String.class);
-                if (Strings.isNullOrEmpty(header))
-                    header = paramElem.getTextContent();
-                if (Strings.isNullOrEmpty(header))
+                field.setId(i + 1);
+                field.setFormat(Doms.getAttribute(fieldElem, "format", null, String.class));
+                String dtoDoc = fieldElem.getTextContent();
+                String header = Doms.getAttribute(fieldElem, "header", null, String.class);
+                if (Strings.isNullOrEmpty(header) && !Strings.isNullOrEmpty(dtoDoc)) {
+                    header = dtoDoc;
+                } else if (!Strings.isNullOrEmpty(header) && Strings.isNullOrEmpty(dtoDoc)) {
+                    dtoDoc = header;
+                } else if (Strings.isNullOrEmpty(header) && Strings.isNullOrEmpty(dtoDoc)) {
+                    dtoDoc = fieldName;
                     header = fieldName;
-                col.setTitle(header);
-                col.setMetaType(Converter.toType(Doms.getAttribute(paramElem, "type", "string", String.class), MetaType.class));
-                col.setAlign(Converter.toType(Doms.getAttribute(paramElem, "align", "left", String.class), Alignment.class));
-                col.setHidden(Converter.toType(Doms.getAttribute(paramElem, "hidden", "false", String.class), boolean.class));
-                col.setFilter(Converter.toType(Doms.getAttribute(paramElem, "filter", "false", String.class), boolean.class));
-                col.setShowTooltip(Converter.toType(Doms.getAttribute(paramElem, "showTooltip", "false", String.class), boolean.class));
-                col.setDefaultVal(Doms.getAttribute(paramElem, "defaultVal", null, String.class));
-                col.setPk(Converter.toType(Doms.getAttribute(paramElem, "pk", "false", String.class), boolean.class));
-                col.setUseNull(Converter.toType(Doms.getAttribute(paramElem, "useNull", "true", String.class), boolean.class));
-                col.setReadonly(Converter.toType(Doms.getAttribute(paramElem, "readOnly", "true", String.class), boolean.class));
-                col.setWidth(Doms.getAttribute(paramElem, "width", null, String.class));
-                col.setExpEnabled(Converter.toType(Doms.getAttribute(paramElem, "expEnabled", "true", String.class), boolean.class));
-                col.setExpFormat(Doms.getAttribute(paramElem, "expFormat", null, String.class));
-                col.setExpWidth(Doms.getAttribute(paramElem, "expWidth", null, String.class));
-                col.setSort(Converter.toType(Doms.getAttribute(paramElem, "sort", "true", String.class), boolean.class));
-                col.setSorter(Doms.getAttribute(paramElem, "sorter", null, String.class));
-                col.setNullsPosition(Converter.toType(Doms.getAttribute(paramElem, "nullsPosition", "DEFAULT", String.class), Sort.NullsPosition.class));
-                col.setTextLocality(Converter.toType(Doms.getAttribute(paramElem, "textLocality", "UNDEFINED", String.class), Sort.TextLocality.class));
-                col.setTooltip(Doms.getAttribute(paramElem, "tooltip", null, String.class));
-                col.setMandatory(Converter.toType(Doms.getAttribute(paramElem, "mandatory", "false", String.class), boolean.class));
-                col.setAggregate(Converter.toType(Doms.getAttribute(paramElem, "aggregate", "UNDEFINED", String.class), Total.Aggregate.class));
-                col.setLooCaption(Converter.toType(Doms.getAttribute(paramElem, "looCaption", "false", String.class), boolean.class));
-                String editMaxLength = Doms.getAttribute(paramElem, "editMaxLength", null, String.class);
-                col.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
-                col.setEditor(Doms.getAttribute(paramElem, "editor", null, Boolean.class));
-                col.setLooReference(Doms.getAttribute(paramElem, "looReference", null, String.class));
-                col.setFixed(Converter.toType(Doms.getAttribute(paramElem, "fixed", "NONE", String.class), Fixed.class));
+                }
+                field.setTitle(header);
+                field.setDtoDocumentation(dtoDoc);
+                field.setMetaType(Converter.toType(Doms.getAttribute(fieldElem, "type", "string", String.class), MetaType.class));
+                field.setAlign(Converter.toType(Doms.getAttribute(fieldElem, "align", "left", String.class), Alignment.class));
+                field.setHidden(Converter.toType(Doms.getAttribute(fieldElem, "hidden", "false", String.class), boolean.class));
+                field.setFilter(Converter.toType(Doms.getAttribute(fieldElem, "filter", "false", String.class), boolean.class));
+                field.setShowTooltip(Converter.toType(Doms.getAttribute(fieldElem, "showTooltip", "false", String.class), boolean.class));
+                field.setDefaultVal(Doms.getAttribute(fieldElem, "defaultVal", null, String.class));
+                field.setPk(Converter.toType(Doms.getAttribute(fieldElem, "pk", "false", String.class), boolean.class));
+                field.setUseNull(Converter.toType(Doms.getAttribute(fieldElem, "useNull", "true", String.class), boolean.class));
+                field.setReadonly(Converter.toType(Doms.getAttribute(fieldElem, "readOnly", "true", String.class), boolean.class));
+                field.setWidth(Doms.getAttribute(fieldElem, "width", null, String.class));
+                field.setExpEnabled(Converter.toType(Doms.getAttribute(fieldElem, "expEnabled", "true", String.class), boolean.class));
+                field.setExpFormat(Doms.getAttribute(fieldElem, "expFormat", null, String.class));
+                field.setExpWidth(Doms.getAttribute(fieldElem, "expWidth", null, String.class));
+                field.setSort(Converter.toType(Doms.getAttribute(fieldElem, "sort", "true", String.class), boolean.class));
+                field.setSorter(Doms.getAttribute(fieldElem, "sorter", null, String.class));
+                field.setNullsPosition(Converter.toType(Doms.getAttribute(fieldElem, "nullsPosition", "DEFAULT", String.class), Sort.NullsPosition.class));
+                field.setTextLocality(Converter.toType(Doms.getAttribute(fieldElem, "textLocality", "UNDEFINED", String.class), Sort.TextLocality.class));
+                field.setTooltip(Doms.getAttribute(fieldElem, "tooltip", null, String.class));
+                field.setMandatory(Converter.toType(Doms.getAttribute(fieldElem, "mandatory", "false", String.class), boolean.class));
+                field.setAggregate(Converter.toType(Doms.getAttribute(fieldElem, "aggregate", "UNDEFINED", String.class), Total.Aggregate.class));
+                field.setLooCaption(Converter.toType(Doms.getAttribute(fieldElem, "looCaption", "false", String.class), boolean.class));
+                String editMaxLength = Doms.getAttribute(fieldElem, "editMaxLength", null, String.class);
+                field.setEditMaxLength(Strings.isNullOrEmpty(editMaxLength) ? Converter.toType(editMaxLength, Integer.class) : null);
+                field.setEditor(Doms.getAttribute(fieldElem, "editor", null, Boolean.class));
+                field.setLooReference(Doms.getAttribute(fieldElem, "looReference", null, String.class));
+                field.setFixed(Converter.toType(Doms.getAttribute(fieldElem, "fixed", "NONE", String.class), Fixed.class));
             }
         }
 
@@ -329,6 +329,7 @@ public class CursorParser {
         if(!document.getDocumentElement().getNodeName().equals("cursor"))
             return null;
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
+        cursor.setDtoName(Doms.getAttribute(document.getDocumentElement(), "dtoName", null, String.class));
         Element exportTitleElem = Doms.findElem(document.getDocumentElement(), "/cursor/exportTitle");
         Boolean readOnly = Doms.getAttribute(document.getDocumentElement(), "readOnly", true, Boolean.class);
         cursor.setReadOnly(readOnly);
@@ -337,7 +338,7 @@ public class CursorParser {
 
         if (exportTitleElem != null)
             cursor.setExportTitle(exportTitleElem.getTextContent());
-        addColsFromXml(cursor, document); // добавляем колонки из XML
+        addFieldsFromXml(cursor, document); // добавляем колонки из XML
         List<Element> sqlTextElems = Doms.findElems(document.getDocumentElement(), "/cursor/SQL");
         for (Element sqlElem : sqlTextElems) {
             SQLType curType = Doms.getAttribute(sqlElem, "action", SQLType.SELECT, SQLType.class);

@@ -41,7 +41,7 @@ public class TypeGenerator {
                 String fieldName = Utl.nvl(field.getAttrName(), field.getName());
                 TypeName typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
                 AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(ApiModelProperty.class)
-                        .addMember("value", "$S", field.getTitle())
+                        .addMember("value", "$S", field.getDtoDocumentation())
                         .addMember("required", "$L", field.isMandatory())
                         .addMember("hidden", "$L", field.isHidden())
                         .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
@@ -82,6 +82,9 @@ public class TypeGenerator {
 
             SQLDefinition cursor = CursorParser.getInstance().pars(inputStream, bioCode);
             if(cursor != null && cursor.getFields().size() > 0) {
+                if(!Strings.isNullOrEmpty(cursor.getDtoName())) {
+                    javaClassName = cursor.getDtoName();
+                }
                 File outputFolder = new File(outputPath);
                 String outputPkg = !Strings.isNullOrEmpty(subPackage) ? packageName.concat(".").concat(subPackage) : packageName;
                 String outputFileName = outputPkg.replace(".", "/").concat("/").concat(javaClassName).concat(".java");

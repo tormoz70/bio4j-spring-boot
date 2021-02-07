@@ -2,7 +2,7 @@
 <cursor xmlns="http://bio4j.ru/biodef-repo/store"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
-        multiselection="true">
+        multiselection="true" dtoName="Note">
     <SQL action="select">
         <text><![CDATA[
 SELECT a.orgnote_id, a.org_id, a.usr_uid, a.credate, a.evedate, a.anote
