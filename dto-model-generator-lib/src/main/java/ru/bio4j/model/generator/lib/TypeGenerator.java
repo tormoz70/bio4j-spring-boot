@@ -26,8 +26,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class TypeGenerator {
@@ -46,8 +48,11 @@ public class TypeGenerator {
                 TypeName typeName;
                 if(field.isDtoAsList())
                     typeName = ParameterizedTypeName.get(List.class, MetaTypeConverter.write(field.getMetaType()));
-                else
-                    typeName = ParameterizedTypeName.get(MetaTypeConverter.write(field.getMetaType()));
+                else {
+                    // TODO: Этот костыль надо убрать, когда фреймворк полностью перейдёт на java.time
+                    Class<?> clazz = MetaTypeConverter.write(field.getMetaType());
+                    typeName = ParameterizedTypeName.get(clazz == Date.class ? LocalDateTime.class : clazz);
+                }
                 AnnotationSpec.Builder fieldAnnotationBuilder = AnnotationSpec.builder(ApiModelProperty.class)
                         .addMember("value", "$S", field.getDtoDocumentation())
                         .addMember("required", "$L", field.isMandatory())
