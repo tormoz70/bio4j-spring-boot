@@ -41,6 +41,7 @@ public class TypeGenerator {
         List<FieldSpec> fieldSpecs = new ArrayList<>();
         List<MethodSpec> gettersetterSpecs = new ArrayList<>();
         if(cursor.getFields().size() > 0) {
+            int pos = 0;
             for(Field field : cursor.getFields()) {
                 if(field.isDtoSkip())
                     continue;
@@ -58,7 +59,8 @@ public class TypeGenerator {
                         .addMember("required", "$L", field.isMandatory())
                         .addMember("hidden", "$L", field.isDtoApiHidden())
                         .addMember("accessMode", "$T.$L", ApiModelProperty.AccessMode.class,
-                                field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO);
+                                field.isReadonly() ? ApiModelProperty.AccessMode.READ_ONLY : ApiModelProperty.AccessMode.AUTO)
+                        .addMember("position", "$L", pos++);
                 FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE)
                         .addAnnotation(fieldAnnotationBuilder.build());
                 if(field.isDtoJsonIgnore())
