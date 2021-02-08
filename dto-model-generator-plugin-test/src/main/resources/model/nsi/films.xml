@@ -3,6 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
         dtoName="Film">
+    <dtoDocumentation>Описание фильма</dtoDocumentation>
 	<SQL action="select">
 		<text><![CDATA[
 SELECT a.film_id, a.name_rus as film_name, a.prod_year, a.madein, a.studia,
@@ -21,14 +22,15 @@ ORDER BY film_name
     <field name="film_id" type="integer" pk="1" attrName="filmId" header="ID" readOnly="true" editor="false"/>
     <field name="film_name" type="string" attrName="filmName" header="Название фильма" readOnly="false" mandatory="true" editMaxLength="500"/>
     <field name="prod_year" type="string" attrName="prodYear" header="Год выпуска" readOnly="false" mandatory="true" editMaxLength="30"/>
-    <field name="madein" type="string" header="Страна" readOnly="false" mandatory="true" editMaxLength="100"/>
+    <field name="madein" type="string" header="Страна" readOnly="false" mandatory="true" editMaxLength="100" dtoJsonIgnore="true"/>
     <field name="studia" type="string" header="Студия" readOnly="false" mandatory="true" editMaxLength="100"/>
     <field name="editable" type="boolean" hidden="true"/>
+    <field name="editableList" type="boolean" dtoAsList="true" hidden="true" dtoApiHidden="false"/>
     <!-- Эти поля нужны для редактора -->
-    <field name="genre" type="string" header="Жанр" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="genre" type="string" header="Жанр" hidden="true" editor="true" readOnly="false" editMaxLength="100" dtoSkip="true"/>
     <field name="bulletin" type="string" header="Номер бюлетеня" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
     <field name="dubbing" type="string" header="Дубляж" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
-    <field name="film_category" type="string" attrName="filmCategory" header="Категория" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
+    <field name="film_category" type="string" attrName="filmCategory" header="Категория" hidden="true" editor="true" readOnly="false" editMaxLength="100">Категория фильма</field>
     <field name="lang_orig" type="string" attrName="langOrig" header="Язык оригинала" hidden="true" editor="true" readOnly="false" editMaxLength="30"/>
     <field name="name_orig" type="string" attrName="nameOrig" header="Оригинальное название" hidden="true" editor="true" readOnly="false" editMaxLength="500"/>
     <field name="frmt" type="string" header="Формат" hidden="true" editor="true" readOnly="false" editMaxLength="100"/>
