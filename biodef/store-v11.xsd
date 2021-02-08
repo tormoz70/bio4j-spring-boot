@@ -184,7 +184,7 @@
                                                     <xs:documentation>Формат вывода данных. Например, для типа "date" - "yyyy.MM.dd HH:mm:ss"</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="align">
+                                            <xs:attribute name="align" default="left">
                                                 <xs:annotation>
                                                     <xs:documentation>Выравнивание</xs:documentation>
                                                 </xs:annotation>
@@ -207,22 +207,22 @@
                                                     <xs:documentation>Заголовок при отображении в DataGrid</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="filter" type="xs:boolean" default="true">
+                                            <xs:attribute name="filter" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Вкл фильтрации по полю</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="hidden" type="xs:boolean">
+                                            <xs:attribute name="hidden" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, то это скрытая колонка в DataGrid</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="dtoSkip" type="xs:boolean">
+                                            <xs:attribute name="dtoSkip" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, то не генерить в dto</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="dtoJsonIgnore" type="xs:boolean">
+                                            <xs:attribute name="dtoJsonIgnore" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, то добавить в dto @JsonIgnore</xs:documentation>
                                                 </xs:annotation>
@@ -232,17 +232,17 @@
                                                     <xs:documentation>Если true, то не публиковать в swagger, по умолчанию берет значение из hidden</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="dtoAsList" type="xs:boolean">
+                                            <xs:attribute name="dtoAsList" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, генерить в dto как List of type</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="showTooltip" type="xs:boolean">
+                                            <xs:attribute name="showTooltip" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, отображать всплывающую подсказаку с полным текстом ячейки</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="readOnly" type="xs:boolean">
+                                            <xs:attribute name="readOnly" type="xs:boolean" default="true">
                                                 <xs:annotation>
                                                     <xs:documentation>Если true, то это колонка в DataGrid только для чтения (по умолчанию true)</xs:documentation>
                                                 </xs:annotation>
@@ -252,12 +252,12 @@
                                                     <xs:documentation>Значения поля, соответствующие 'true' и 'false' для типа поля 'boolean', разделённые символом ':'</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="pk" type="xs:boolean">
+                                            <xs:attribute name="pk" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Признак того, что поле является первичным ключем</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="useNull" type="xs:boolean">
+                                            <xs:attribute name="useNull" type="xs:boolean" default="true">
                                                 <xs:annotation>
                                                     <xs:documentation>На клиенте не приводить значение null к типу колонки</xs:documentation>
                                                 </xs:annotation>
@@ -308,18 +308,19 @@
                                                     <xs:documentation>Имя колонки, по которой будет сортировка</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="nullsPosition">
+                                            <xs:attribute name="nullsPosition" default="DEFAULT">
                                                 <xs:annotation>
                                                     <xs:documentation>Позиция NULL при сортировке</xs:documentation>
                                                 </xs:annotation>
                                                 <xs:simpleType>
                                                     <xs:restriction base="xs:NMTOKEN">
+                                                        <xs:enumeration value="DEFAULT"/>
                                                         <xs:enumeration value="NULLLAST"/>
                                                         <xs:enumeration value="NULLFIRST"/>
                                                     </xs:restriction>
                                                 </xs:simpleType>
                                             </xs:attribute>
-                                            <xs:attribute name="textLocality">
+                                            <xs:attribute name="textLocality" default="UNDEFINED">
                                                 <xs:annotation>
                                                     <xs:documentation>Язык текста в поле (влияет на алгоритм сортировки)</xs:documentation>
                                                 </xs:annotation>
@@ -336,12 +337,12 @@
                                                     <xs:documentation>Имя колонки, из которой будет браться tooltip</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="mandatory" type="xs:boolean" default="true">
+                                            <xs:attribute name="mandatory" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>При сохранении поле должно быть заполнено обязательно</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="aggregate">
+                                            <xs:attribute name="aggregate" default="UNDEFINED">
                                                 <xs:annotation>
                                                     <xs:documentation>Вычислять агрегат</xs:documentation>
                                                 </xs:annotation>
@@ -356,7 +357,7 @@
                                                     </xs:restriction>
                                                 </xs:simpleType>
                                             </xs:attribute>
-                                            <xs:attribute name="looCaption" type="xs:boolean" default="true">
+                                            <xs:attribute name="looCaption" type="xs:boolean" default="false">
                                                 <xs:annotation>
                                                     <xs:documentation>Поле является значением в combobox</xs:documentation>
                                                 </xs:annotation>
@@ -371,7 +372,7 @@
                                                     <xs:documentation>Вкл поле в форму редактирования</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="fixed">
+                                            <xs:attribute name="fixed" default="NONE">
                                                 <xs:annotation>
                                                     <xs:documentation>Фиксировать колонку при горизонтальной прокрутке DataGrid слева или справа</xs:documentation>
                                                 </xs:annotation>
