@@ -367,7 +367,7 @@
                                                     <xs:documentation>Максимальное кол-во символов при вводе в поле редактирования</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
-                                            <xs:attribute name="editor" type="xs:boolean" default="true">
+                                            <xs:attribute name="editor" type="xs:boolean">
                                                 <xs:annotation>
                                                     <xs:documentation>Вкл поле в форму редактирования</xs:documentation>
                                                 </xs:annotation>
