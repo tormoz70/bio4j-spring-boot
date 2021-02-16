@@ -1,15 +1,12 @@
 package ru.bio4j.spring.model.transport;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.annotations.ApiModelProperty;
-import ru.bio4j.spring.model.serializers.DateSerializerOpt;
 
 import java.io.Serializable;
 import java.security.Principal;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class SsoUser implements Principal, Serializable {
@@ -19,9 +16,9 @@ public class SsoUser implements Principal, Serializable {
     @ApiModelProperty("Токен безопасности. Передавать в заголовок \"X-SToken\" для всех запросов")
     private String stoken;
     @ApiModelProperty("Дата/время когда истекает срокдействия токена безопасности")
-    @JsonSerialize(using = DateSerializerOpt.class)
-    @JsonDeserialize
-    private Date stokenExpire;
+    private LocalDateTime stokenExpire;
+    @ApiModelProperty("Токен обновления. Используется для обновления токена безопасности")
+    private String refreshToken;
     @ApiModelProperty("Логин пользователя (уникальное имя пользователя, которое используется при входе в систему)")
     private String login;
     @ApiModelProperty("ФИО пользователя")
@@ -188,11 +185,11 @@ public class SsoUser implements Principal, Serializable {
         this.anonymouse = anonymouse;
     }
 
-    public Date getStokenExpire() {
+    public LocalDateTime getStokenExpire() {
         return stokenExpire;
     }
 
-    public void setStokenExpire(Date stokenExpire) {
+    public void setStokenExpire(LocalDateTime stokenExpire) {
         this.stokenExpire = stokenExpire;
     }
 
@@ -226,5 +223,46 @@ public class SsoUser implements Principal, Serializable {
 
     public void setChildOrgIds(String childOrgIds) {
         this.childOrgIds = childOrgIds;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SsoUser)) return false;
+        SsoUser ssoUser = (SsoUser) o;
+        return Objects.equals(innerUid, ssoUser.innerUid) &&
+                Objects.equals(stoken, ssoUser.stoken) &&
+                Objects.equals(stokenExpire, ssoUser.stokenExpire) &&
+                Objects.equals(refreshToken, ssoUser.refreshToken) &&
+                Objects.equals(login, ssoUser.login) &&
+                Objects.equals(fio, ssoUser.fio) &&
+                Objects.equals(email, ssoUser.email) &&
+                Objects.equals(phone, ssoUser.phone) &&
+                Objects.equals(orgId, ssoUser.orgId) &&
+                Objects.equals(orgName, ssoUser.orgName) &&
+                Objects.equals(orgDesc, ssoUser.orgDesc) &&
+                Objects.equals(parentOrgId, ssoUser.parentOrgId) &&
+                Objects.equals(childOrgIds, ssoUser.childOrgIds) &&
+                Objects.equals(roles, ssoUser.roles) &&
+                Objects.equals(grants, ssoUser.grants) &&
+                Objects.equals(remoteIP, ssoUser.remoteIP) &&
+                Objects.equals(remoteClient, ssoUser.remoteClient) &&
+                Objects.equals(anonymouse, ssoUser.anonymouse) &&
+                Objects.equals(deviceuuid, ssoUser.deviceuuid) &&
+                Objects.equals(pushenabled, ssoUser.pushenabled) &&
+                Objects.equals(pushtoken, ssoUser.pushtoken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(innerUid, stoken, stokenExpire, refreshToken, login, fio, email, phone, orgId, orgName, orgDesc, parentOrgId, childOrgIds, roles, grants, remoteIP, remoteClient, anonymouse, deviceuuid, pushenabled, pushtoken);
     }
 }
