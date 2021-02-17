@@ -10,8 +10,8 @@
     <properties>
         <dependency-plugin-version>2.7</dependency-plugin-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-framework.version>5.3.1</spring-framework.version>
-        <spring-boot.version>2.4.0</spring-boot.version>
+        <spring-framework.version>5.3.3</spring-framework.version>
+        <spring-boot.version>2.4.2</spring-boot.version>
         <spring-kafka.version>2.6.4</spring-kafka.version>
         <org.apache.poi.version>4.1.2</org.apache.poi.version>
         <hikaricp.version>3.4.5</hikaricp.version>
@@ -27,7 +27,7 @@
         <jackson.version>2.11.3</jackson.version>
         <junit.version>4.13.1</junit.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
-        <logback.version>1.2.3</logback.version>
+<!--        <logback.version>1.2.3</logback.version>-->
         <javapoet.version>1.13.0</javapoet.version>
         <commons-text.version>1.9</commons-text.version>
 	</properties>
@@ -340,12 +340,12 @@
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-                <scope>test</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>ch.qos.logback</groupId>-->
+<!--                <artifactId>logback-classic</artifactId>-->
+<!--                <version>${logback.version}</version>-->
+<!--                <scope>test</scope>-->
+<!--            </dependency>-->
 
             <!-- bio4j -->
             <dependency>
