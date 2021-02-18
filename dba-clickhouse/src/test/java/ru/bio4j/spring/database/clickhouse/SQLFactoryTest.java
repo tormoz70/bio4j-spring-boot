@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,16 +87,19 @@ public class SQLFactoryTest {
         try {
 //            Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:8123/default", "default", "j12");
             Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:9000", "default", "j12");
-            PreparedStatement stmt = conn.prepareStatement("select ? as periodStart\n" +
-                    "      ,toDate(?) as periodStart1\n" +
+            PreparedStatement stmt = conn.prepareStatement(
+                    "select ? as periodStart\n" +
                     "      ,? as periodEnd\n" +
+                    "      ,toDate(?) as periodStart1\n" +
                     "      ,toDateTime(?) as periodEnd1\n" +
                     "      ,now() as emptyDate");
-            java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().parse("2009-01-01").getTime());
-            java.sql.Timestamp endDate = new java.sql.Timestamp(DateTimeParser.getInstance().parse("2009-01-02T12:00:00").getTime());
+            //java.sql.Date startDate = new java.sql.Date(DateTimeParser.getInstance().parse("2009-01-01").getTime());
+            LocalDate startDate = LocalDate.parse("2009-01-01");
+            //java.sql.Timestamp endDate = new java.sql.Timestamp(DateTimeParser.getInstance().parse("2009-01-02T12:00:00").getTime());
+            ZonedDateTime endDate = ZonedDateTime.of(LocalDateTime.parse("2009-01-02T12:00:00"), ZoneId.of("UTC"));
             stmt.setObject(1, startDate);
-            stmt.setObject(2, startDate);
-            stmt.setObject(3, endDate);
+            stmt.setObject(2, endDate);
+            stmt.setObject(3, startDate);
             stmt.setObject(4, endDate);
             ResultSet rs = stmt.executeQuery();
 
@@ -107,10 +111,10 @@ public class SQLFactoryTest {
                 Object emptyDate = rs.getObject("emptyDate");
                 System.out.println(
                         periodStart + "(" + periodStart.getClass() + ")\t" +
-                                periodStart1 + "(" + periodStart1.getClass() + ")\t" +
-                                periodEnd + "(" + periodEnd.getClass() + ")\t" +
-                                periodEnd1 + "(" + periodEnd1.getClass() + ")\t" +
-                                emptyDate + "(" + emptyDate.getClass() + ")\t");
+                        periodEnd + "(" + periodEnd.getClass() + ")\t" +
+                        periodStart1 + "(" + periodStart1.getClass() + ")\t" +
+                        periodEnd1 + "(" + periodEnd1.getClass() + ")\t" +
+                        emptyDate + "(" + emptyDate.getClass() + ")\t");
             }
 
         } catch (Exception ex) {
@@ -223,6 +227,34 @@ public class SQLFactoryTest {
             Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggregate() == Total.Aggregate.COUNT).findFirst().get().getFact());
             Assert.assertEquals(27527750L, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.SUM).findFirst().get().getFact());
             Assert.assertEquals(275277.5D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.AVG).findFirst().get().getFact());
+        } catch (Exception ex) {
+            LOG.error("Error!", ex);
+            Assert.fail();
+        }
+
+    }
+
+    @Test(timeout = 20000)
+    public void testSQLCommandWithTotals() {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:clickhouse://192.168.70.101:9000", "default", "j12");
+            PreparedStatement stmt = conn.prepareStatement(
+                    "select id, sum(val) as summ from (\n" +
+                    "    select 1 as id, 23 as val\n" +
+                    "    union all\n" +
+                    "    select 2 as id, 3 as val\n" +
+                    "    union all\n" +
+                    "    select 1 as id, 30 as val\n" +
+                    "    union all\n" +
+                    "    select 3 as id, 10 as val\n" +
+                    ")\n" +
+                    "group by id with totals");
+            ResultSet rs = stmt.executeQuery();
+            int cnt = 0;
+            while (rs.next()) {
+                cnt++;
+            }
+            Assert.assertEquals(4L, cnt);
         } catch (Exception ex) {
             LOG.error("Error!", ex);
             Assert.fail();
