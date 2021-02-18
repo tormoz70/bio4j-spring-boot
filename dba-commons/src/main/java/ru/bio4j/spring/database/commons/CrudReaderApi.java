@@ -181,52 +181,53 @@ public class CrudReaderApi {
         }, user);
     }
 
-    private static <T> void _processCurrentRecordOnTotals(final List<Total> pageTotals, final T bean, final Total total) {
-        if(total.getAggregate() != Total.Aggregate.COUNT) {
+    private static <T> void _processCurrentRecordOnTotals(final T bean, final Total total) {
+        if (total.getAggregate() == Total.Aggregate.COUNT) {
+            total.setFact(Converter.toType(total.getFact(), long.class) + 1L);
+        } else {
             String field = total.getFieldName();
             double value;
             if (bean instanceof HashMap)
                 value = ABeans.extractAttrFromBean((Map) bean, field, double.class, null);
             else
                 value = fieldValue(bean, field, double.class);
-            Total rsTotal = pageTotals.stream().filter(t -> Strings.compare(t.getFieldName(), total.getFieldName(), true)).findFirst().orElse(null);
-            if(rsTotal == null) {
-                rsTotal = Total.builder()
-                        .fieldName(total.getFieldName())
-                        .aggrigate(total.getAggregate())
-                        .fieldType(total.getFieldType())
-                        .fact(Converter.toType(0D, total.getFieldType()))
-                        .build();
+            if (total.getAggregate() == Total.Aggregate.MIN) {
+                if (total.getFact() == null || value < Converter.toType(total.getFact(), double.class))
+                    total.setFact(Converter.toType(value, total.getFieldType()));
+            } else if (total.getAggregate() == Total.Aggregate.MAX) {
+                if (total.getFact() == null || value > Converter.toType(total.getFact(), double.class))
+                    total.setFact(Converter.toType(value, total.getFieldType()));
+            } else if (total.getAggregate() == Total.Aggregate.SUM || total.getAggregate() == Total.Aggregate.AVG) {
+                double newValue = Converter.toType(total.getFact(), double.class) + value;
+                total.setFact(Converter.toType(newValue, total.getFieldType()));
             }
-            double newValue = Converter.toType(rsTotal.getFact(), double.class) + value;
-            rsTotal.setFact(Converter.toType(newValue, total.getFieldType()));
-        } else {
-            Total rsTotal = pageTotals.stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(null);
-            if(rsTotal == null) {
-                rsTotal = Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).fact(0L).build();
-                pageTotals.add(rsTotal);
-            }
-            rsTotal.setFact(Converter.toType(rsTotal.getFact(), long.class) + 1L);
         }
     }
 
     public static <T> List<Total> calcTotals(final List<T> pageData, final List<Total> totals) {
         PreparePageParams preparePageParams = new PreparePageParams();
         _initPreparedTotals(preparePageParams, totals);
-        for (T bean : pageData){
+        for (T bean : pageData)
             for(Total total : preparePageParams.preparedTotals)
-                _processCurrentRecordOnTotals(preparePageParams.preparedTotals, bean, total);
-        }
+                _processCurrentRecordOnTotals(bean, total);
+        preparePageParams.preparedTotals.stream()
+                .filter(ttl -> ttl.getAggregate() == Total.Aggregate.AVG)
+                .findFirst()
+                .ifPresent(avgTotal -> avgTotal.setFact(Converter.toType(Converter.toType(avgTotal.getFact(), double.class) / pageData.size(), avgTotal.getFieldType())));
         return preparePageParams.preparedTotals;
     }
+
     private static <T> BeansPage<T> _calcTotals(final BeansPage<T> page, final List<Total> totals) {
         PreparePageParams preparePageParams = new PreparePageParams();
         preparePageParams.preparedTotals = page.getTotals();
         _initPreparedTotals(preparePageParams, totals);
-        for (T bean : page.getRows()){
+        for (T bean : page.getRows())
             for(Total total : preparePageParams.preparedTotals)
-                _processCurrentRecordOnTotals(preparePageParams.preparedTotals, bean, total);
-        }
+                _processCurrentRecordOnTotals(bean, total);
+        preparePageParams.preparedTotals.stream()
+                .filter(ttl -> ttl.getAggregate() == Total.Aggregate.AVG)
+                .findFirst()
+                .ifPresent(avgTotal -> avgTotal.setFact(Converter.toType(Converter.toType(avgTotal.getFact(), double.class) / page.getRows().size(), avgTotal.getFieldType())));
         page.setTotals(preparePageParams.preparedTotals);
         Total couner = page.getTotals().stream().filter(t -> t.getAggregate() == Total.Aggregate.COUNT).findFirst().orElse(null);
         page.setTotalCount(couner != null ? Converter.toType(couner.getFact(), long.class) : 0L);
