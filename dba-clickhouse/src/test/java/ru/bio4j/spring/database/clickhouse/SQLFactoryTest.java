@@ -178,9 +178,10 @@ public class SQLFactoryTest {
             List<Total> totals = new ArrayList<>();
             totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
             totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.AVG).fieldType(double.class).build());
             BeansPage<ABean> rst = CrudReaderApi.loadPage(null, null, null, totals, context, sqlDefinition, null,
                     CrudOptions.builder()
                             .forceCalcCount(false)
@@ -193,7 +194,8 @@ public class SQLFactoryTest {
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(50, rst.getPaginationPageSize());
             Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggregate() == Total.Aggregate.COUNT).findFirst().get().getFact());
-            Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
+            Assert.assertEquals(27527750L, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.SUM).findFirst().get().getFact());
+            Assert.assertEquals(275277.5D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.AVG).findFirst().get().getFact());
         } catch (Exception ex) {
             LOG.error("Error!", ex);
             Assert.fail();
@@ -208,9 +210,10 @@ public class SQLFactoryTest {
             List<Total> totals = new ArrayList<>();
             totals.add(Total.builder().fieldName("*").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
             totals.add(Total.builder().fieldName("1").aggrigate(Total.Aggregate.COUNT).fieldType(long.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(double.class).build());
-            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(double.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.SUM).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MIN).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.MAX).fieldType(long.class).build());
+            totals.add(Total.builder().fieldName("summ").aggrigate(Total.Aggregate.AVG).fieldType(double.class).build());
             BeansPage<ABean> rst = CrudReaderApi.loadAll(null, null, null, totals, context, sqlDefinition, null, ABean.class);
             Assert.assertEquals(100L, rst.getTotalCount());
             Assert.assertEquals(100L, rst.getPaginationCount());
@@ -218,7 +221,8 @@ public class SQLFactoryTest {
             Assert.assertEquals(0, rst.getPaginationOffset());
             Assert.assertEquals(0, rst.getPaginationPageSize());
             Assert.assertEquals(100L, rst.getTotals().stream().filter(f -> f.getAggregate() == Total.Aggregate.COUNT).findFirst().get().getFact());
-            Assert.assertEquals(774097D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ")).findFirst().get().getFact());
+            Assert.assertEquals(27527750L, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.SUM).findFirst().get().getFact());
+            Assert.assertEquals(275277.5D, rst.getTotals().stream().filter(f -> f.getFieldName().equals("summ") && f.getAggregate() == Total.Aggregate.AVG).findFirst().get().getFact());
         } catch (Exception ex) {
             LOG.error("Error!", ex);
             Assert.fail();
