@@ -7,12 +7,11 @@ import ru.bio4j.spring.commons.converter.Types;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class LocalDateHandler extends TypeHandlerBase implements TypeHandler<LocalDate> {
@@ -44,15 +43,15 @@ public class LocalDateHandler extends TypeHandlerBase implements TypeHandler<Loc
     @Override
     public <T> T write(LocalDate value, Class<T> targetType, String format) throws ConvertValueException {
         Class<?> targetTypeWrapped = Types.wrapPrimitiveType(targetType);
-        if (Types.typeIsDate(targetTypeWrapped))
+        if (Types.typeIsDate(targetTypeWrapped) || Types.typeIsLocalDate(targetTypeWrapped) || Types.typeIsLocalDateTime(targetTypeWrapped))
             return (T) Types.date2Date(value, targetTypeWrapped);
         else if (targetTypeWrapped == Boolean.class)
             Types.nop();
         else if (Types.typeIsNumber(targetTypeWrapped))
             return (T) Types.number2Number(value.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(), targetTypeWrapped);
         else if (targetTypeWrapped == String.class) {
-            DateFormat df = new SimpleDateFormat(Strings.isNullOrEmpty(format) ? DEFAULT_DATETIME_FORMAT : format);
-            return (T) df.format(value);
+            DateTimeFormatter df = DateTimeFormatter.ofPattern(Strings.isNullOrEmpty(format) ? DEFAULT_DATETIME_FORMAT : format);
+            return (T) value.format(df);
         } else if (targetTypeWrapped == byte[].class)
             Types.nop();
         throw new ConvertValueException(value, genericType, targetTypeWrapped);

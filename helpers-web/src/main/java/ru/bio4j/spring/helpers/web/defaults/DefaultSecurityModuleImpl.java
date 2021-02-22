@@ -22,7 +22,7 @@ public class DefaultSecurityModuleImpl implements SecurityService {
     }
 
     @Override
-    public User refresh(BioQueryParams qprms) {
+    public User refresh(final String stoken, final String refreshToken, final String lifetime, final BioQueryParams qprms) {
         return null;
     }
 

@@ -119,6 +119,12 @@ public class Types {
     public static boolean typeIsDate(Class<?> type) {
         return Date.class.isAssignableFrom(type);
     }
+    public static boolean typeIsLocalDate(Class<?> type) {
+        return LocalDate.class.isAssignableFrom(type);
+    }
+    public static boolean typeIsLocalDateTime(Class<?> type) {
+        return LocalDateTime.class.isAssignableFrom(type);
+    }
 
     public static <T> T date2Date(java.util.Date inValue, Class<T> targetType) {
         if (targetType == java.util.Date.class)

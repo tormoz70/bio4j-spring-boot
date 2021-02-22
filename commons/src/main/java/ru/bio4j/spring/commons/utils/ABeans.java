@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.commons.converter.DateTimeParser;
+import ru.bio4j.spring.commons.converter.Types;
 import ru.bio4j.spring.model.transport.ABean;
 import ru.bio4j.spring.model.transport.Prop;
 import ru.bio4j.spring.model.transport.errors.ApplyValuesToBeanException;
@@ -14,6 +15,9 @@ import java.beans.MethodDescriptor;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -154,13 +158,7 @@ public class ABeans {
                         method = getMethodOfBean(bean, "set"+propName);
                     if (method != null) {
                         try {
-                            Object valueLocal;
-                            if (value instanceof Date && pd.getPropertyType() == String.class)
-                                valueLocal = DateFormatUtils.format((Date) value, dateTimeFormat);
-                            else if (value instanceof String && pd.getPropertyType() == Date.class)
-                                valueLocal = DateTimeParser.getInstance().parse((String) value, dateTimeFormat);
-                            else
-                                valueLocal = Converter.toType(value, pd.getPropertyType());
+                            Object valueLocal = Converter.toType(value, pd.getPropertyType(), dateTimeFormat);
                             method.invoke(bean, valueLocal);
                             return;
                         } catch (Exception e) {
