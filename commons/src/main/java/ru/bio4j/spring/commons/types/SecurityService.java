@@ -13,7 +13,7 @@ public interface SecurityService {
     User getUser(final BioQueryParams qprms);
     User login(final String apptoken, final String login, final BioQueryParams qprms);
     User loginGuest(final String apptoken, final String deviceuuid, final BioQueryParams qprms);
-    User refresh(final String stoken, final String refreshToken, final String lifetime, final BioQueryParams qprms);
+    User refresh(final String refreshToken, final BioQueryParams qprms);
     void logout(final BioQueryParams qprms);
     boolean loggedin(final BioQueryParams qprms);
     void storeParam(final BioQueryParams qprms, final String paramCode, final String paramName, final Object paramValue);
