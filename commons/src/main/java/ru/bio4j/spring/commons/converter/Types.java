@@ -1,5 +1,6 @@
 package ru.bio4j.spring.commons.converter;
 
+import ru.bio4j.spring.commons.converter.hanlers.DateTimePatterns;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.model.transport.errors.ConvertValueException;
 import ru.bio4j.spring.model.transport.errors.DateParseException;
@@ -226,7 +227,6 @@ public class Types {
         }
     }
 
-
 	public static Date parseDate(String str, String formatStr) {
 		SimpleDateFormat format = new SimpleDateFormat(formatStr);
 		try {
@@ -235,7 +235,7 @@ public class Types {
         	return null;
         }
 	}
-	
+
 	public static Date minDate(){
 		return new Date(Long.MIN_VALUE);
 	}
@@ -244,6 +244,8 @@ public class Types {
 	}
 
     public static LocalDate parseLocalDate(String str, String formatStr) {
+        if(Strings.isNullOrEmpty(formatStr))
+            formatStr = DateTimePatterns.detectFormat(str);
         DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);
         try {
             return LocalDate.parse(str, format);
@@ -252,13 +254,23 @@ public class Types {
         }
     }
 
+    public static LocalDate parseLocalDate(String str) {
+        return parseLocalDate(str, null);
+    }
+
     public static LocalDateTime parseLocalDateTime(String str, String formatStr) {
+        if(Strings.isNullOrEmpty(formatStr))
+            formatStr = DateTimePatterns.detectFormat(str);
         DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);
         try {
             return LocalDateTime.parse(str, format);
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static LocalDateTime parseLocalDateTime(String str) {
+        return parseLocalDateTime(str, null);
     }
 
     public static Boolean parseBoolean(String value) {

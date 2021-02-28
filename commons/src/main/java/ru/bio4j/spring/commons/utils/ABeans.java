@@ -183,7 +183,7 @@ public class ABeans {
                     Object value = pd.getReadMethod().invoke(srcBean);
                     if(value == null && skipNulls)
                         continue;
-                    setPropertyValue(destBean, pd.getName(), value, "yyyy-MM-dd'T'hh:mm:ss");
+                    setPropertyValue(destBean, pd.getName(), value, "yyyy-MM-dd'T'HH:mm:ss");
                 }
             }
         } catch (Exception e) {

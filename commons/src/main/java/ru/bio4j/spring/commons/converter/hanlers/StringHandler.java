@@ -14,6 +14,10 @@ public class StringHandler extends TypeHandlerBase implements TypeHandler<String
         Class<?> targetTypeWrapped = Types.wrapPrimitiveType(targetType);
         if (Types.typeIsDate(targetTypeWrapped))
             result = Types.date2Date(Types.parseDate(value), targetTypeWrapped);
+        else if (Types.typeIsLocalDate(targetTypeWrapped))
+            result = Types.date2Date(Types.parseLocalDate(value), targetTypeWrapped);
+        else if (Types.typeIsLocalDateTime(targetTypeWrapped))
+            result = Types.date2Date(Types.parseLocalDateTime(value), targetTypeWrapped);
         else if (targetTypeWrapped == Boolean.class)
             result = Types.parseBoolean(value);
         else if (Types.typeIsNumber(targetTypeWrapped)) {
