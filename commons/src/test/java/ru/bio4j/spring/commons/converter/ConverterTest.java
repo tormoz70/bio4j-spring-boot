@@ -7,6 +7,8 @@ import ru.bio4j.spring.model.transport.Param;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -244,6 +246,30 @@ public class ConverterTest {
         } catch (ConvertValueException ex) {
             Assert.fail(ex.getMessage());
         }
+    }
+
+    @Test
+    public void localDate2String() {
+        LocalDate ld = LocalDate.of(2021, 1, 13);
+        String st = null;
+        try {
+            st = Converter.toType(ld, String.class);
+        } catch (Exception ex) {
+            Assert.fail(ex.getMessage());
+        }
+        Assert.assertEquals("13.01.2021", st);
+    }
+
+    @Test
+    public void localDateTime2String() {
+        LocalDateTime ld = LocalDateTime.of(2021, 1, 13, 10, 23, 15);
+        String st = null;
+        try {
+            st = Converter.toType(ld, String.class);
+        } catch (Exception ex) {
+            Assert.fail(ex.getMessage());
+        }
+        Assert.assertEquals("13.01.2021 10:23:15", st);
     }
 
     @Test

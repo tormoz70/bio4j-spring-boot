@@ -38,7 +38,7 @@ public class LocalDateHandler extends TypeHandlerBase implements TypeHandler<Loc
         throw new ConvertValueException(value, valType, genericType);
     }
 
-    private static final String DEFAULT_DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
+    private static final String DEFAULT_DATETIME_FORMAT = "dd.MM.yyyy";
 
     @Override
     public <T> T write(LocalDate value, Class<T> targetType, String format) throws ConvertValueException {
