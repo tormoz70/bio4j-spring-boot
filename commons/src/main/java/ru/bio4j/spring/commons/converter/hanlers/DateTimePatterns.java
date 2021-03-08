@@ -2,12 +2,14 @@ package ru.bio4j.spring.commons.converter.hanlers;
 
 import ru.bio4j.spring.commons.converter.DateTimeParserTemplate;
 import ru.bio4j.spring.commons.utils.Regexs;
+import ru.bio4j.spring.commons.utils.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class DateTimePatterns {
+
     private static final List<DateTimeParserTemplate> templates;
     static {
         templates = new ArrayList<>();
@@ -33,10 +35,11 @@ public class DateTimePatterns {
     }
 
     public static String detectFormat(String datetimeValue) {
-
-        for (DateTimeParserTemplate f : templates) {
-            if (Regexs.match(datetimeValue, f.getRegex(), Pattern.CASE_INSENSITIVE).find())
-                return f.getFormat();
+        if(!Strings.isNullOrEmpty(datetimeValue)) {
+            for (DateTimeParserTemplate f : templates) {
+                if (Regexs.match(datetimeValue, f.getRegex(), Pattern.CASE_INSENSITIVE).find())
+                    return f.getFormat();
+            }
         }
         return null;
     }

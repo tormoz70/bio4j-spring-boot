@@ -228,6 +228,8 @@ public class Types {
     }
 
 	public static Date parseDate(String str, String formatStr) {
+        if(Strings.isNullOrEmpty(str))
+            return null;
 		SimpleDateFormat format = new SimpleDateFormat(formatStr);
 		try {
 	        return format.parse(str);
@@ -244,6 +246,8 @@ public class Types {
 	}
 
     public static LocalDate parseLocalDate(String str, String formatStr) {
+        if(Strings.isNullOrEmpty(str))
+            return null;
         if(Strings.isNullOrEmpty(formatStr))
             formatStr = DateTimePatterns.detectFormat(str);
         DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);
@@ -259,6 +263,8 @@ public class Types {
     }
 
     public static LocalDateTime parseLocalDateTime(String str, String formatStr) {
+        if(Strings.isNullOrEmpty(str))
+            return null;
         if(Strings.isNullOrEmpty(formatStr))
             formatStr = DateTimePatterns.detectFormat(str);
         DateTimeFormatter format = DateTimeFormatter.ofPattern(formatStr);

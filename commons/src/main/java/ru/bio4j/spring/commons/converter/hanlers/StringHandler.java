@@ -9,15 +9,15 @@ import java.lang.reflect.Array;
 public class StringHandler extends TypeHandlerBase implements TypeHandler<String> {
 
     @Override
-    public <T> T write(String value, Class<T> targetType) throws ConvertValueException {
+    public <T> T write(String value, Class<T> targetType, String format) throws ConvertValueException {
         Object result = null;
         Class<?> targetTypeWrapped = Types.wrapPrimitiveType(targetType);
         if (Types.typeIsDate(targetTypeWrapped))
-            result = Types.date2Date(Types.parseDate(value), targetTypeWrapped);
+            result = Types.date2Date(Types.parseDate(value, format), targetTypeWrapped);
         else if (Types.typeIsLocalDate(targetTypeWrapped))
-            result = Types.date2Date(Types.parseLocalDate(value), targetTypeWrapped);
+            result = Types.date2Date(Types.parseLocalDate(value, format), targetTypeWrapped);
         else if (Types.typeIsLocalDateTime(targetTypeWrapped))
-            result = Types.date2Date(Types.parseLocalDateTime(value), targetTypeWrapped);
+            result = Types.date2Date(Types.parseLocalDateTime(value, format), targetTypeWrapped);
         else if (targetTypeWrapped == Boolean.class)
             result = Types.parseBoolean(value);
         else if (Types.typeIsNumber(targetTypeWrapped)) {
@@ -48,8 +48,8 @@ public class StringHandler extends TypeHandlerBase implements TypeHandler<String
         throw new ConvertValueException(value, genericType, targetTypeWrapped);
     }
 
-    public <T> T write(String value, Class<T> targetType, String format) throws ConvertValueException {
-        return write(value, targetType);
+    public <T> T write(String value, Class<T> targetType) throws ConvertValueException {
+        return write(value, targetType, null);
     }
 
 }

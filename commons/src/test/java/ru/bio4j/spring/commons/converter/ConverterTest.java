@@ -385,4 +385,17 @@ public class ConverterTest {
         Assert.assertEquals(actual, expected);
     }
 
+
+    @Test
+    public void ConvertEmptyStr2LocalDateTime() throws Exception {
+        String value = "";
+        Assert.assertNull(Converter.toType(value, LocalDateTime.class, "yyyy-MM-dd'T'HH:mm:ss"));
+    }
+
+    @Test
+    public void ConvertEmptyStr2LocalDate() throws Exception {
+        String value = "";
+        Assert.assertNull(Converter.toType(value, LocalDate.class, "yyyy-MM-dd"));
+    }
+
 }
