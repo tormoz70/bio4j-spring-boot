@@ -10,24 +10,16 @@ public class IsrvtConsumerProperies {
 
     private Map<String, Object> props;
 
-    @Value("${upldr.consumer.topicName}")
     private String topicName;
 
-    @Value("${upldr.consumer.threadPoolSize}")
     private int threadPoolSize;
 
-    @Value("${upldr.consumer.bootstrapServer}")
     private String bootstrapServer;
 
-//    private String clientId;
-
-    @Value("${upldr.consumer.groupId}")
     private String groupId;
 
-    @Value("${upldr.consumer.sessionTimeoutMs}")
     private int sessionTimeoutMs;
 
-    @Value("${upldr.consumer.heartbeatIntervalMs}")
     private int heartbeatIntervalMs;
 
     public String getTopicName() {

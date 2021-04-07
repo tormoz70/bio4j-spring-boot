@@ -10,34 +10,18 @@ public class IsrvtProducerProperies {
 
     private Map<String, Object> props;
 
-    @Value("${upldr.producer.bootstrapServer}")
     private String bootstrapServer;
 
-    @Value("${upldr.producer.clientId}")
     private String clientId;
 
-    @Value("${upldr.producer.topicName}")
-    private String topicName;
-
-    @Value("${upldr.producer.topicPartitions}")
-    private int topicPartitions;
-
-    @Value("${upldr.producer.topicReplications}")
-    private short topicReplicationFactor;
-
-    @Value("${upldr.producer.acks}")
     private String acks;
 
-    @Value("${upldr.producer.retries}")
     private int retries;
 
-    @Value("${upldr.producer.batchSize}")
     private int batchSize;
 
-    @Value("${upldr.producer.lingerMs}")
     private int lingerMs;
 
-    @Value("${upldr.producer.bufferMemory}")
     private int bufferMemory;
 
     public String getBootstrapServer() {
@@ -46,14 +30,6 @@ public class IsrvtProducerProperies {
 
     public void setBootstrapServer(String bootstrapServer) {
         this.bootstrapServer = bootstrapServer;
-    }
-
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
     }
 
     public String getAcks() {
@@ -96,22 +72,6 @@ public class IsrvtProducerProperies {
         this.bufferMemory = bufferMemory;
     }
 
-    public int getTopicPartitions() {
-        return topicPartitions;
-    }
-
-    public void setTopicPartitions(int topicPartitions) {
-        this.topicPartitions = topicPartitions;
-    }
-
-    public short getTopicReplicationFactor() {
-        return topicReplicationFactor;
-    }
-
-    public void setTopicReplicationFactor(short topicReplicationFactor) {
-        this.topicReplicationFactor = topicReplicationFactor;
-    }
-
     public Map<String, Object> producerConfigs() {
         if (props == null) {
             props = new HashMap<>();
@@ -142,9 +102,6 @@ public class IsrvtProducerProperies {
                 "props=" + props +
                 ", bootstrapServer='" + bootstrapServer + '\'' +
                 ", clientId='" + clientId + '\'' +
-                ", topicName='" + topicName + '\'' +
-                ", topicPartitions=" + topicPartitions +
-                ", topicReplicationFactor=" + topicReplicationFactor +
                 ", acks='" + acks + '\'' +
                 ", retries=" + retries +
                 ", batchSize=" + batchSize +

@@ -21,9 +21,15 @@ public class IsrvtProducerBase<K, V> {
         this.producer = new KafkaProducer<>(properies.producerConfigs(), keySerializer, messageSerializer);
     }
 
-    public void send(K key, V message) {
-        if(LOG.isDebugEnabled()) LOG.debug(String.format("Try sending msg{key: %d; messageBody: %s} to topic: %s from service: %s...", key, message, properies.getTopicName(), properies.getClientId()));
-        producer.send(new ProducerRecord(properies.getTopicName(), key, message));
-        if(LOG.isDebugEnabled()) LOG.debug(String.format("Sent msg{key: %d; messageBody: %s} to topic: %s from service: %s!", key, message, properies.getTopicName(), properies.getClientId()));
+    public void send(String topic, int partition, K key, V message) {
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Try sending msg{partition: %d; key: %d; messageBody: %s} to topic: %s from service: %s...", partition, key, message, topic, properies.getClientId()));
+        producer.send(new ProducerRecord(topic, partition, key, message));
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Sent msg{key: %d; messageBody: %s} to topic: %s from service: %s!", key, message, topic, properies.getClientId()));
+    }
+
+    public void send(String topic, K key, V message) {
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Try sending msg{key: %d; messageBody: %s} to topic: %s from service: %s...", key, message, topic, properies.getClientId()));
+        producer.send(new ProducerRecord(topic, key, message));
+        if(LOG.isDebugEnabled()) LOG.debug(String.format("Sent msg{key: %d; messageBody: %s} to topic: %s from service: %s!", key, message, topic, properies.getClientId()));
     }
 }
