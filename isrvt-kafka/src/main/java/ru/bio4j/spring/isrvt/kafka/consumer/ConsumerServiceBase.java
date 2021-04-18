@@ -9,17 +9,17 @@ import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IsrvtConsumerBase<K, V> {
-    private static final Logger LOG = LoggerFactory.getLogger(IsrvtConsumerBase.class);
+public class ConsumerServiceBase<K, V> {
+    private static final Logger LOG = LoggerFactory.getLogger(ConsumerServiceBase.class);
 
-    private final IsrvtConsumerProperies properies;
-    private final List<IsrvtConsumerRunner<K, V>> runners;
+    private final ConsumerServiceProperties properies;
+    private final List<ConsumerRunner<K, V>> runners;
     private final MessageHandlerFactory messageHandlerFactory;
     private final Deserializer<K> keyDeserializer;
     private final Deserializer<V> messageDeserializer;
 
     @Autowired
-    public IsrvtConsumerBase(IsrvtConsumerProperies properies, MessageHandlerFactory messageHandlerFactory, Deserializer<K> keyDeserializer, Deserializer<V> messageDeserializer) {
+    public ConsumerServiceBase(ConsumerServiceProperties properies, MessageHandlerFactory messageHandlerFactory, Deserializer<K> keyDeserializer, Deserializer<V> messageDeserializer) {
         this.properies = properies;
         this.messageHandlerFactory = messageHandlerFactory;
         this.keyDeserializer = keyDeserializer;
@@ -33,7 +33,7 @@ public class IsrvtConsumerBase<K, V> {
         LOG.info("About init consumers pool...");
         for(int i=0; i<properies.getThreadPoolSize(); i++) {
 //            properies.setClientId(properies.getTopicName() + "-" + i);
-            runners.add(new IsrvtConsumerRunner<>(properies, messageHandlerFactory, keyDeserializer, messageDeserializer));
+            runners.add(new ConsumerRunner<>(properies, messageHandlerFactory, keyDeserializer, messageDeserializer));
         }
         LOG.info("Consumers pool initialized");
         LOG.info("About consumers pool running...");

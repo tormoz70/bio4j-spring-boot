@@ -8,15 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class IsrvtProducerBase<K, V> {
-    private static final Logger LOG = LoggerFactory.getLogger(IsrvtProducerBase.class);
+public class ProducerServiceBase<K, V> {
+    private static final Logger LOG = LoggerFactory.getLogger(ProducerServiceBase.class);
 
-    private final IsrvtProducerProperies properies;
+    private final ProducerServiceProperties properies;
     private final Producer<K, V> producer;
 
 
     @Autowired
-    public IsrvtProducerBase(IsrvtProducerProperies properies, Serializer<K> keySerializer, Serializer<V> messageSerializer) {
+    public ProducerServiceBase(ProducerServiceProperties properies, Serializer<K> keySerializer, Serializer<V> messageSerializer) {
         this.properies = properies;
         this.producer = new KafkaProducer<>(properies.producerConfigs(), keySerializer, messageSerializer);
     }

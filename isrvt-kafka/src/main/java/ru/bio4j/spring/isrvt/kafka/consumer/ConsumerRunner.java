@@ -1,7 +1,6 @@
 package ru.bio4j.spring.isrvt.kafka.consumer;
 
 import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
@@ -13,16 +12,16 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class IsrvtConsumerRunner<K, V> extends Thread {
-    private static final Logger LOG = LoggerFactory.getLogger(IsrvtConsumerRunner.class);
+public class ConsumerRunner<K, V> extends Thread {
+    private static final Logger LOG = LoggerFactory.getLogger(ConsumerRunner.class);
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
-    private final IsrvtConsumerProperies properties;
+    private final ConsumerServiceProperties properties;
     private final MessageHandler<K, V> messageHandler;
     private final Deserializer<K> keyDeserializer;
     private final Deserializer<V> messageDeserializer;
 
-    public IsrvtConsumerRunner(IsrvtConsumerProperies properties, MessageHandlerFactory messageHandlerFactory, Deserializer<K> keyDeserializer, Deserializer<V> messageDeserializer) {
+    public ConsumerRunner(ConsumerServiceProperties properties, MessageHandlerFactory messageHandlerFactory, Deserializer<K> keyDeserializer, Deserializer<V> messageDeserializer) {
         this.properties = properties;
         this.keyDeserializer = keyDeserializer;
         this.messageDeserializer = messageDeserializer;

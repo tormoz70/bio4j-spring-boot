@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IsrvtConsumerProperies {
+public class ConsumerServiceProperties {
 
     private Map<String, Object> props;
 
