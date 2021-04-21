@@ -230,7 +230,9 @@ public class Types {
 	public static Date parseDate(String str, String formatStr) {
         if(Strings.isNullOrEmpty(str))
             return null;
-		SimpleDateFormat format = new SimpleDateFormat(formatStr);
+        if(Strings.isNullOrEmpty(formatStr))
+            formatStr = DateTimePatterns.detectFormat(str);
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
 		try {
 	        return format.parse(str);
         } catch (ParseException e) {
