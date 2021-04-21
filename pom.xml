@@ -8,24 +8,24 @@
     <packaging>pom</packaging>
 
     <properties>
-        <dependency-plugin-version>2.7</dependency-plugin-version>
+        <dependency-plugin-version>3.1.2</dependency-plugin-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-framework.version>5.3.3</spring-framework.version>
-        <spring-boot.version>2.4.2</spring-boot.version>
-        <spring-kafka.version>2.6.4</spring-kafka.version>
-        <org.apache.poi.version>4.1.2</org.apache.poi.version>
-        <hikaricp.version>3.4.5</hikaricp.version>
-        <org.apache.httpcomponents.core.version>4.4.13</org.apache.httpcomponents.core.version>
-        <org.apache.httpcomponents.client.version>4.5.12</org.apache.httpcomponents.client.version>
+        <spring-framework.version>5.3.6</spring-framework.version>
+        <spring-boot.version>2.4.5</spring-boot.version>
+        <spring-kafka.version>2.7.0</spring-kafka.version>
+        <org.apache.poi.version>5.0.0</org.apache.poi.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
+        <org.apache.httpcomponents.core.version>4.4.14</org.apache.httpcomponents.core.version>
+        <org.apache.httpcomponents.client.version>4.5.13</org.apache.httpcomponents.client.version>
         <swagger.version>3.0.0</swagger.version>
         <ehcache.version>2.10.6</ehcache.version>
         <ehcache-core.version>2.6.11</ehcache-core.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <mail-api.version>1.4.7</mail-api.version>
-        <jason-api.version>20200518</jason-api.version>
-        <jackson.version>2.11.3</jackson.version>
-        <junit.version>4.13.1</junit.version>
+        <jason-api.version>20210307</jason-api.version>
+        <jackson.version>2.12.3</jackson.version>
+        <junit.version>4.13.2</junit.version>
         <javax.ws.rs-api.version>2.1.1</javax.ws.rs-api.version>
         <logback.version>1.2.3</logback.version>
         <javapoet.version>1.13.0</javapoet.version>
@@ -273,12 +273,12 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.10</version>
+                <version>3.12.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.14</version>
+                <version>1.15</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
