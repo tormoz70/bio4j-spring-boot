@@ -33,6 +33,12 @@ public class SQLDefinitionImpl implements SQLDefinition {
     public void setDtoDocumentation(String dtoDocumentation) {
         this.dtoDocumentation = dtoDocumentation;
     }
+    public Boolean getDtoInheritable() {
+        return dtoInheritable;
+    }
+    public void setDtoInheritable(Boolean dtoInheritable) {
+        this.dtoInheritable = dtoInheritable;
+    }
 
     public String getExportTitle() {
         return exportTitle;
@@ -189,6 +195,7 @@ public class SQLDefinitionImpl implements SQLDefinition {
     private Boolean dtoSkip;
     private String dtoName;
     private String dtoDocumentation;
+    private Boolean dtoInheritable;
     private String exportTitle;
 
     private Boolean multiSelection;

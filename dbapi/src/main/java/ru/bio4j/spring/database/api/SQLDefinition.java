@@ -16,6 +16,7 @@ public interface SQLDefinition extends Serializable {
     Boolean getDtoSkip();
     String getDtoName();
     String getDtoDocumentation();
+    Boolean getDtoInheritable();
 
     String getExportTitle();
     void setExportTitle(String exportTitle);

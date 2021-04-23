@@ -339,6 +339,7 @@ public class CursorParser {
         SQLDefinitionImpl cursor = new SQLDefinitionImpl(bioCode);
         cursor.setDtoName(Doms.getAttribute(document.getDocumentElement(), "dtoName", null, String.class));
         cursor.setDtoSkip(Doms.getAttribute(document.getDocumentElement(), "dtoSkip", false, Boolean.class));
+        cursor.setDtoInheritable(Doms.getAttribute(document.getDocumentElement(), "dtoInheritable", false, Boolean.class));
         Element dtoDocElem = Doms.findElem(document.getDocumentElement(), "/cursor/dtoDocumentation");
         if(dtoDocElem != null)
             cursor.setDtoDocumentation(dtoDocElem.getTextContent());
