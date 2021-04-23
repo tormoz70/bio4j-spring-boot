@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        dtoInheritable="true">
+    <SQL action="select">
+        <text><![CDATA[{text-file:pus.sql}]]></text>
+    </SQL>
+    <fields>
+        <field name="pu_id" type="integer" pk="true" attrName="puId" hidden="false" header="ID ПУ" readOnly="true" mandatory="true" editMaxLength="18"/>
+        <field name="summ" type="decimal" format=".0##"/>
+    </fields>
+</cursor>

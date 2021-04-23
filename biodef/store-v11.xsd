@@ -181,7 +181,7 @@
                                             </xs:attribute>
                                             <xs:attribute name="format" type="xs:string">
                                                 <xs:annotation>
-                                                    <xs:documentation>Формат вывода данных. Например, для типа "date" - "yyyy.MM.dd HH:mm:ss"</xs:documentation>
+                                                    <xs:documentation>Формат вывода данных. Например, для типа "date" - "yyyy.MM.dd HH:mm:ss", для типа "decimal" - "#,##0.00##"</xs:documentation>
                                                 </xs:annotation>
                                             </xs:attribute>
                                             <xs:attribute name="align" default="left">

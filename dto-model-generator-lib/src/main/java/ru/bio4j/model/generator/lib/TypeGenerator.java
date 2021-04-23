@@ -1,6 +1,7 @@
 package ru.bio4j.model.generator.lib;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.squareup.javapoet.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,11 +10,15 @@ import org.apache.commons.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.converter.MetaTypeConverter;
+import ru.bio4j.spring.commons.serializers.BigDecimalContextualSerializer;
+import ru.bio4j.spring.commons.serializers.Precision;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLDefinition;
 import ru.bio4j.spring.database.commons.CursorParser;
+import ru.bio4j.spring.model.transport.MetaType;
 import ru.bio4j.spring.model.transport.jstore.Field;
+import springfox.documentation.spring.web.json.JsonSerializer;
 
 import javax.lang.model.element.Modifier;
 import java.io.File;
@@ -25,6 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -64,12 +70,39 @@ public class TypeGenerator {
                 if(field.isDtoJsonIgnore())
                     fieldSpecBuilder.addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build());
                 fieldSpecs.add(fieldSpecBuilder.build());
+
+                MethodSpec.Builder getterSpecBuilder = MethodSpec.methodBuilder("get" + StringUtils.capitalize(fieldName));
+                if (field.getMetaType() != null && field.getMetaType().equals(MetaType.DECIMAL) && !Strings.isNullOrEmpty(field.getFormat())) {
+                    String format = field.getFormat();
+                    if (!format.matches("^[0#,.]*$"))
+                        throw new NumberFormatException("Illegal characters found in format specified for field '" + fieldName + "'.");
+                    int precision = 0, minPrecision = 0;
+                    if (format.contains(".")) {
+                        for (int i = format.length() - 1; i >= 0 && format.charAt(i) != '.'; i--) {
+                            if (format.charAt(i) == '#' && minPrecision == 0)
+                                precision++;
+                            else if (format.charAt(i) == '0')
+                                minPrecision++;
+                            else
+                                throw new NumberFormatException(String.format("Illegal character found in format specified for field '%s' in position %d.", fieldName, i));
+                        }
+                        precision += minPrecision;
+                    }
+                    getterSpecBuilder.addAnnotation(AnnotationSpec.builder(JsonSerialize.class)
+                            .addMember("using", "$T.class", BigDecimalContextualSerializer.class)
+                            .build());
+                    getterSpecBuilder.addAnnotation(AnnotationSpec.builder(Precision.class)
+                            .addMember("precision", "$L", precision)
+                            .addMember("minPrecision", "$L", minPrecision)
+                            .build());
+                }
+
                 gettersetterSpecs.add(MethodSpec.methodBuilder("set" + StringUtils.capitalize(fieldName))
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(typeName, "value")
                         .addStatement("this.$N = value", fieldName)
                         .build());
-                gettersetterSpecs.add(MethodSpec.methodBuilder("get" + StringUtils.capitalize(fieldName))
+                gettersetterSpecs.add(getterSpecBuilder
                         .addModifiers(Modifier.PUBLIC)
                         .addStatement("return this.$N", fieldName)
                         .returns(typeName).build());
