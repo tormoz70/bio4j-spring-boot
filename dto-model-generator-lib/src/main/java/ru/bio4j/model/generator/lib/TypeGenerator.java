@@ -37,6 +37,52 @@ import java.util.List;
 public class TypeGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(TypeGenerator.class);
 
+    private static final String BUILDER_CLASS_NAME = "Builder";
+
+    private TypeSpec createBuilder(String parentName, SQLDefinition cursor) {
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(BUILDER_CLASS_NAME)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+        List<FieldSpec> fieldSpecs = new ArrayList<>();
+        List<MethodSpec> setterSpecs = new ArrayList<>();
+        MethodSpec.Builder buildMethodNuilder = MethodSpec.methodBuilder("build")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement(String.format("%s result = new %s()", parentName, parentName));
+        if(cursor.getFields().size() > 0) {
+            for(Field field : cursor.getFields()) {
+                if(field.isDtoSkip())
+                    continue;
+                String fieldName = Utl.nvl(field.getAttrName(), field.getName());
+                TypeName typeName;
+                if(field.isDtoAsList())
+                    typeName = ParameterizedTypeName.get(List.class, MetaTypeConverter.write(field.getMetaType()));
+                else {
+                    // TODO: Этот костыль надо убрать, когда фреймворк полностью перейдёт на java.time
+                    Class<?> clazz = MetaTypeConverter.write(field.getMetaType());
+                    typeName = ParameterizedTypeName.get(clazz == Date.class ? LocalDateTime.class : clazz);
+                }
+                fieldSpecs.add(FieldSpec.builder(typeName, fieldName, Modifier.PRIVATE).build());
+
+                setterSpecs.add(MethodSpec.methodBuilder(fieldName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(typeName, "value")
+                        .addStatement("this.$N = value", fieldName)
+                        .addStatement("return this")
+                        .returns(ClassName.get("", BUILDER_CLASS_NAME))
+                        .build());
+                buildMethodNuilder.addStatement("result.$N = this.$N", fieldName, fieldName);
+            }
+            buildMethodNuilder.addStatement("return result");
+            buildMethodNuilder.returns(ClassName.get("", parentName));
+        }
+        TypeSpec.Builder resultBuilder = classBuilder.addFields(fieldSpecs)
+                .addMethods(setterSpecs)
+                .addMethod(buildMethodNuilder.build());
+
+
+        return resultBuilder.build();
+
+    }
+
     private TypeSpec createClass(String name, SQLDefinition cursor) {
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(name)
             .addModifiers(Modifier.PUBLIC);
@@ -115,6 +161,14 @@ public class TypeGenerator {
                     .addMember("description", "$S", cursor.getDtoDocumentation());
             resultBuilder.addAnnotation(typeAnnotationBuilder.build());
         }
+        resultBuilder.addType(createBuilder(name, cursor));
+        resultBuilder.addMethod(MethodSpec.methodBuilder(BUILDER_CLASS_NAME.toLowerCase())
+                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.STATIC)
+                .addStatement(String.format("return new %s()", BUILDER_CLASS_NAME))
+                .returns(ClassName.get("", BUILDER_CLASS_NAME))
+                .build());
+
         return resultBuilder.build();
     }
 

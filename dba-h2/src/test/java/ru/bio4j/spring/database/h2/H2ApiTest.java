@@ -15,6 +15,10 @@ import ru.bio4j.spring.database.commons.DbUtils;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 import ru.bio4j.spring.model.transport.Param;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +28,22 @@ public class H2ApiTest {
     private static final String testDBDriverName = "org.h2.Driver";
 
     private static DbServer dbServer = new H2ServerImpl("9990");
-    private static final String testDBUrl = "jdbc:h2:d:/tmp/h2test/test";
+    private static final String testDBPath = "d:/tmp/h2test/";
+    private static final String testDBUrl = "jdbc:h2:" + testDBPath + "test";
     private static final String testDBUsr = "sa";
     private static final String testDBPwd = "";
 
     private static SQLContext context;
 
     @BeforeClass
-    public static void initTests() {
+    public static void initTests() throws IOException {
+        Files.list(Paths.get(testDBPath)).forEach(p -> {
+            try {
+                Files.deleteIfExists(p);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         dbServer.startServer();
         context = DbContextFactory.createHikariCP(
                 DataSourceProperties.builder()
@@ -51,7 +63,7 @@ public class H2ApiTest {
 
     @AfterClass
     public static void deinitTests() {
-        dbServer.shutdownServer();
+//        dbServer.shutdownServer();
     }
 
     @Test

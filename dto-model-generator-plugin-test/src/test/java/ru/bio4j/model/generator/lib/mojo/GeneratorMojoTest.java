@@ -12,6 +12,12 @@ import java.util.List;
 public class GeneratorMojoTest {
 
     @Test
+    public void test0() {
+        Film film = Film.builder().colornot("colored").build();
+        Assert.assertTrue(film.getColornot().equals("colored"));
+    }
+
+    @Test
     public void test1() {
         Field field = Reflex.findFieldOfBean(Film.class, "editableList");
         Assert.assertTrue(field != null);
