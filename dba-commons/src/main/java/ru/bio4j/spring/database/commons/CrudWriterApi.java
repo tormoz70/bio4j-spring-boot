@@ -37,7 +37,7 @@ public class CrudWriterApi {
                 for (ABean row : rows) {
                     prms.clear();
                     Paramus.setParams(prms, params);
-                    DbUtils.applayRowToParams(row, prms);
+                    DbUtils.applyRowToParams(row, prms);
                     cmd.execSQL(prms, ctx.currentUser(), true);
                     try (Paramus paramus = Paramus.set(cmd.getParams())) {
                         for (Param p : paramus.get()) {

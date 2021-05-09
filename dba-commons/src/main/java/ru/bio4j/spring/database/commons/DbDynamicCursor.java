@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Реализует 3 основных вида запроса Query, Exec, Scalar
@@ -45,23 +44,23 @@ public class DbDynamicCursor extends DbCursor implements SQLCursor {
     }
 
     @Override
-    public boolean fetch(List<Param> inParams, User usr, DelegateSQLFetch onrecord) {
+    public boolean fetch(Object params, User usr, DelegateSQLFetch onrecord) {
         boolean rslt = false;
-        List<Param> prms = inParams != null ? inParams : new ArrayList<>();
+        final List<Param> prms = DbUtils.decodeParams(params);
         SrvcUtils.applyCurrentUserParams(usr, prms);
 
-        if (params == null)
-            params = new ArrayList<>();
+        if (this.params == null)
+            this.params = new ArrayList<>();
 
-        DbUtils.applyParamsToParams(inParams, params, false, true, false);
+        DbUtils.applyParamsToParams(prms, this.params, false, true, false);
 
-        if (!doBeforeStatement(params)) // Обрабатываем события
+        if (!doBeforeStatement(this.params)) // Обрабатываем события
             return rslt;
 
         try {
             if(statementPreparerer != null)
-                statementPreparerer.prepare(() -> { return DbUtils.cutFilterConditions(sql, params); });
-            setParamsToStatement(); // Применяем параметры
+                statementPreparerer.prepare(() -> DbUtils.cutFilterConditions(sql, this.params));
+            setParamsToStatement(this.params); // Применяем параметры
 
             try (ResultSet result = preparedStatement.executeQuery()) {
                 isActive = true;

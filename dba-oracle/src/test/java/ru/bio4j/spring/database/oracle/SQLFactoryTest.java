@@ -116,7 +116,7 @@ public class SQLFactoryTest {
             Double dummysum = context.execBatch(ctx -> {
                 Var var = new Var();
                 String sql = "select user as curuser, :dummy as dm, :dummy1 as dm1 from dual";
-                List<Param> prms = Paramus.set(new ArrayList<Param>()).add("dummy", 101).pop();
+                List<Param> prms = Paramus.createParams("dummy", 101);
                 ctx.createCursor()
                         .init(ctx.currentConnection(), sql, null)
                         .fetch(prms, ctx.currentUser(), rs->{

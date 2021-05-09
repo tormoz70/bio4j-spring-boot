@@ -343,7 +343,7 @@ public class CrudReaderApi {
      * @return первую запись
      *
      */
-    public static <T> List<T> loadRecord0Ext(final List<Param> params, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
+    public static <T> List<T> loadRecord0Ext(final Object pkValue, final List<Param> params, final SQLContext context, final SQLDefinition cursor, final Class<T> beanType) {
         Connection connTest = context.currentConnection();
         if (connTest == null)
             throw new BioSQLException(String.format("This method can be used only in SQLAction of execBatch!", cursor.getBioCode()));
@@ -353,7 +353,8 @@ public class CrudReaderApi {
             throw new BioSQLException(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-
+        List<Param> p = preparePkParamValue(pkValue, pkField);
+        Paramus.applyParams(params, p, false, true);
         return readStoreDataExt(params, context, cursor, beanType);
     }
 
@@ -400,13 +401,17 @@ public class CrudReaderApi {
             return MAX_RECORDS_FETCH_LIMIT;
         };
 
+        final boolean[] isFirstRec = new boolean[] {true};
         //todo: сделать wrapper который накладывает лимит выбранных записей из CrudOptions.getRecordsLimit если нет пагинации
         context.createDynamicCursor()
                 .init(context.currentConnection(), cursorDef.getSelectSqlDef())
                 .fetch(prms, context.currentUser(), rs -> {
-                    if (rs.isFirstRow()) {
-                        long estimatedTime = System.currentTimeMillis() - startTime;
-                        if(LOG.isDebugEnabled()) LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
+                    if (isFirstRec[0]) {
+                        isFirstRec[0] = false;
+                        if(LOG.isDebugEnabled()) {
+                            long estimatedTime = System.currentTimeMillis() - startTime;
+                            LOG.debug("Cursor \"{}\" opened in {} secs!!!", cursorDef.getBioCode(), Double.toString(estimatedTime / 1000));
+                        }
                     }
                     T bean;
                     if(beanType == ABean.class)
@@ -725,11 +730,10 @@ public class CrudReaderApi {
             throw new BioError.BadIODescriptor(String.format("PK column not fount in \"%s\" object!", cursor.getSelectSqlDef().getBioCode()));
         cursor.getSelectSqlDef().setPreparedSql(context.getWrappers().getGetrowWrapper().wrap(cursor.getSelectSqlDef().getSql(), pkField.getName()));
         preparePkParamValue(params, pkField);
-        List<Param> pres = Paramus.clone(params);
         List<Param> p = preparePkParamValue(pkValue, pkField);
-        Paramus.applyParams(pres, p, false, true);
+        Paramus.applyParams(params, p, false, true);
         List<T> result = context.execBatch((conn) -> {
-            return readStoreDataExt(pres, context, cursor, beanType);
+            return readStoreDataExt(params, context, cursor, beanType);
         }, user);
         return result;
     }

@@ -99,23 +99,23 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
 	}
 
     @Override
-    public boolean fetch(List<Param> params, User usr, DelegateSQLFetch onrecord) {
+    public boolean fetch(Object params, User usr, DelegateSQLFetch onrecord) {
         boolean rslt = false;
         BioSQLException lastError = null;
         try {
-            List<Param> prms = params != null ? params : new ArrayList<>();
+            List<Param> prms = DbUtils.decodeParams(params);
             SrvcUtils.applyCurrentUserParams(usr, prms);
             try {
 
                 if (this.params == null)
                     this.params = new ArrayList<>();
 
-                DbUtils.applyParamsToParams(params, this.params, false, true, false);
+                DbUtils.applyParamsToParams(prms, this.params, false, true, false);
 
                 if (!doBeforeStatement(this.params)) // Обрабатываем события
                     return rslt;
 
-                setParamsToStatement(); // Применяем параметры
+                setParamsToStatement(this.params); // Применяем параметры
 
                 if(LOG.isDebugEnabled()) LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(this.preparedSQL, this.preparedStatement.getParamsAsString()));
                 try (ResultSet result = this.preparedStatement.executeQuery()) {
@@ -156,7 +156,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
     }
 
     @Override
-    public <T> T scalar(final List<Param> params, final User usr, final String fieldName, final Class<T> clazz, T defaultValue) {
+    public <T> T scalar(final Object params, final User usr, final String fieldName, final Class<T> clazz, T defaultValue) {
         final ScalarResult<T> rslt = new ScalarResult();
         if(this.fetch(params, usr, (rs -> {
             if(rs.getFields().size() > 0) {
@@ -187,7 +187,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
     }
 
     @Override
-    public <T> T scalar(final List<Param> params, final User usr, final Class<T> clazz, T defaultValue) {
+    public <T> T scalar(final Object params, final User usr, final Class<T> clazz, T defaultValue) {
         return scalar(params, usr, null, clazz, defaultValue);
     }
 
@@ -202,9 +202,9 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
     }
 
     @Override
-    public <T> List<T> beans(final List<Param> params, final User usr, final Class<T> clazz) {
+    public <T> List<T> beans(final Object params, final User usr, final Class<T> clazz) {
         final List<T> rslt = new ArrayList<>();
-        this.fetch(null, usr, (rs -> {
+        this.fetch(params, usr, (rs -> {
             rslt.add(DbUtils.createBeanFromReader(rs, clazz));
             return true;
         }));
@@ -217,7 +217,7 @@ public class DbCursor extends DbCommand<SQLCursor> implements SQLCursor {
     }
 
     @Override
-    public <T> T firstBean(final List<Param> params, final User usr, final Class<T> clazz) {
+    public <T> T firstBean(final Object params, final User usr, final Class<T> clazz) {
         final List<T> rslt = new ArrayList<>();
         this.fetch(params, usr, (rs -> {
             rslt.add(DbUtils.createBeanFromReader(rs, clazz));

@@ -655,6 +655,28 @@ public class DbaHelper {
     }
 
     /**
+     *
+     * @param bioCode
+     * @param id
+     * @param params
+     * @param beanType
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> loadBeanLocal(
+            final String bioCode,
+            final Object id,
+            final List<Param> params,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
+        if(id != null) {
+            return CrudReaderApi.loadRecord0Ext(id, params, context, sqlDefinition, beanType);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * Выполняет запрос к Бд и экспортирует данные к MSExcel
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
      * @param request

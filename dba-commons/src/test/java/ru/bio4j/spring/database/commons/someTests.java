@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.bio4j.spring.commons.types.Paramus;
+import ru.bio4j.spring.commons.utils.Lists;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.ABean;
@@ -113,5 +114,48 @@ public class someTests {
 //        BeansPage<ABean> rrr = parsClockhouse4jJson(json, ABean.class);
 //        Assert.assertTrue(rrr != null);
 //    }
+
+    @Test
+    public void decodeParamsTest1() throws Exception {
+        List<Param> params = DbUtils.decodeParams(Arrays.asList(12, "dfg", 123L));
+        Assert.assertTrue(params.size() == 1);
+    }
+
+    @Test
+    public void applyParamsToParamsTest1() {
+        List<Object> inPrms = Arrays.asList(12, "dfg", 123L);
+        List<Param> params = DbUtils.decodeParams(inPrms);
+        params.get(1).setValue("asd");
+        DbUtils.applyParamsToParams(params, inPrms, true, true, true);
+        Assert.assertTrue(inPrms.get(1).equals("asd"));
+    }
+
+    @Test
+    public void applyParamsToParamsTest2() {
+        Object[] inPrms = new Object[] {12, "dfg", 123L};
+        List<Param> params = DbUtils.decodeParams(inPrms);
+        params.get(1).setValue("asd");
+        DbUtils.applyParamsToParams(params, inPrms, true, true, true);
+        Assert.assertTrue(inPrms[1].equals("asd"));
+    }
+
+    @Test
+    public void applyParamsToParamsTest3() {
+        List<Param> params = Paramus.createParams("p1", 1, "p2", 2, "p3", "3");
+        Object[] inPrms = new Object[] {12, "dfg", 123L};
+        List<Param> prms = DbUtils.decodeParams(inPrms);
+        DbUtils.applyParamsToParams(prms, params, true, true, true);
+        params.get(1).setValue("asd");
+        DbUtils.applyParamsToParams(params, inPrms, true, true, true);
+        Assert.assertTrue(inPrms[1].equals("asd"));
+    }
+
+    @Test
+    public void applyParamsToParamsTest4() {
+        List<Param> params = new ArrayList<>();
+        List<Param> inparams = Paramus.createParams("p1", 1, "p2", 2, "p3", "3");
+        DbUtils.applyParamsToParams(inparams, params, true, true, true);
+        Assert.assertTrue(params.size() == 3);
+    }
 
 }

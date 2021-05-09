@@ -15,10 +15,14 @@ import ru.bio4j.spring.model.transport.jstore.StoreRow;
 import ru.bio4j.spring.commons.utils.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.sql.*;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static ru.bio4j.spring.commons.utils.ABeans.newInstance;
 import static ru.bio4j.spring.commons.utils.Reflex.findAnnotation;
@@ -29,6 +33,8 @@ import static ru.bio4j.spring.commons.utils.Reflex.getAllObjectFields;
  */
 public class DbUtils {
     private static final Logger LOG = LoggerFactory.getLogger(DbUtils.class);
+
+    public static final String UNKNOWN_PARAM_PREFIX = "unknownParam-";
 
     private SqlTypeConverter converter;
     private RDBMSUtils rdbmsUtils;
@@ -258,19 +264,49 @@ public class DbUtils {
         return createBeanFromReader(null, reader, clazz);
     }
 
+    private static List<Param> decodeListOfObjectToParams(List<Object> params) {
+        final List<Param> rslt0 = new ArrayList<>();
+        int[] paramIndex = new int[] {1};
+        params.forEach(v -> {
+            rslt0.add(Param.builder()
+                    .name(String.format("%s%d", UNKNOWN_PARAM_PREFIX, paramIndex[0]++))
+                    .value(v)
+                    .type(v != null ? MetaTypeConverter.read(v.getClass()) : MetaType.UNDEFINED)
+                    .build());
+        });
+        return rslt0;
+    }
+
+    private static List<Param> decodeArrayOfObjectToParams(Object[] params) {
+        final List<Param> rslt0 = new ArrayList<>();
+        int[] paramIndex = new int[] {1};
+        Arrays.stream(params).forEach(v -> {
+            rslt0.add(Param.builder()
+                    .name(String.format("%s%d", UNKNOWN_PARAM_PREFIX, paramIndex[0]++))
+                    .value(v)
+                    .type(v != null ? MetaTypeConverter.read(v.getClass()) : MetaType.UNDEFINED)
+                    .build());
+        });
+        return rslt0;
+    }
+
     public static List<Param> decodeParams(Object params) {
         List<Param> rslt = null;
         if(params != null){
-            if(params instanceof List)
-                rslt = (List<Param>)params;
-            else if(params instanceof ABean)
+            if(params instanceof List<?> && ((List)params).size() > 0 && ((List)params).get(0) instanceof Param) {
+                rslt = (List<Param>) params;
+            } else if(params instanceof List<?> && ((List)params).size() > 0 && !(((List)params).get(0) instanceof Param)) {
+                rslt = decodeListOfObjectToParams((List<Object>) params);
+            } else if(params.getClass().isArray()) {
+                rslt = decodeArrayOfObjectToParams((Object[]) params);
+            } else if(params instanceof ABean)
                 rslt = Utl.abeanToParams((ABean) params);
             else if(params instanceof HashMap)
                 rslt = Utl.hashmapToParams((HashMap) params);
             else
                 rslt = Utl.beanToParams(params);
         }
-        return rslt;
+        return rslt != null ? rslt : new ArrayList<>();
     }
 
 
@@ -292,6 +328,11 @@ public class DbUtils {
                     "Необходимо, чтобы все имена аргументов начинались с префикса \"%s\" или \"%s\" !", parName.toUpperCase(), DEFAULT_PARAM_PREFIX[0], DEFAULT_PARAM_PREFIX[1]));
     }
 
+    /**
+     * Приводит параметр к виду "p_paramName" если параметр не имеет префикса "p_" или "v_"
+     * @param paramName
+     * @return
+     */
     public static String normalizeParamName(String paramName) {
         if(!Strings.isNullOrEmpty(paramName)) {
             paramName = paramName.toUpperCase().startsWith(DEFAULT_PARAM_PREFIX[0])||
@@ -355,9 +396,10 @@ public class DbUtils {
         return null;
     }
 
-    private static void applyParamsToParams0(List<Param> src, List<Param> dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes) {
+    private static void applyParamsToParams0(List<Param> src, List<Param> dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes, Predicate<Param> filter) {
         if(src != null && dst != null) {
-            for(Param p : src){
+            List<Param> srcFiltered = filter != null ? src.stream().filter(filter).collect(Collectors.toList()) : src;
+            for(Param p : srcFiltered){
                 Param exists = findParamIgnorePrefix(p.getName(), dst);
                 if(exists != null && exists != p) {
                     MetaType srcType = p.getType();
@@ -383,9 +425,49 @@ public class DbUtils {
         }
     }
 
-    private static void applyParamsToABean(List<Param> src, ABean dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes) {
+    private static void applyParamsToParamsByIndex(List<Param> src, List<Param> dst, boolean normalizeName, boolean overwriteTypes) {
         if(src != null && dst != null) {
-            for(Param p : src){
+            for(int i=0; i<src.size(); i++){
+                Param p = src.get(i);
+                Param exists = i<dst.size() ? dst.get(i) : null;
+                if(exists != null && exists != p) {
+                    MetaType srcType = p.getType();
+                    MetaType dstType = overwriteTypes || exists.getType() == MetaType.UNDEFINED ? srcType : exists.getType();
+
+                    if (srcType != null && srcType != MetaType.UNDEFINED && srcType != exists.getType()) {
+                        exists.setValue(Converter.toType(p.getValue(), MetaTypeConverter.write(dstType)));
+                        exists.setType(dstType);
+                    } else
+                        exists.setValue(p.getValue());
+                    if(normalizeName)
+                        exists.setName(normalizeParamName(exists.getName()));
+                }
+            }
+        }
+    }
+
+    private static void applyParamsToValuesList(List<Param> src, List<Object> dst) {
+        if(src != null && dst != null) {
+            for (int i = 0; i < dst.size(); i++) {
+                if(i < src.size())
+                    dst.set(i, src.get(i).getValue());
+            }
+        }
+    }
+
+    private static void applyParamsToValuesArray(List<Param> src, Object[] dst) {
+        if(src != null && dst != null) {
+            for (int i = 0; i < dst.length; i++) {
+                if(i < src.size())
+                    dst[i] = src.get(i).getValue();
+            }
+        }
+    }
+
+    private static void applyParamsToABean(List<Param> src, ABean dst, boolean normalizeName, boolean addIfNotExists, Predicate<Param> filter) {
+        if(src != null && dst != null) {
+            List<Param> srcFiltered = filter != null ? src.stream().filter(filter).collect(Collectors.toList()) : src;
+            for(Param p : srcFiltered){
                 String existsKey = findKeyIgnorePrefix(p.getName(), dst);
                 if(existsKey != null) {
                     if(normalizeName) {
@@ -407,9 +489,10 @@ public class DbUtils {
         }
     }
 
-    private static void applyParamsToHashMap(List<Param> src, HashMap<String, Object> dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes) {
+    private static void applyParamsToHashMap(List<Param> src, HashMap<String, Object> dst, boolean normalizeName, boolean addIfNotExists, Predicate<Param> filter) {
         if(src != null && dst != null) {
-            for(Param p : src){
+            List<Param> srcFiltered = filter != null ? src.stream().filter(filter).collect(Collectors.toList()) : src;
+            for(Param p : srcFiltered){
                 String existsKey = findKeyIgnorePrefix(p.getName(), dst);
                 if(existsKey != null) {
                     if(normalizeName) {
@@ -431,16 +514,17 @@ public class DbUtils {
         }
     }
 
-    public static void applyParamsToObject(List<Param> src, Object dst) {
+    public static void applyParamsToObject(List<Param> src, Object dst, Predicate<Param> filter) {
         if (src == null || src.size() == 0 || dst == null)
             return;
+        List<Param> srcFiltered = filter != null ? src.stream().filter(filter).collect(Collectors.toList()) : src;
         Class<?> dstType = dst.getClass();
         for (java.lang.reflect.Field fld : getAllObjectFields(dstType)) {
             String param2find = fld.getName();
             Prop prp = fld.getAnnotation(Prop.class);
             if (prp != null && !Strings.isNullOrEmpty(prp.name()))
                 param2find = prp.name().toLowerCase();
-            Param param = findParamIgnorePrefix(param2find, src);
+            Param param = findParamIgnorePrefix(param2find, srcFiltered);
             if (param != null) {
                 fld.setAccessible(true);
                 Object valObj = Converter.toType(param.getValue(), fld.getType());
@@ -450,31 +534,64 @@ public class DbUtils {
         }
     }
 
-    public static List<Param> findOUTParams(List<Param> prms) {
-        List<Param> rslt = new ArrayList<>();
-        for (Param p : prms) {
-            if (Arrays.asList(Param.Direction.INOUT, Param.Direction.OUT).indexOf(p.getDirection()) >= 0)
-                rslt.add(p);
-        }
-        return rslt;
+//    public static List<Param> findOUTParams(List<Param> prms) {
+//        List<Param> rslt = new ArrayList<>();
+//        for (Param p : prms) {
+//            if (Arrays.asList(Param.Direction.INOUT, Param.Direction.OUT).indexOf(p.getDirection()) >= 0)
+//                rslt.add(p);
+//        }
+//        return rslt;
+//    }
+
+    private static boolean paramsIsUnknownNames(List<Param> src) {
+        final boolean[] result = new boolean[] {false};
+        src.forEach(p -> {
+            result[0] = result[0] || p.getName().startsWith(UNKNOWN_PARAM_PREFIX);
+        });
+        return result[0];
     }
 
-    public static void applyParamsToParams(List<Param> src, Object dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes) {
+    /**
+     * Применяет значения параметров "src" в параметры "dst"
+     * @param src - List<Param>
+     * @param dst - может быть List<Param>, List<Object>, Object[], ABean, HashMap, Pojo
+     * @param normalizeName - см @normalizeParamName
+     * @param addIfNotExists - если "dst" - List<Param> или ABean или HashMap, то отсутствующий параметр будет добавлен
+     * @param overwriteTypes - если "dst" - List<Param>, то типа будет перегружен из "src"
+     * @param filter - фильтр для "src"
+     */
+    public static void applyParamsToParams(List<Param> src, Object dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes, Predicate<Param> filter) {
         if(src != null && dst != null) {
-
-            if(dst instanceof List) {
-                applyParamsToParams0(src, (List<Param>) dst, normalizeName, addIfNotExists, overwriteTypes);
+            List<Param> dstParams;
+            try {
+                dstParams = (List<Param>) dst;
+            } catch (ClassCastException e) {
+                dstParams = null;
+            }
+            if(dstParams != null) {
+                    if (paramsIsUnknownNames(src))
+                        applyParamsToParamsByIndex(src, (List<Param>) dst, normalizeName, overwriteTypes);
+                    else
+                        applyParamsToParams0(src, (List<Param>) dst, normalizeName, addIfNotExists, overwriteTypes, filter);
+            } else if(dstParams == null && dst instanceof List) {
+                applyParamsToValuesList(src, (List<Object>) dst);
+            } else if(dst.getClass().isArray()) {
+                applyParamsToValuesArray(src, (Object[]) dst);
             } else if(dst instanceof ABean) {
-                applyParamsToABean(src, (ABean) dst, normalizeName, addIfNotExists, overwriteTypes);
+                applyParamsToABean(src, (ABean) dst, normalizeName, addIfNotExists, filter);
             } else if(dst instanceof HashMap) {
-                applyParamsToHashMap(src, (HashMap<String, Object>) dst, normalizeName, addIfNotExists, overwriteTypes);
+                applyParamsToHashMap(src, (HashMap<String, Object>) dst, normalizeName, addIfNotExists, filter);
             } else {
-                applyParamsToObject(src, dst);
+                applyParamsToObject(src, dst, filter);
             }
         }
     }
 
-    public static void applayRowToParams(StoreRow row, List<Param> params){
+    public static void applyParamsToParams(List<Param> src, Object dst, boolean normalizeName, boolean addIfNotExists, boolean overwriteTypes) {
+        applyParamsToParams(src, dst, normalizeName, addIfNotExists, overwriteTypes, null);
+    }
+
+    public static void applyRowToParams(StoreRow row, List<Param> params){
         try(Paramus paramus = Paramus.set(params)) {
             for(String key : row.getData().keySet()) {
                 String paramName = DbUtils.normalizeParamName(key).toLowerCase();
@@ -493,7 +610,7 @@ public class DbUtils {
 
     }
 
-    public static void applayRowToParams(ABean row, List<Param> params){
+    public static void applyRowToParams(ABean row, List<Param> params){
         try(Paramus paramus = Paramus.set(params)) {
             for(String key : row.keySet()) {
                 String paramName = DbUtils.normalizeParamName(key).toLowerCase();

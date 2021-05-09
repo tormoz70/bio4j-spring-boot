@@ -1,7 +1,6 @@
 package ru.bio4j.spring.database.commons;
 
 import ru.bio4j.spring.commons.types.Paramus;
-import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.model.transport.errors.BioSQLException;
 import ru.bio4j.spring.model.transport.Param;
 import ru.bio4j.spring.model.transport.User;
@@ -12,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -73,6 +73,12 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
         return this.init(conn, storedProcName);
     }
 
+    /**
+     * Выполняет хранимую процедуру
+     * @param params сюда можно передавать List<Param>, List<Object> (список значений)
+     * @param usr
+     * @param stayOpened
+     */
     @Override
 	public void execSQL(Object params, User usr, boolean stayOpened) {
         List<Param> prms = params != null ? DbUtils.decodeParams(params) : new ArrayList<>();
@@ -92,13 +98,13 @@ public class DbStoredProc extends DbCommand<SQLStoredProc> implements SQLStoredP
                     if (!doBeforeStatement(this.params)) // Обрабатываем события
                         return;
 
-                    setParamsToStatement(); // Применяем параметры
+                    setParamsToStatement(this.params); // Применяем параметры
 
                     preparedStatement.execute();
 
-                    getParamsFromStatement(); // Вытаскиваем OUT-параметры
+                    getParamsFromStatement(this.params); // Вытаскиваем OUT-параметры
 
-                    DbUtils.applyParamsToParams(DbUtils.findOUTParams(this.params), params, false, true, false);
+                    DbUtils.applyParamsToParams(this.params, params, false, true, false, param -> Arrays.asList(Param.Direction.INOUT, Param.Direction.OUT).indexOf(param.getDirection()) >= 0);
                     if (this.params != null) {
                         for (Param p : prms) {
                             Param exists = Paramus.getParam(this.params, DbUtils.normalizeParamName(p.getName()));

@@ -17,17 +17,17 @@ public interface SQLCursor extends SQLCommand {
 
     SQLReader createReader();
 
-    boolean fetch(final List<Param> params, final User usr, final DelegateSQLFetch onrecord);
+    boolean fetch(final Object params, final User usr, final DelegateSQLFetch onrecord);
     boolean fetch(final User usr, final DelegateSQLFetch onrecord);
 
-    public <T> T scalar(final List<Param> params, final User usr, final String fieldName, final Class<T> clazz, T defaultValue);
-    public <T> T scalar(final List<Param> params, final User usr, final Class<T> clazz, T defaultValue);
-    public <T> T scalar(final User usr, final String fieldName, final Class<T> clazz, T defaultValue);
-    public <T> T scalar(final User usr, final Class<T> clazz, T defaultValue);
+    <T> T scalar(final Object params, final User usr, final String fieldName, final Class<T> clazz, T defaultValue);
+    <T> T scalar(final Object params, final User usr, final Class<T> clazz, T defaultValue);
+    <T> T scalar(final User usr, final String fieldName, final Class<T> clazz, T defaultValue);
+    <T> T scalar(final User usr, final Class<T> clazz, T defaultValue);
 
-    <T> List<T> beans(final List<Param> params, final User usr, final Class<T> clazz);
+    <T> List<T> beans(final Object params, final User usr, final Class<T> clazz);
     <T> List<T> beans(final User usr, final Class<T> clazz);
-    <T> T firstBean(final List<Param> params, final User usr, final Class<T> clazz);
+    <T> T firstBean(final Object params, final User usr, final Class<T> clazz);
     <T> T firstBean(final User usr, final Class<T> clazz);
 
 }
