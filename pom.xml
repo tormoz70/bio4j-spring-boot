@@ -11,7 +11,7 @@
         <dependency-plugin-version>3.1.2</dependency-plugin-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-framework.version>5.3.8</spring-framework.version>
-        <spring-boot.version>2.5.0</spring-boot.version>
+        <spring-boot.version>2.5.1</spring-boot.version>
         <spring-kafka.version>2.7.2</spring-kafka.version>
         <org.apache.poi.version>5.0.0</org.apache.poi.version>
         <hikaricp.version>4.0.3</hikaricp.version>

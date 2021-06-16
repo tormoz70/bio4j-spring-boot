@@ -39,12 +39,13 @@ public class DbContextFactory {
         cfg.setPassword(dataSourceProperties.getPassword());
         cfg.setMaximumPoolSize(getValFromCfg(dataSourceProperties.getMaximumPoolSize(), "10", int.class));
         cfg.setMinimumIdle(getValFromCfg(dataSourceProperties.getMinimumPoolSize(), "2", int.class));
+        cfg.setSchema(dataSourceProperties.getCurrentSchema());
         cfg.setDataSourceProperties(properties);
 
         DataSource dataSource = new com.zaxxer.hikari.HikariDataSource(cfg);
         try {
             Constructor<T> constructor = clazz.getConstructor(DataSource.class, DataSourceProperties.class);
-            return constructor.newInstance(new Object[]{dataSource, dataSourceProperties});
+            return constructor.newInstance(dataSource, dataSourceProperties);
         } catch (Exception e) {
             throw BioError.wrap(e);
         }

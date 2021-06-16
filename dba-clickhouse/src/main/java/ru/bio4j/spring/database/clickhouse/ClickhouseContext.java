@@ -17,15 +17,12 @@ public class ClickhouseContext extends DbContextAbstract {
 
         if(this.getDataSourceProperties().getCurrentSchema() != null) {
             this.innerAfterEvents.add(
-                    new SQLConnectionConnectedEvent() {
-                        @Override
-                        public void handle(SQLContext sender, Attributes attrs) {
-                            if(attrs.getConnection() != null) {
-//                                String curSchema = sender.getDataSourceProperties().getCurrentSchema().toUpperCase();
-//                                LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
-//                                DbUtils.execSQL(attrs.getConnection(), "alter session set current_schema="+curSchema);
-//                                LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
-                            }
+                    (sender, attrs) -> {
+                        if(attrs.getConnection() != null) {
+                            String curSchema = sender.getDataSourceProperties().getCurrentSchema();
+                            LOG.debug("onAfterGetConnection - start setting current_schema="+curSchema);
+                            DbUtils.execSQL(attrs.getConnection(), "use "+curSchema);
+                            LOG.debug("onAfterGetConnection - OK. current_schema now is "+curSchema);
                         }
                     }
             );
@@ -47,7 +44,4 @@ public class ClickhouseContext extends DbContextAbstract {
     public String dbmsName() {
         return "clickhouse";
     }
-
-
-
 }
