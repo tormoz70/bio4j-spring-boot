@@ -3,13 +3,14 @@ package ru.bio4j.spring.model.transport;
 import ru.bio4j.spring.model.transport.jstore.Field;
 import ru.bio4j.spring.model.transport.jstore.Total;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Набор данных для возврата клинету
  * @param <T> - bean описывающий запись
  */
-public class BeansPage<T> {
+public class BeansPage<T> implements Serializable {
     /**
      * Строки с данными
      */
