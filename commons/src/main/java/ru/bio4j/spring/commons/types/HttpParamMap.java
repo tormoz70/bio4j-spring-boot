@@ -36,6 +36,10 @@ public interface HttpParamMap {
     default String deviceuuid() {
         return "deviceuuid";
     }
+    /** Флаг для подсчёта общего числа записей */
+    default String calcTotal() {
+        return "gcount";
+    }
 
     default String pageSizeHeader() {
         return "X-Pagination-Pagesize";

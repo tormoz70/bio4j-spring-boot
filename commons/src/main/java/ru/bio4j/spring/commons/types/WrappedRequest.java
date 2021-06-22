@@ -259,6 +259,13 @@ public class WrappedRequest extends HttpServletRequestWrapper {
                 result.pageSizeOrig = bioHeaderPageSize;
         }
 
+        if(Strings.isNullOrEmpty(result.gcount)) {
+            final String calTotalParam = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.calcTotal()) ? httpParamMap.calcTotal() : "gcount";
+            if(request.getParameterMap() != null && request.getParameterMap().containsKey(calTotalParam)){
+                result.gcount = request.getParameter(calTotalParam);
+            }
+        }
+
         String userNameParam = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.username()) ? httpParamMap.username() : null;
         String passwordParam = httpParamMap != null && !Strings.isNullOrEmpty(httpParamMap.password()) ? httpParamMap.password() : null;
 
