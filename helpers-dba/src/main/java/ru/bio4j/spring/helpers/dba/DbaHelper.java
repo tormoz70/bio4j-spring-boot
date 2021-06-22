@@ -1179,32 +1179,32 @@ public class DbaHelper {
     }
 
     /**
-     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
      * @param cacheName имя используемого кэша
      * @param request   объект запроса, который используется для получения уникального ключа
-     * @param creator   метод создания нового экзмпляра объекта
+     * @param creator   метод создания нового экзмпляра объекта или {@code null}
      * @param <T>       тип получаемого объекта
-     * @return Экземпляр объекта из кэша, либо объект, созданный creator'ом.
+     * @return Экземпляр объекта из кэша, либо объект, созданный {@code creator}'ом.
      */
-    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, HttpServletRequest request, Supplier<T> creator) {
+    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, HttpServletRequest request, ObjectSupplier<T> creator) {
         T rslt = getObjectFromCache(cacheName, request);
-        if (rslt == null) {
+        if (rslt == null && creator != null) {
             rslt = creator.get();
             putObjectToCache(cacheName, request, rslt);
         }
         return rslt;
     }
     /**
-     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
      * @param cacheName имя используемого кэша
      * @param key       уникальный ключ в кэше
-     * @param creator   метод создания нового экзмпляра объекта
+     * @param creator   метод создания нового экзмпляра объекта или {@code null}
      * @param <T>       тип получаемого объекта
-     * @return Экземпляр объекта из кэша, либо объект, созданный creator'ом.
+     * @return Экземпляр объекта из кэша, либо объект, созданный {@code creator}'ом.
      */
-    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, String key, Supplier<T> creator) {
+    public <T extends Serializable> T wrapObjectCacheCall(String cacheName, String key, ObjectSupplier<T> creator) {
         T rslt = getObjectFromCache(cacheName, key);
-        if (rslt == null) {
+        if (rslt == null && creator != null) {
             rslt = creator.get();
             putObjectToCache(cacheName, key, rslt);
         }
@@ -1212,32 +1212,32 @@ public class DbaHelper {
     }
 
     /**
-     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
      * @param cacheName имя используемого кэша
      * @param request   объект запроса, который используется для получения уникального ключа
-     * @param creator   метод создания нового списка объектов
+     * @param creator   метод создания нового списка объектов или {@code null}
      * @param <T>       тип получаемого объекта в списке
-     * @return Список объектов из кэша, либо список объектов, созданный creator'ом.
+     * @return Список объектов из кэша, либо список объектов, созданный {@code creator}'ом.
      */
     public <T extends Serializable> List<T> wrapListCacheCall(String cacheName, HttpServletRequest request, ListSupplier<T> creator) {
         List<T> rslt = getListFromCache(cacheName, request);
-        if (rslt == null) {
+        if (rslt == null && creator != null) {
             rslt = creator.get();
             putListToCache(cacheName, request, rslt);
         }
         return rslt;
     }
     /**
-     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова creator и помещает его в кэш.
+     * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
      * @param cacheName имя используемого кэша
      * @param key       уникальный ключ в кэше
-     * @param creator   метод создания нового списка объектов
+     * @param creator   метод создания нового списка объектов или {@code null}
      * @param <T>       тип получаемого объекта в списке
-     * @return Список объектов из кэша, либо список объектов, созданный creator'ом.
+     * @return Список объектов из кэша, либо список объектов, созданный {@code creator}'ом.
      */
     public <T extends Serializable> List<T> wrapListCacheCall(String cacheName, String key, ListSupplier<T> creator) {
         List<T> rslt = getListFromCache(cacheName, key);
-        if (rslt == null) {
+        if (rslt == null && creator != null) {
             rslt = creator.get();
             putListToCache(cacheName, key, rslt);
         }
