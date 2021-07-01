@@ -38,6 +38,9 @@ public class SsoUser implements Principal, Serializable {
     @ApiModelProperty("ID дочерних организаций по отношению к организации, к которой относится пользователь (разделитель \",\")")
     private String childOrgIds;
 
+    @ApiModelProperty("ID организаций, к которым пользователь имеет доступ (разделитель \",\"). Если пользователь имеет доступ к нескольким киносетям, то будут перечислены все киносети и кинотеатры, которые в них входят.")
+    private String accessOrgIds;
+
     @ApiModelProperty("Список ролей пользователя (разделитель \",\")")
     private String roles;
     @ApiModelProperty("Список разрешений пользователя (разделитель \",\")")
@@ -233,6 +236,14 @@ public class SsoUser implements Principal, Serializable {
         this.refreshToken = refreshToken;
     }
 
+    public String getAccessOrgIds() {
+        return accessOrgIds;
+    }
+
+    public void setAccessOrgIds(String accessOrgIds) {
+        this.accessOrgIds = accessOrgIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -258,11 +269,12 @@ public class SsoUser implements Principal, Serializable {
                 Objects.equals(anonymouse, ssoUser.anonymouse) &&
                 Objects.equals(deviceuuid, ssoUser.deviceuuid) &&
                 Objects.equals(pushenabled, ssoUser.pushenabled) &&
-                Objects.equals(pushtoken, ssoUser.pushtoken);
+                Objects.equals(pushtoken, ssoUser.pushtoken) &&
+                Objects.equals(accessOrgIds, ssoUser.accessOrgIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(innerUid, stoken, stokenExpire, refreshToken, login, fio, email, phone, orgId, orgName, orgDesc, parentOrgId, childOrgIds, roles, grants, remoteIP, remoteClient, anonymouse, deviceuuid, pushenabled, pushtoken);
+        return Objects.hash(innerUid, stoken, stokenExpire, refreshToken, login, fio, email, phone, orgId, orgName, orgDesc, parentOrgId, childOrgIds, roles, grants, remoteIP, remoteClient, anonymouse, deviceuuid, pushenabled, pushtoken, accessOrgIds);
     }
 }
