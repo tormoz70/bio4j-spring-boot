@@ -37,10 +37,10 @@ public class SsoUser implements Principal, Serializable {
     private String parentOrgId;
     @ApiModelProperty("ID дочерних организаций по отношению к организации, к которой относится пользователь (разделитель \",\")")
     private String childOrgIds;
-
-    @ApiModelProperty("ID организаций, к которым пользователь имеет доступ (разделитель \",\"). Если пользователь имеет доступ к нескольким киносетям, то будут перечислены все киносети и кинотеатры, которые в них входят.")
+    @ApiModelProperty("ID организаций, к которым пользователь имеет доступ (разделитель \",\"). Если пользователь имеет доступ к нескольким киносетям, то будут перечислены все киносети и кинотеатры, которые в них входят")
     private String accessOrgIds;
-
+    @ApiModelProperty("ID организаций, к которым пользователь имеет отношение (разделитель \",\"), см. таблицу GIVCADMIN.USR2ORG")
+    private String refsOrgIds;
     @ApiModelProperty("Список ролей пользователя (разделитель \",\")")
     private String roles;
     @ApiModelProperty("Список разрешений пользователя (разделитель \",\")")
@@ -244,6 +244,14 @@ public class SsoUser implements Principal, Serializable {
         this.accessOrgIds = accessOrgIds;
     }
 
+    public String getRefsOrgIds() {
+        return refsOrgIds;
+    }
+
+    public void setRefsOrgIds(String refsOrgIds) {
+        this.refsOrgIds = refsOrgIds;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -270,11 +278,12 @@ public class SsoUser implements Principal, Serializable {
                 Objects.equals(deviceuuid, ssoUser.deviceuuid) &&
                 Objects.equals(pushenabled, ssoUser.pushenabled) &&
                 Objects.equals(pushtoken, ssoUser.pushtoken) &&
-                Objects.equals(accessOrgIds, ssoUser.accessOrgIds);
+                Objects.equals(accessOrgIds, ssoUser.accessOrgIds) &&
+                Objects.equals(refsOrgIds, ssoUser.refsOrgIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(innerUid, stoken, stokenExpire, refreshToken, login, fio, email, phone, orgId, orgName, orgDesc, parentOrgId, childOrgIds, roles, grants, remoteIP, remoteClient, anonymouse, deviceuuid, pushenabled, pushtoken, accessOrgIds);
+        return Objects.hash(innerUid, stoken, stokenExpire, refreshToken, login, fio, email, phone, orgId, orgName, orgDesc, parentOrgId, childOrgIds, roles, grants, remoteIP, remoteClient, anonymouse, deviceuuid, pushenabled, pushtoken, accessOrgIds, refsOrgIds);
     }
 }

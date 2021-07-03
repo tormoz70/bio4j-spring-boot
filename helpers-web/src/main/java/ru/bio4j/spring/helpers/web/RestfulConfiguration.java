@@ -5,10 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.bio4j.spring.commons.types.*;
-import ru.bio4j.spring.helpers.web.defaults.DefaultErrorProcessorImpl;
-import ru.bio4j.spring.helpers.web.defaults.DefaultHttpParamMapImpl;
-import ru.bio4j.spring.helpers.web.defaults.DefaultLoginProcessorImpl;
-import ru.bio4j.spring.helpers.web.defaults.DefaultSecurityModuleImpl;
+import ru.bio4j.spring.helpers.web.defaults.*;
 
 @Configuration
 public class RestfulConfiguration {
@@ -29,6 +26,10 @@ public class RestfulConfiguration {
     @Bean("defaultHttpParamMap")
     public HttpParamMap httpParamMap() {
         return new DefaultHttpParamMapImpl();
+    }
+    @Bean("defaultHttpParamDefaults")
+    public HttpParamDefaults httpParamDefaults() {
+        return new DefaultHttpParamDefaultsImpl();
     }
 
     @Bean("defaultErrorProcessor")

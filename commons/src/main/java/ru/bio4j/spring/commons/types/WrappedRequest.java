@@ -37,9 +37,13 @@ public class WrappedRequest extends HttpServletRequestWrapper {
     }
 
     protected HttpParamMap httpParamMap;
+    protected HttpParamDefaults httpParamDefaults;
 
     public HttpParamMap getHttpParamMap() {
         return httpParamMap;
+    }
+    public HttpParamDefaults getHttpParamDefaults() {
+        return httpParamDefaults;
     }
 
     public WrappedRequest(final HttpServletRequest request) {
@@ -48,6 +52,11 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         HttpParamMap defaultHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("defaultHttpParamMap");
         HttpParamMap overrideHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
         httpParamMap = overrideHttpParamMap != null ? overrideHttpParamMap : defaultHttpParamMap;
+
+        HttpParamDefaults defaultHttpParamDefaults = (HttpParamDefaults)ApplicationContextProvider.getApplicationContext().getBean("defaultHttpParamDefaults");
+        HttpParamDefaults overrideHttpParamDefaults = (HttpParamDefaults)ApplicationContextProvider.getApplicationContext().getBean("httpParamDefaults");
+        httpParamDefaults = overrideHttpParamDefaults != null ? overrideHttpParamDefaults : defaultHttpParamDefaults;
+
         modParameters = new TreeMap<>();
         appendParams(request.getParameterMap());
         modHeaders = new HashMap();
@@ -343,7 +352,7 @@ public class WrappedRequest extends HttpServletRequestWrapper {
             result.offset = Sqls.UNKNOWN_RECS_TOTAL + 1 - result.pageSize;
         }
         if(result.pageSize == null && Strings.isNullOrEmpty(result.pageSizeOrig))
-            result.pageSize = 50;
+            result.pageSize = httpParamDefaults.pageSize();
         if((result.page == null && result.pageOrig == null) || (result.page != null && result.page < 1))
             result.page = 1;
         if(result.offset == null && result.offsetOrig == null && result.page != null)
