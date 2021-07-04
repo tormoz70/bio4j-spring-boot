@@ -1,6 +1,7 @@
 package ru.bio4j.spring.commons.types;
 
 import org.apache.poi.util.IOUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import ru.bio4j.spring.commons.converter.Converter;
 import ru.bio4j.spring.model.transport.*;
 import ru.bio4j.spring.model.transport.jstore.Sort;
@@ -46,15 +47,23 @@ public class WrappedRequest extends HttpServletRequestWrapper {
         return httpParamDefaults;
     }
 
+
+    private static <T> T findBean(String beanName) {
+        try {
+            return (T) ApplicationContextProvider.getApplicationContext().getBean(beanName);
+        } catch(NoSuchBeanDefinitionException e) {
+            return null;
+        }
+    }
+
     public WrappedRequest(final HttpServletRequest request) {
         super(request);
         ServletContextHolder.setServletContext(request.getServletContext());
-        HttpParamMap defaultHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("defaultHttpParamMap");
-        HttpParamMap overrideHttpParamMap = (HttpParamMap)ApplicationContextProvider.getApplicationContext().getBean("httpParamMap");
+        HttpParamMap defaultHttpParamMap = findBean("defaultHttpParamMap");
+        HttpParamMap overrideHttpParamMap = findBean("httpParamMap");
         httpParamMap = overrideHttpParamMap != null ? overrideHttpParamMap : defaultHttpParamMap;
-
-        HttpParamDefaults defaultHttpParamDefaults = (HttpParamDefaults)ApplicationContextProvider.getApplicationContext().getBean("defaultHttpParamDefaults");
-        HttpParamDefaults overrideHttpParamDefaults = (HttpParamDefaults)ApplicationContextProvider.getApplicationContext().getBean("httpParamDefaults");
+        HttpParamDefaults defaultHttpParamDefaults = findBean("defaultHttpParamDefaults");
+        HttpParamDefaults overrideHttpParamDefaults = findBean("httpParamDefaults");
         httpParamDefaults = overrideHttpParamDefaults != null ? overrideHttpParamDefaults : defaultHttpParamDefaults;
 
         modParameters = new TreeMap<>();
