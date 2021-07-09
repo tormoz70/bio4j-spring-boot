@@ -285,16 +285,16 @@ public class DbNamedParametersStatement implements SQLNamedParametersStatement {
     }
 
     private void logBeforeWrite(String sql) throws SQLException {
-        if(LOG.isDebugEnabled()) LOG.debug("Try to execute (autocommit: {}) : {}", getConnection().getAutoCommit(), DbUtils.getSQL2Execute(sql, getParamsAsString()));
+        if(LOG.isDebugEnabled()) LOG.debug("Try to execute (autocommit: {}) : {}", getConnection().getAutoCommit(), DbUtils.getSQL2Execute(LOG.isTraceEnabled() ? "\n" + sql : "<omitted, enable TRACE>", getParamsAsString()));
     }
     private void logBeforeWrite() throws SQLException {
         logBeforeWrite(getOrigQuery());
     }
     private void logBeforeRead(String sql) throws SQLException {
-        if(LOG.isDebugEnabled()) LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(sql, getParamsAsString()));
+        if(LOG.isDebugEnabled()) LOG.debug("Try to execute: {}", DbUtils.getSQL2Execute(LOG.isTraceEnabled() ? "\n" + sql : "<omitted, enable TRACE>", getParamsAsString()));
     }
     private void logBeforeRead() throws SQLException {
-        logBeforeWrite(getOrigQuery());
+        logBeforeRead(getOrigQuery());
     }
 
     @Override
