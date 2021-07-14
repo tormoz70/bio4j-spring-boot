@@ -1180,6 +1180,7 @@ public class DbaHelper {
 
     /**
      * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
+     * Если {@code creator} возвращает null, то он не помещается в кэш.
      * @param cacheName имя используемого кэша
      * @param request   объект запроса, который используется для получения уникального ключа
      * @param creator   метод создания нового экзмпляра объекта или {@code null}
@@ -1190,12 +1191,14 @@ public class DbaHelper {
         T rslt = getObjectFromCache(cacheName, request);
         if (rslt == null && creator != null) {
             rslt = creator.get();
-            putObjectToCache(cacheName, request, rslt);
+            if (rslt != null)
+                putObjectToCache(cacheName, request, rslt);
         }
         return rslt;
     }
     /**
      * Пытается получить объект из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
+     * Если {@code creator} возвращает null, то он не помещается в кэш.
      * @param cacheName имя используемого кэша
      * @param key       уникальный ключ в кэше
      * @param creator   метод создания нового экзмпляра объекта или {@code null}
@@ -1206,13 +1209,15 @@ public class DbaHelper {
         T rslt = getObjectFromCache(cacheName, key);
         if (rslt == null && creator != null) {
             rslt = creator.get();
-            putObjectToCache(cacheName, key, rslt);
+            if (rslt != null)
+                putObjectToCache(cacheName, key, rslt);
         }
         return rslt;
     }
 
     /**
      * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
+     * Если {@code creator} возвращает null, то он не помещается в кэш.
      * @param cacheName имя используемого кэша
      * @param request   объект запроса, который используется для получения уникального ключа
      * @param creator   метод создания нового списка объектов или {@code null}
@@ -1223,12 +1228,14 @@ public class DbaHelper {
         List<T> rslt = getListFromCache(cacheName, request);
         if (rslt == null && creator != null) {
             rslt = creator.get();
-            putListToCache(cacheName, request, rslt);
+            if (rslt != null)
+                putListToCache(cacheName, request, rslt);
         }
         return rslt;
     }
     /**
      * Пытается получить список объектов из кэша, а если его там нет, то создаёт новый посредством вызова {@code creator} и помещает его в кэш.
+     * Если {@code creator} возвращает null, то он не помещается в кэш.
      * @param cacheName имя используемого кэша
      * @param key       уникальный ключ в кэше
      * @param creator   метод создания нового списка объектов или {@code null}
@@ -1239,7 +1246,8 @@ public class DbaHelper {
         List<T> rslt = getListFromCache(cacheName, key);
         if (rslt == null && creator != null) {
             rslt = creator.get();
-            putListToCache(cacheName, key, rslt);
+            if (rslt != null)
+                putListToCache(cacheName, key, rslt);
         }
         return rslt;
     }
