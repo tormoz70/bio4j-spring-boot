@@ -26,10 +26,10 @@ public class DbContextFactory {
 
     public static <T extends DbContextAbstract> SQLContext createHikariCP(DataSourceProperties dataSourceProperties, Class<T> clazz) {
         if(LOG.isDebugEnabled()) LOG.debug("Creating SQLContext with:\n" + Utl.buildBeanStateInfo(dataSourceProperties, null, "\t"));
-        final Properties properties = new Properties();
-        properties.setProperty("dataSource.cachePrepStmts", "true");
-        properties.setProperty("dataSource.prepStmtCacheSize", "250");
-        properties.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+//        final Properties properties = new Properties();
+//        properties.setProperty("dataSource.cachePrepStmts", "true");
+//        properties.setProperty("dataSource.prepStmtCacheSize", "250");
+//        properties.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
 
         HikariConfig cfg = new HikariConfig();
         cfg.setAutoCommit(false);
@@ -40,7 +40,7 @@ public class DbContextFactory {
         cfg.setMaximumPoolSize(getValFromCfg(dataSourceProperties.getMaximumPoolSize(), "10", int.class));
         cfg.setMinimumIdle(getValFromCfg(dataSourceProperties.getMinimumPoolSize(), "2", int.class));
         cfg.setSchema(dataSourceProperties.getCurrentSchema());
-        cfg.setDataSourceProperties(properties);
+//        cfg.setDataSourceProperties(properties);
 
         DataSource dataSource = new com.zaxxer.hikari.HikariDataSource(cfg);
         try {
