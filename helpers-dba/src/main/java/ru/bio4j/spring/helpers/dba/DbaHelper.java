@@ -1112,7 +1112,10 @@ public class DbaHelper {
     public <T extends Serializable> T getObjectFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
-        return cacheService.get(cacheName, key);
+        T res = cacheService.get(cacheName, key);
+        if (res != null)
+            LOG.debug("Cache hit! [name: {}, key: {}]", cacheName, key);
+        return res;
     }
     public <T extends Serializable> T getObjectFromCache(String cacheName, HttpServletRequest request) {
         String requestHash = getRequestHash(request);
