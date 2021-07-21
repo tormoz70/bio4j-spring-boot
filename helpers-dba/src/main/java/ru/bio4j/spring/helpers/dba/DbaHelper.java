@@ -966,6 +966,26 @@ public class DbaHelper {
      * @param request
      */
     public void setSorterToRequest(String fieldName, Sort.Direction direction, HttpServletRequest request) {
+        setSorterToRequest(fieldName, direction, Sort.NullsPosition.DEFAULT, request);
+    }
+
+    /**
+     * Устанавливает сортер в запрос
+     * @param sort объект, описывающий сортировку
+     * @param request
+     */
+    public void setSorterToRequest(Sort sort, HttpServletRequest request) {
+        setSorterToRequest(sort.getFieldName(), sort.getDirection(), sort.getNullsPosition(), request);
+    }
+
+    /**
+     * Устанавливает сортер в запрос
+     * @param fieldName     имя поля по которому сортировать
+     * @param direction     напрвление сортировки
+     * @param nullsPosition правило сортировки null-ов
+     * @param request
+     */
+    public void setSorterToRequest(String fieldName, Sort.Direction direction, Sort.NullsPosition nullsPosition, HttpServletRequest request) {
         final BioQueryParams queryParams = wrappedRequest(request).getBioQueryParams();
         if(queryParams.sort == null)
             queryParams.sort = new ArrayList<>();
@@ -974,6 +994,7 @@ public class DbaHelper {
             Sort newSort = new Sort();
             newSort.setFieldName(fieldName);
             newSort.setDirection(direction);
+            newSort.setNullsPosition(nullsPosition);
             queryParams.sort.add(newSort);
         }
     }
