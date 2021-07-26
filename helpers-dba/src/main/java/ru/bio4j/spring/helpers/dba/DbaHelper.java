@@ -1148,9 +1148,21 @@ public class DbaHelper {
             throw new IllegalArgumentException("cacheService not defined!");
         cacheService.put(cacheName, key, value);
     }
+
+    public <T extends Serializable> void removeObjectFromCache(String cacheName, String key) {
+        if(cacheService == null)
+            throw new IllegalArgumentException("cacheService not defined!");
+        cacheService.remove(cacheName, key);
+    }
+
     public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
         String key = getRequestHash(request);
         putObjectToCache(cacheName, key, value);
+    }
+
+    public void removeObjectFromCache(String cacheName, HttpServletRequest request) {
+        String key = getRequestHash(request);
+        removeObjectFromCache(cacheName, key);
     }
 
     private static final String CACHE_CONTENT_HOLDER = "cached_content_holder";

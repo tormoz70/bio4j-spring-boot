@@ -3,10 +3,13 @@ package ru.bio4j.spring.commons.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
+import ru.bio4j.spring.model.transport.errors.BioError;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -359,6 +362,22 @@ public class Strings {
         });
         result.add(sb.toString());
         return result;
+    }
+
+    public static String md5(String line) {
+        try {
+            byte[] bytesOfMessage = line.getBytes("UTF-8");
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] thedigest = md.digest(bytesOfMessage);
+            BigInteger bigInt = new BigInteger(1, thedigest);
+            String hashtext = bigInt.toString(16);
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
+        } catch (Exception e) {
+            throw BioError.wrap(e);
+        }
     }
 
 }
