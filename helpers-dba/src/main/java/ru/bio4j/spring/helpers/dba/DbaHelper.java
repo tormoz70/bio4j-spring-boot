@@ -1149,10 +1149,10 @@ public class DbaHelper {
         cacheService.put(cacheName, key, value);
     }
 
-    public <T extends Serializable> void removeObjectFromCache(String cacheName, String key) {
+    public <T extends Serializable> T removeObjectFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
-        cacheService.remove(cacheName, key);
+        return cacheService.remove(cacheName, key);
     }
 
     public <T extends Serializable> void putObjectToCache(String cacheName, HttpServletRequest request, T value) {
