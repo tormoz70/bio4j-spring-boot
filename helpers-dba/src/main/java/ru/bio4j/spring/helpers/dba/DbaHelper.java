@@ -1171,7 +1171,10 @@ public class DbaHelper {
             throw new IllegalArgumentException("cacheService not defined!");
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
-        return content != null ? (List<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
+        List<T> res =  content != null ? (List<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
+        if (res != null)
+            LOG.debug("Cache hit! [name: {}, key: {}]", cacheName, key);
+        return res;
     }
     public <T extends Serializable> List<T> getListFromCache(String cacheName, HttpServletRequest request) {
         String key = getRequestHash(request);
