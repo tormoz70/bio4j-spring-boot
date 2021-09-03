@@ -30,6 +30,8 @@
         <logback.version>1.2.3</logback.version>
         <javapoet.version>1.13.0</javapoet.version>
         <commons-text.version>1.9</commons-text.version>
+        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <spring-cloud-ribbon.version>2.2.9.RELEASE</spring-cloud-ribbon.version>
 	</properties>
 
 
@@ -402,6 +404,23 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- Spring Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                <version>${spring-cloud-ribbon.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -427,6 +446,7 @@
 
     <modules>
         <module>commons</module>
+        <module>commons-grpc</module>
         <module>dbapi</module>
         <module>dba-commons</module>
         <module>dba-oracle</module>
