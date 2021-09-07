@@ -442,7 +442,7 @@
 
     <modules>
         <module>commons</module>
-        <module>commons-grpc</module>
+        <module>commons-eureka</module>
         <module>dbapi</module>
         <module>dba-commons</module>
         <module>dba-oracle</module>

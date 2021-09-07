@@ -7,23 +7,12 @@
         <version>2.5.21-SNAPSHOT</version>
     </parent>
 
-    <artifactId>bio4j-spring-commons-grpc-lib</artifactId>
-
-    <properties>
-        <io.grpc.version>1.37.0</io.grpc.version>
-    </properties>
+    <artifactId>bio4j-spring-commons-eureka-lib</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-commons-lib</artifactId>
-        </dependency>
-
-        <!--grpc-->
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>${io.grpc.version}</version>
         </dependency>
 
         <!--spring cloud-->
