@@ -9,7 +9,6 @@ import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.DiskStoreConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.FileSystemUtils;
 import ru.bio4j.spring.commons.utils.Strings;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.helpers.cache.CacheEventListener;
@@ -47,12 +46,12 @@ public class CacheServiceImpl implements CacheService {
 
 	@Override
 	public <Key extends Serializable, T extends Serializable> void put(String cacheName, Key key, T value) {
-		this.put(cacheName, key, value, false);
+		this.put(cacheName, key, value, true);
 	}
 
 	@Override
 	public <Key extends Serializable, T extends Serializable> void put(String cacheName, Key key1, Key key2, T value) {
-		this.put(cacheName, CacheUtil.createKeyFromObjects(key1, key2), value, false);
+		this.put(cacheName, CacheUtil.createKeyFromObjects(key1, key2), value, true);
 	}
 	
 	@Override

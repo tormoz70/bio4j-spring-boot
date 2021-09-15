@@ -79,6 +79,11 @@
         </dependency>
         <dependency>
             <groupId>ru.bio4j.spring</groupId>
+            <artifactId>bio4j-spring-commons-eureka-lib</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.bio4j.spring</groupId>
             <artifactId>bio4j-spring-dba-commons-lib</artifactId>
             <scope>provided</scope>
         </dependency>

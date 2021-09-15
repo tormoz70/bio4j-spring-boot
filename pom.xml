@@ -352,6 +352,11 @@
             </dependency>
             <dependency>
                 <groupId>ru.bio4j.spring</groupId>
+                <artifactId>bio4j-spring-commons-eureka-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-tmodel-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
