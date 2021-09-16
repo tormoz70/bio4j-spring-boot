@@ -21,6 +21,8 @@ public class ApplicationContextProvider implements ApplicationContextAware {
      * @return
      */
     public static <T extends Object> T getBean(Class<T> beanClass) {
+        if (context == null)
+            throw new IllegalArgumentException("Cannot get bean. Context not initialized.");
         return context.getBean(beanClass);
     }
 
