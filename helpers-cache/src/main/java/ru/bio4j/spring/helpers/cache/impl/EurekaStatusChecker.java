@@ -130,7 +130,7 @@ public class EurekaStatusChecker {
                                     return Stream.empty();
                                 })
                                 .filter(s -> !self(s))
-                                .collect(Collectors.joining("|"));
+                                .collect(Collectors.joining(METADATA_CACHE_DELIMITER));
                         LOG.trace("rmiUrls received {}", rmiUrls);
                         processRmiUrls(rmiUrls);
                     }

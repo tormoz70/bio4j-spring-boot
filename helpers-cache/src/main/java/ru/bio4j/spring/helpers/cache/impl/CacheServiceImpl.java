@@ -243,11 +243,9 @@ public class CacheServiceImpl implements CacheService {
     	LOG.debug("Attempting to find cache configuration");
         try(InputStream configIn = openCacheConfigFile(getCacheConfigFile())) {
 			LOG.debug("Attempting to create new cache service");
-			serviceConfiguration = ConfigurationFactory.parseConfiguration(configIn);
-			DiskStoreConfiguration cfg = null;
-				cfg = createDiskStoreConfiguration();
-			if (cfg != null)
-				serviceConfiguration.diskStore(cfg);
+			serviceConfiguration = MyConfigurationFactory.parseConfiguration(configIn);
+			DiskStoreConfiguration cfg = createDiskStoreConfiguration();
+			serviceConfiguration.diskStore(cfg);
         } catch (IOException e) {
         	LOG.error("Failed to create Configuration!", e);
 			throw Utl.wrapErrorAsRuntimeException(e);
