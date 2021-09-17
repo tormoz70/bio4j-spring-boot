@@ -23,7 +23,8 @@ import java.util.stream.Stream;
 public class EurekaStatusChecker {
     private static final String METADATA_CACHES_KEY = "ehcache.names";
     private static final String METADATA_PORT_KEY = "ehcache.port";
-    private static final String METADATA_CACHE_SEPARATOR = "|";
+    private static final String METADATA_CACHE_DELIMITER = "|";
+    private static final String METADATA_CACHE_DELIMITER_REGEX = "\\|";
     private static final Logger LOG = LoggerFactory.getLogger(EurekaStatusChecker.class.getName());
 
     private final EurekaRMICacheManagerPeerProvider peerProvider;
@@ -45,6 +46,17 @@ public class EurekaStatusChecker {
         this.appInfoMng = appInfoMng;
         this.cacheManager = cacheManager;
         this.refreshInterval = refreshInterval;
+    }
+
+    public static String getUrl(String hostname, String rmiRegistryPort, String cacheName) {
+        return new StringBuilder()
+                .append("//")
+                .append(hostname)
+                .append(":")
+                .append(rmiRegistryPort)
+                .append("/")
+                .append(cacheName)
+                .toString();
     }
 
     public long getRefreshInterval() {
@@ -100,7 +112,7 @@ public class EurekaStatusChecker {
                                                 return null;
                                             }
                                         })
-                                        .collect(Collectors.joining(METADATA_CACHE_SEPARATOR)));
+                                        .collect(Collectors.joining(METADATA_CACHE_DELIMITER)));
                                 metadata.put(METADATA_PORT_KEY, localCachePeers.get(0).getUrlBase().split(":")[1]);
                             }
                             appInfoMng.registerAppMetadata(metadata);
@@ -112,8 +124,8 @@ public class EurekaStatusChecker {
                                     String port = instanceInfo.getMetadata().get(METADATA_PORT_KEY);
                                     String caches = instanceInfo.getMetadata().get(METADATA_CACHES_KEY);
                                     if (!Strings.isNullOrEmpty(caches) && !Strings.isNullOrEmpty(port)) {
-                                        return Arrays.stream(caches.split("\\" + METADATA_CACHE_SEPARATOR))
-                                                .map(s -> "//" + instanceInfo.getIPAddr() + ":" + port + "/" + s);
+                                        return Arrays.stream(caches.split(METADATA_CACHE_DELIMITER_REGEX))
+                                                .map(cacheName -> getUrl(instanceInfo.getIPAddr(), port, cacheName));
                                     }
                                     return Stream.empty();
                                 })
@@ -150,7 +162,7 @@ public class EurekaStatusChecker {
                 try {
                     // Add the rmiUrls we are processing.
                     rmiUrlsProcessingQueue.add(rmiUrls);
-                    for (StringTokenizer stringTokenizer = new StringTokenizer(rmiUrls, "|"); stringTokenizer.hasMoreTokens();) {
+                    for (StringTokenizer stringTokenizer = new StringTokenizer(rmiUrls, METADATA_CACHE_DELIMITER); stringTokenizer.hasMoreTokens();) {
                         if (stopped)
                             return;
                         String rmiUrl = stringTokenizer.nextToken();

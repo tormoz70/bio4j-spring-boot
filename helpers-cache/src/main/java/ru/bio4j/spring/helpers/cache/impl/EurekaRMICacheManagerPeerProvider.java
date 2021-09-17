@@ -45,7 +45,7 @@ public class EurekaRMICacheManagerPeerProvider extends RMICacheManagerPeerProvid
         try {
             eurekaChecker.init();
         } catch (IOException e) {
-            LOG.error("Error starting heartbeat. Error was: " + e.getMessage(), e);
+            LOG.error("Error starting Eureka checker. Error was: " + e.getMessage(), e);
             throw new CacheException(e.getMessage());
         }
     }
@@ -57,7 +57,7 @@ public class EurekaRMICacheManagerPeerProvider extends RMICacheManagerPeerProvid
      */
     @Override
     public long getTimeForClusterToForm() {
-        return 30000;
+        return 20000;
     }
 
     public Map getPeerUrls() {
