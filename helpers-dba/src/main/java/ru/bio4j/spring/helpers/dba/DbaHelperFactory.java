@@ -1,29 +1,22 @@
 package ru.bio4j.spring.helpers.dba;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.bio4j.spring.commons.types.ApplicationContextProvider;
 import ru.bio4j.spring.commons.types.ExcelBuilder;
 import ru.bio4j.spring.commons.utils.Utl;
 import ru.bio4j.spring.database.api.SQLContext;
 import ru.bio4j.spring.database.commons.DbContextAbstract;
 import ru.bio4j.spring.database.commons.DbContextFactory;
-import ru.bio4j.spring.helpers.cache.CacheService;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 
 /**
  * Фабрика для создания DbaHelper
  */
 public class DbaHelperFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(DbaHelperFactory.class);
-
 
     private final ExcelBuilder excelBuilder;
-    private final CacheService cacheService;
 
-    public DbaHelperFactory(ExcelBuilder excelBuilder, CacheService cacheService) {
+    public DbaHelperFactory(ExcelBuilder excelBuilder) {
         this.excelBuilder = excelBuilder;
-        this.cacheService = cacheService;
     }
 
     public DbaHelper create(DataSourceProperties dataSourceProperties) {
@@ -32,7 +25,7 @@ public class DbaHelperFactory {
             if (sqlContextType == null)
                 throw new IllegalArgumentException(String.format("Unknown dbmsName (%s) in dataSourceProperties!", dataSourceProperties.getDbmsName()));
             final SQLContext sqlContext = DbContextFactory.createHikariCP(dataSourceProperties, sqlContextType);
-            return new DbaHelper(sqlContext, excelBuilder, cacheService);
+            return new DbaHelper(sqlContext, excelBuilder);
         } catch (Exception e) {
             throw Utl.wrapErrorAsRuntimeException(e);
         }
