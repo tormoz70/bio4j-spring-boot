@@ -139,6 +139,32 @@ public class DbaHelper {
         return cursor;
     }
 
+    private  <T> BeansPage<T> loadPage(
+            final SQLDefinition sqlDefinition,
+            final Object params,
+            final User user,
+            final FilterAndSorter filterAndSorter,
+            final List<Total> totals,
+            final CrudOptions crudOptions,
+            final Class<T> beanType
+    ) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
+        if(pageSize == 0)
+            return CrudReaderApi.loadAll(prms,
+                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                    totals,
+                    context, sqlDefinition, user, beanType);
+        else
+            return CrudReaderApi.loadPage(
+                    prms,
+                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                    totals, context, sqlDefinition, user, crudOptions, beanType);
+    }
+
     /**
      * Выполняет запрос по коду и возвращает структуру @BeansPage
      * Набор содержит запрошенную страницу.
@@ -161,22 +187,8 @@ public class DbaHelper {
             final CrudOptions crudOptions,
             final Class<T> beanType
             ) {
-        final List<Param> prms = DbUtils.decodeParams(params);
-        final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
-        if(pageSize == 0)
-            return CrudReaderApi.loadAll(prms,
-                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
-                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
-                    totals,
-                    context, sqlDefinition, user, beanType);
-        else
-            return CrudReaderApi.loadPage(
-                    prms,
-                    filterAndSorter != null ? filterAndSorter.getFilter() : null,
-                    filterAndSorter != null ? filterAndSorter.getSorter() : null,
-                    totals, context, sqlDefinition, user, crudOptions, beanType);
+        return loadPage(sqlDefinition, params, user, filterAndSorter, totals, crudOptions, beanType);
     }
     public <T> BeansPage<T> loadPage(
             final String bioCode,
@@ -192,6 +204,22 @@ public class DbaHelper {
             final User user,
             final Class<T> beanType) {
         return loadPage(bioCode, params, user, null, null, CrudOptions.builder().build(), beanType);
+    }
+
+    private <T> BeansPage<T> loadAll(
+            final SQLDefinition sqlDefinition,
+            final Object params,
+            final User user,
+            final FilterAndSorter filterAndSorter,
+            final List<Total> totals,
+            final Class<T> beanType
+    ) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        return CrudReaderApi.loadAll(prms,
+                filterAndSorter != null ? filterAndSorter.getFilter() : null,
+                filterAndSorter != null ? filterAndSorter.getSorter() : null,
+                totals, context, sqlDefinition, user, beanType);
     }
 
     /**
@@ -212,13 +240,8 @@ public class DbaHelper {
             final List<Total> totals,
             final Class<T> beanType
     ) {
-        final List<Param> prms = DbUtils.decodeParams(params);
-        final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
-        return CrudReaderApi.loadAll(prms,
-                filterAndSorter != null ? filterAndSorter.getFilter() : null,
-                filterAndSorter != null ? filterAndSorter.getSorter() : null,
-                totals, context, sqlDefinition, user, beanType);
+        return loadAll(sqlDefinition, params, user, filterAndSorter, totals, beanType);
     }
     public <T> BeansPage<T> loadAll(
             final String bioCode,
@@ -290,7 +313,7 @@ public class DbaHelper {
             final List<Total> totals,
             final Class<T> beanType) {
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
-        return loadAll(bioCode, pax.params, pax.user, pax.filterAndSorter, totals, beanType);
+        return loadAll(pax.sqlDefinition, pax.params, pax.user, pax.filterAndSorter, totals, beanType);
     }
     public <T> BeansPage<T> requestAll(
             final String bioCode,
@@ -303,7 +326,7 @@ public class DbaHelper {
             final HttpServletRequest request,
             final Class<T> beanType) {
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
-        return loadAllExt(bioCode, pax.params, pax.user, beanType, pax.filterAndSorter);
+        return loadAllExt(pax.sqlDefinition, pax.params, pax.user, beanType, pax.filterAndSorter);
     }
 
 
@@ -322,7 +345,7 @@ public class DbaHelper {
             final Class<T> beanType) {
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
         boolean forceCalcCount = Converter.toType(pax.queryParams.gcount, boolean.class);
-        return loadPage(bioCode, pax.params, pax.user, pax.filterAndSorter, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
+        return loadPage(pax.sqlDefinition, pax.params, pax.user, pax.filterAndSorter, totals, CrudOptions.builder().forceCalcCount(forceCalcCount).build(), beanType);
     }
     public <T> BeansPage<T> requestPage(
             final String bioCode,
@@ -344,7 +367,7 @@ public class DbaHelper {
             final HttpServletRequest request,
             final Class<T> beanType) {
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
-        return loadFirstBean(bioCode, pax.params, pax.user, beanType);
+        return loadFirstBean(pax.sqlDefinition, pax.params, pax.user, beanType);
     }
 
     /**
@@ -368,6 +391,21 @@ public class DbaHelper {
         return rslt;
     }
 
+    private  <T> List<T> loadPageExt(
+            final SQLDefinition sqlDefinition,
+            final Object params,
+            final User user,
+            final Class<T> beanType,
+            final FilterAndSorter filterAndSorter) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
+        if(pageSize == 0)
+            return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+        else
+            return CrudReaderApi.loadPageExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+    }
+
     /**
      * Возвращает список бинов
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
@@ -383,14 +421,8 @@ public class DbaHelper {
             final User user,
             final Class<T> beanType,
             final FilterAndSorter filterAndSorter) {
-        final List<Param> prms = DbUtils.decodeParams(params);
-        final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
-        int pageSize = Paramus.paramValue(prms, Rest2sqlParamNames.PAGINATION_PARAM_LIMIT, int.class, 0);
-        if(pageSize == 0)
-            return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
-        else
-            return CrudReaderApi.loadPageExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+        return loadPageExt(sqlDefinition, params, user, beanType, filterAndSorter);
     }
     public <T> List<T> loadPageExt(
             final String bioCode,
@@ -418,6 +450,17 @@ public class DbaHelper {
         return loadPageExt(bioCode, params, beanType, null);
     }
 
+    private  <T> List<T> loadAllExt(
+            final SQLDefinition sqlDefinition,
+            final Object params,
+            final User user,
+            final Class<T> beanType,
+            final FilterAndSorter filterAndSorter) {
+        final List<Param> prms = DbUtils.decodeParams(params);
+        final SQLContext context = getSqlContext();
+        return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+    }
+
     /**
      * Возвращает список бинов
      * @param bioCode код запроса к базе данных (путь к xml-описанию запроса)
@@ -434,10 +477,8 @@ public class DbaHelper {
             final User user,
             final Class<T> beanType,
             final FilterAndSorter filterAndSorter) {
-        final List<Param> prms = DbUtils.decodeParams(params);
-        final SQLContext context = getSqlContext();
         final SQLDefinition sqlDefinition = CursorParser.getInstance().pars(bioCode);
-        return CrudReaderApi.loadAllExt(prms, filterAndSorter != null ? filterAndSorter.getFilter() : null, filterAndSorter != null ? filterAndSorter.getSorter() : null, context, sqlDefinition, user, beanType);
+        return loadAllExt(sqlDefinition, params, user, beanType, filterAndSorter);
     }
     public <T> List<T> loadAllExt(
             final String bioCode,
@@ -510,7 +551,16 @@ public class DbaHelper {
             final HttpServletRequest request,
             final Class<T> beanType) {
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
-        return loadPageExt(bioCode, pax.params, pax.user, beanType, pax.filterAndSorter);
+        return loadPageExt(pax.sqlDefinition, pax.params, pax.user, beanType, pax.filterAndSorter);
+    }
+
+    private  <T> T loadFirstBean(
+            final SQLDefinition cursorDef,
+            final List<Param> params,
+            final User usr,
+            final Class<T> beanType) {
+        final SQLContext context = getSqlContext();
+        return CrudReaderApi.loadFirstRecordExt(params, context, cursorDef, usr, beanType);
     }
 
     /**
@@ -527,9 +577,8 @@ public class DbaHelper {
             final List<Param> params,
             final User usr,
             final Class<T> beanType) {
-        final SQLContext context = getSqlContext();
         final SQLDefinition cursorDef = CursorParser.getInstance().pars(bioCode);
-        return CrudReaderApi.loadFirstRecordExt(params, context, cursorDef, usr, beanType);
+        return loadFirstBean(cursorDef, params, usr, beanType);
     }
     public <T> T loadFirstBean(
             final String bioCode,
@@ -578,8 +627,8 @@ public class DbaHelper {
             final HttpServletRequest request,
             final Object id,
             final Class<T> beanType) {
-        final RequestParamsPack pax = _parsRequestPack(bioCode, request);
         if(id != null) {
+            final RequestParamsPack pax = _parsRequestPack(bioCode, request);
             Paramus.setParamValue(pax.params, Rest2sqlParamNames.GETROW_PARAM_PKVAL, id, MetaTypeConverter.read(id.getClass()));
             List<T> rslt = CrudReaderApi.loadRecordExt(pax.params, pax.context, pax.sqlDefinition, pax.user, beanType);
             if (rslt.size() > 0)
@@ -688,7 +737,7 @@ public class DbaHelper {
         if(excelBuilder == null)
             throw new IllegalArgumentException("excelBuilder not defined!");
         final RequestParamsPack pax = _parsRequestPack(bioCode, request);
-        BeansPage<ABean> beansPage = requestAll(bioCode, request, ABean.class);
+        BeansPage<ABean> beansPage = loadAll(pax.sqlDefinition, pax.params, pax.user, pax.filterAndSorter, null, ABean.class);
         return pax.context.execBatch((ctx) -> {
             return excelBuilder.toExcel(beansPage.getRows(), bioCode);
         }, pax.user);
