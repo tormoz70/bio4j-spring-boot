@@ -5,20 +5,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import ru.bio4j.spring.helpers.cache.CacheConfiguration;
-import ru.bio4j.spring.helpers.cache.CacheProperties;
 import ru.bio4j.spring.model.config.props.DataSourceProperties;
 
 @Configuration
-@Import({ DbaHelperConfiguration.class, CacheConfiguration.class })
+@Import({ DbaHelperConfiguration.class })
 @EnableConfigurationProperties
 public class OracleTestAutoConfiguration {
-
-    @Bean
-    @ConfigurationProperties("ehcache")
-    public CacheProperties cacheProperties() {
-        return new CacheProperties();
-    }
 
     @Bean
     @ConfigurationProperties("oracle.datasource")
