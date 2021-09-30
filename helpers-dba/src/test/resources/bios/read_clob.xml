@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursor xmlns="http://bio4j.ru/biodef-repo/store"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://bio4j.ru/biodef-repo/store http://bio4j.ru/biodef-repo/store/store-v11.xsd"
+        multiselection="true">
+    <SQL action="select">
+        <text><![CDATA[select * from givc_tmp.test_tbl a where a.fld2 = :p1 ]]></text>
+        <param name="p1" type="integer"/>
+    </SQL>
+    <fields>
+        <field name="fld1" type="string"/>
+        <field name="fld2" type="integer"/>
+        <field name="fld3" type="clob"/>
+    </fields>
+</cursor>
