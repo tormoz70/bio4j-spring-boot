@@ -35,4 +35,15 @@ public class DbaTestAutoConfiguration {
         return dbaHelperFactory.create(pgsqlDataSourceProperties);
     }
 
+    @Bean
+    @ConfigurationProperties("oracle.datasource")
+    public DataSourceProperties oracleDataSourceProperties() {
+        return new DataSourceProperties();
+    }
+
+    @Bean
+    public DbaHelper oracleDbaHelper(DbaHelperFactory dbaHelperFactory, DataSourceProperties oracleDataSourceProperties) {
+        return dbaHelperFactory.create(oracleDataSourceProperties);
+    }
+
 }
