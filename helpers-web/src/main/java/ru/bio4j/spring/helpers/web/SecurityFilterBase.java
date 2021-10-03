@@ -2,6 +2,7 @@ package ru.bio4j.spring.helpers.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -18,7 +19,7 @@ import java.util.Arrays;
 
 @Configuration
 public class SecurityFilterBase {
-    private Logger LOG = LoggerFactory.getLogger(SecurityFilterBase.class);
+    private final Logger LOG = LoggerFactory.getLogger(SecurityFilterBase.class);
 
     private LoginProcessor loginProcessor;
     private boolean disableAnonymouse;
@@ -31,7 +32,12 @@ public class SecurityFilterBase {
 
         ApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
         LoginProcessor defaultLoginProcessor = (LoginProcessor) ctx.getBean("defaultLoginProcessor");
-        LoginProcessor overrideLoginProcessor = (LoginProcessor) ctx.getBean("loginProcessor");
+        LoginProcessor overrideLoginProcessor = null;
+        try {
+            overrideLoginProcessor = (LoginProcessor) ctx.getBean("loginProcessor");
+        } catch (NoSuchBeanDefinitionException ex) {
+            LOG.debug("No override for login processor found. Using default login processor.");
+        }
         this.loginProcessor = overrideLoginProcessor != null ? overrideLoginProcessor : defaultLoginProcessor;
     }
 
