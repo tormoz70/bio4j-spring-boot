@@ -293,9 +293,9 @@ public class DbUtils {
     public static List<Param> decodeParams(Object params) {
         List<Param> rslt = null;
         if(params != null){
-            if(params instanceof List<?> && ((List)params).size() > 0 && ((List)params).get(0) instanceof Param) {
+            if(params instanceof List<?> && ((List<?>)params).size() > 0 && ((List<?>)params).get(0) instanceof Param) {
                 rslt = (List<Param>) params;
-            } else if(params instanceof List<?> && ((List)params).size() > 0 && !(((List)params).get(0) instanceof Param)) {
+            } else if(params instanceof List<?> && (((List<?>)params).size() > 0 && !(((List<?>)params).get(0) instanceof Param) || ((List<?>)params).size() == 0)) {
                 rslt = decodeListOfObjectToParams((List<Object>) params);
             } else if(params.getClass().isArray()) {
                 rslt = decodeArrayOfObjectToParams((Object[]) params);
