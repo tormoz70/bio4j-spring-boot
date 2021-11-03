@@ -64,10 +64,12 @@ public class CacheServiceImpl implements CacheService {
 	
 	@Override
 	public <Key extends Serializable, T extends Serializable> T get(String cacheName, Key key) {
+		LOG.trace("Obtaining cache by name...");
 		Cache cache = getCache(cacheName);
+		LOG.trace("Obtaining value from cache by key...");
 		Element element = cache.get(key);
 		T result = getValue(element);
-		LOG.trace("got from cahe {} by key {}", result, key);
+		LOG.trace("Got from cache {} by key {}", result, key);
 		return result;
 	}
 	

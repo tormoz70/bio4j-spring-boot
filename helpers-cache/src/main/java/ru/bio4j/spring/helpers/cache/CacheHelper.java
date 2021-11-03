@@ -29,6 +29,7 @@ public class CacheHelper {
     public <T extends Serializable> T getObjectFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
+        LOG.trace("Trying to get value from cache {}...", cacheName);
         T res = cacheService.get(cacheName, key);
         if (res != null)
             LOG.debug("Cache hit! [name: {}, key: {}]", cacheName, key);
@@ -65,9 +66,10 @@ public class CacheHelper {
     public <T extends Serializable> List<T> getListFromCache(String cacheName, String key) {
         if(cacheService == null)
             throw new IllegalArgumentException("cacheService not defined!");
+        LOG.trace("Trying to get value from cache {}...", cacheName);
         ABean contaiter = cacheService.get(cacheName, key);
         Object content = contaiter != null ? contaiter.get(CACHE_CONTENT_HOLDER) : null;
-        List<T> res =  content != null ? (List<T>)contaiter.get(CACHE_CONTENT_HOLDER) : null;
+        List<T> res =  content != null ? (List<T>)content : null;
         if (res != null)
             LOG.debug("Cache hit! [name: {}, key: {}]", cacheName, key);
         return res;
