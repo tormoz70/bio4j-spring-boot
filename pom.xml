@@ -32,6 +32,7 @@
         <commons-text.version>1.9</commons-text.version>
         <spring-cloud.version>2020.0.3</spring-cloud.version>
         <spring-cloud-ribbon.version>2.2.9.RELEASE</spring-cloud-ribbon.version>
+        <lombok.version>1.18.20</lombok.version>
 	</properties>
 
 
@@ -344,6 +345,27 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- Spring Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                <version>${spring-cloud-ribbon.version}</version>
+            </dependency>
+
+            <!-- lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
             <!-- bio4j -->
             <dependency>
                 <groupId>ru.bio4j.spring</groupId>
@@ -369,6 +391,11 @@
             <dependency>
                 <groupId>ru.bio4j.spring</groupId>
                 <artifactId>bio4j-spring-dba-commons-lib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.bio4j.spring</groupId>
+                <artifactId>bio4j-spring-ibus-api-lib</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -409,19 +436,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- Spring Cloud -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-                <version>${spring-cloud-ribbon.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -442,6 +456,10 @@
             <artifactId>commons-codec</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -460,7 +478,8 @@
         <module>helpers-dba</module>
         <module>helpers-web</module>
 
-		<module>isrvt-kafka</module>
+        <module>ibus-api</module>
+		<module>ibus-kafka</module>
 
         <module>dto-model-generator-lib</module>
         <module>dto-model-generator-plugin</module>
