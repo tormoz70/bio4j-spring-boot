@@ -15,8 +15,7 @@ import ru.bio4j.spring.commons.utils.Strings;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,7 +34,7 @@ public class EurekaStatusChecker {
     private final Set<String> rmiUrlsProcessingQueue = Collections.synchronizedSet(new HashSet<>());
     private final ApplicationInfoManager appInfoMng;
 
-    private EurekaCheckerThread receiverThread;
+    private ScheduledExecutorService receiverExecutor;
     private ExecutorService processingThreadPool;
     private boolean stopped;
 
@@ -65,17 +64,36 @@ public class EurekaStatusChecker {
 
     final void init() throws IOException {
         if (eurekaClient != null) {
-            receiverThread = new EurekaCheckerThread();
-            receiverThread.start();
+            receiverExecutor = Executors.newSingleThreadScheduledExecutor();
+            startEurekaCheckerSchedule(receiverExecutor);
             processingThreadPool = Executors.newCachedThreadPool(new NamedThreadFactory("Eureka Status Checker"));
         }
+    }
+
+    private void startEurekaCheckerSchedule(final ScheduledExecutorService service) {
+        final ScheduledFuture<?> future = receiverExecutor.scheduleWithFixedDelay(new EurekaCheckerThread(), 0, getRefreshInterval(), TimeUnit.MILLISECONDS);
+        Runnable watchdog = () -> {
+            while (true) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    LOG.error("Eureka checker thread caught execution exception. Cause was " + e.getMessage() + ". Continuing...");
+                    startEurekaCheckerSchedule(service);
+                    return;
+                } catch (InterruptedException e) {
+                    LOG.error("Eureka checker thread was interrupted. Cause was " + e.getMessage() + ".");
+                    return;
+                }
+            }
+        };
+        new Thread(watchdog).start();
     }
 
     public final void dispose() {
         LOG.debug("dispose called");
         processingThreadPool.shutdownNow();
         stopped = true;
-        receiverThread.interrupt();
+        receiverExecutor.shutdownNow();
     }
 
     private final class EurekaCheckerThread extends Thread {
@@ -88,56 +106,49 @@ public class EurekaStatusChecker {
 
         @Override
         public void run() {
-            try {
-                while (!stopped) {
-                    CacheManagerPeerListener cacheManagerPeerListener = cacheManager.getCachePeerListener("RMI");
-                    if (cacheManagerPeerListener == null) {
-                        LOG.warn("The RMICacheManagerPeerListener is missing. You need to configure a cacheManagerPeerListenerFactory" +
-                                " with class=\"net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory\" in ehcache.xml.");
-                    } else {
-                        List<InstanceInfo> instanceInfos = eurekaClient.getInstancesByVipAddress(serviceName, false);
-                        List<RMICachePeer> localCachePeers = new ArrayList<>();
-                        for (Object o : cacheManagerPeerListener.getBoundCachePeers()) {
-                            if (o instanceof RMICachePeer)
-                                localCachePeers.add((RMICachePeer)o);
-                        }
-                        if (!metadataRegistered) {
-                            Map<String, String> metadata = new HashMap<>();
-                            if (localCachePeers.size() > 0) {
-                                metadata.put(METADATA_CACHES_KEY, localCachePeers.stream()
-                                        .map(rmiCachePeer -> {
-                                            try {
-                                                return rmiCachePeer.getName();
-                                            } catch (RemoteException e) {
-                                                return null;
-                                            }
-                                        })
-                                        .collect(Collectors.joining(METADATA_CACHE_DELIMITER)));
-                                metadata.put(METADATA_PORT_KEY, localCachePeers.get(0).getUrlBase().split(":")[1]);
-                            }
-                            appInfoMng.registerAppMetadata(metadata);
-                            metadataRegistered = true;
-                        }
-                        String rmiUrls = instanceInfos.stream()
-                                .filter(instanceInfo -> instanceInfo.getStatus() == InstanceInfo.InstanceStatus.UP)
-                                .flatMap(instanceInfo -> {
-                                    String port = instanceInfo.getMetadata().get(METADATA_PORT_KEY);
-                                    String caches = instanceInfo.getMetadata().get(METADATA_CACHES_KEY);
-                                    if (!Strings.isNullOrEmpty(caches) && !Strings.isNullOrEmpty(port)) {
-                                        return Arrays.stream(caches.split(METADATA_CACHE_DELIMITER_REGEX))
-                                                .map(cacheName -> getUrl(instanceInfo.getIPAddr(), port, cacheName));
-                                    }
-                                    return Stream.empty();
-                                })
-                                .filter(s -> !self(s))
-                                .collect(Collectors.joining(METADATA_CACHE_DELIMITER));
-                        LOG.trace("rmiUrls received {}", rmiUrls);
-                        processRmiUrls(rmiUrls);
-                    }
-                    Thread.sleep(getRefreshInterval());
+            CacheManagerPeerListener cacheManagerPeerListener = cacheManager.getCachePeerListener("RMI");
+            if (cacheManagerPeerListener == null) {
+                LOG.warn("The RMICacheManagerPeerListener is missing. You need to configure a cacheManagerPeerListenerFactory" +
+                        " with class=\"net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory\" in ehcache.xml.");
+            } else {
+                List<InstanceInfo> instanceInfos = eurekaClient.getInstancesByVipAddress(serviceName, false);
+                List<RMICachePeer> localCachePeers = new ArrayList<>();
+                for (Object o : cacheManagerPeerListener.getBoundCachePeers()) {
+                    if (o instanceof RMICachePeer)
+                        localCachePeers.add((RMICachePeer)o);
                 }
-            } catch (Throwable t) {
-                LOG.error("Eureka checker thread caught throwable. Cause was " + t.getMessage() + ". Continuing...");
+                if (!metadataRegistered) {
+                    Map<String, String> metadata = new HashMap<>();
+                    if (localCachePeers.size() > 0) {
+                        metadata.put(METADATA_CACHES_KEY, localCachePeers.stream()
+                                .map(rmiCachePeer -> {
+                                    try {
+                                        return rmiCachePeer.getName();
+                                    } catch (RemoteException e) {
+                                        return null;
+                                    }
+                                })
+                                .collect(Collectors.joining(METADATA_CACHE_DELIMITER)));
+                        metadata.put(METADATA_PORT_KEY, localCachePeers.get(0).getUrlBase().split(":")[1]);
+                    }
+                    appInfoMng.registerAppMetadata(metadata);
+                    metadataRegistered = true;
+                }
+                String rmiUrls = instanceInfos.stream()
+                        .filter(instanceInfo -> instanceInfo.getStatus() == InstanceInfo.InstanceStatus.UP)
+                        .flatMap(instanceInfo -> {
+                            String port = instanceInfo.getMetadata().get(METADATA_PORT_KEY);
+                            String caches = instanceInfo.getMetadata().get(METADATA_CACHES_KEY);
+                            if (!Strings.isNullOrEmpty(caches) && !Strings.isNullOrEmpty(port)) {
+                                return Arrays.stream(caches.split(METADATA_CACHE_DELIMITER_REGEX))
+                                        .map(cacheName -> getUrl(instanceInfo.getIPAddr(), port, cacheName));
+                            }
+                            return Stream.empty();
+                        })
+                        .filter(s -> !self(s))
+                        .collect(Collectors.joining(METADATA_CACHE_DELIMITER));
+                LOG.trace("rmiUrls received: {}.", rmiUrls.isEmpty() ? "<empty>" : rmiUrls);
+                processRmiUrls(rmiUrls);
             }
         }
 

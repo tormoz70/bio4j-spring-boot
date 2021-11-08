@@ -85,7 +85,7 @@ public class BioError extends RuntimeException {
         @JsonTypeInfo(use = Id.CLASS, property = "@class")
         public static class Unauthorized extends BioError.Login {
             public Unauthorized() {
-                super(6401, "Не верное имя или пароль пользователя!");
+                super(6401, "Неверное имя или пароль пользователя!");
             }
         }
 
@@ -99,14 +99,14 @@ public class BioError extends RuntimeException {
         @JsonTypeInfo(use = Id.CLASS, property = "@class")
         public static class MethodNotAllowed extends BioError.Login {
             public MethodNotAllowed() {
-                super(6405, "Метод не доступен!");
+                super(6405, "Метод недоступен!");
             }
         }
 
         @JsonTypeInfo(use = Id.CLASS, property = "@class")
         public static class BadSToken extends BioError.Login {
             public BadSToken() {
-                super(6406, "Токен безопастности отсутствует!");
+                super(6406, "Токен безопасности отсутствует!");
             }
         }
 
