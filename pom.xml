@@ -41,7 +41,7 @@
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <postgresql-jdbc.version>42.1.4</postgresql-jdbc.version>
         <hikaricp.version>3.4.1</hikaricp.version>
-        <org.apache.httpcomponents.version>4.4.1</org.apache.httpcomponents.version>
+        <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
 	</properties>
 
     <build>
