@@ -535,6 +535,7 @@ public class SQLFactoryTest {
         LOG.debug(msg);
     }
 
+    @Ignore
     @Test
     public void testSQLCommandOpenCursorNewSbkItem() throws Exception {
         final String sql = Utl.readStream(Thread.currentThread().getContextClassLoader().getResourceAsStream("new-sbkitem.sql"));
