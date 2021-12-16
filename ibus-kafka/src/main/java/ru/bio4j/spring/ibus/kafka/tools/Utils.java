@@ -14,8 +14,8 @@ public class Utils {
     public static Map<String, Object> adminConfigs(AdminToolsProperties producerProperies) {
         HashMap<String, Object> props = new HashMap<>();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, producerProperies.getBootstrapServer());
-        props.put(AdminClientConfig.RETRIES_CONFIG, producerProperies.getRetries());
-        props.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, producerProperies.getRequestTimeoutMs());
+//        props.put(AdminClientConfig.RETRIES_CONFIG, producerProperies.getRetries());
+//        props.put(AdminClientConfig.REQUEST_TIMEOUT_MS_CONFIG, producerProperies.getRequestTimeoutMs());
         return props;
     }
 

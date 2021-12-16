@@ -1,16 +1,11 @@
 package ru.bio4j.spring.ibus.kafka.tools;
 
-import org.apache.kafka.clients.admin.Admin;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
-import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.config.TopicConfig;
 import ru.bio4j.spring.model.transport.errors.BioError;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 public class AdminTools {
@@ -48,4 +43,28 @@ public class AdminTools {
     public void createTopic(String topicName) {
         createTopic(topicName, 1, (short)1);
     }
+
+    public void dropTopics(Set<String> topicNames, boolean silent) {
+        try(Admin admin = Admin.create(Utils.adminConfigs(adminToolsProperties))) {
+            DeleteTopicsResult result = admin.deleteTopics(topicNames);
+            result.all().get();
+        } catch (Throwable e) {
+            if(!silent) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public Set<String> listTopics() {
+        try(Admin admin = Admin.create(Utils.adminConfigs(adminToolsProperties))) {
+            ListTopicsOptions listTopicsOptions = new ListTopicsOptions().listInternal(false);
+            ListTopicsResult result = admin.listTopics(listTopicsOptions);
+            return result.names().get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw BioError.wrap(e);
+        }
+    }
+
+    public Set<String> createPartitions() {
+
 }
