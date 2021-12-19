@@ -3,10 +3,12 @@ package ru.bio4j.spring.ibus.kafka.tools;
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.config.TopicConfig;
+import org.apache.kafka.common.errors.UnknownTopicOrPartitionException;
 import ru.bio4j.spring.model.transport.errors.BioError;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class AdminTools {
 
@@ -47,7 +49,7 @@ public class AdminTools {
     public void dropTopics(Set<String> topicNames, boolean silent) {
         try(Admin admin = Admin.create(Utils.adminConfigs(adminToolsProperties))) {
             DeleteTopicsResult result = admin.deleteTopics(topicNames);
-            result.all().get();
+            checkResultFutures(result.values());
         } catch (Throwable e) {
             if(!silent) {
                 throw new RuntimeException(e);
@@ -65,6 +67,48 @@ public class AdminTools {
         }
     }
 
-    public Set<String> createPartitions() {
+    public void addPartitions(String topicName, int numPartitions) {
+        try (Admin admin = Admin.create(Utils.adminConfigs(adminToolsProperties))) {
+            Map<String, NewPartitions> newPartitionSet = new HashMap<>();
+            newPartitionSet.put(topicName, NewPartitions.increaseTo(numPartitions));
+            CreatePartitionsResult result = admin.createPartitions(newPartitionSet);
+            checkResultFutures(result.values());
+        } catch (Exception e) {
+            throw BioError.wrap(e);
+        }
+    }
 
+    public Map<String, Integer> getPartitionCount(Set<String> topicNames) {
+        try (Admin admin = Admin.create(Utils.adminConfigs(adminToolsProperties))) {
+            DescribeTopicsResult topicsResult = admin.describeTopics(topicNames);
+            Map<String, TopicDescription> topicDescriptions = new HashMap<>();
+            for(Map.Entry<String, KafkaFuture<TopicDescription>> entry : topicsResult.values().entrySet()) {
+                try {
+                    topicDescriptions.put(entry.getKey(), entry.getValue().get());
+                } catch(ExecutionException e) {
+                    if (e.getCause() instanceof UnknownTopicOrPartitionException) {
+                        // ignore
+                    } else {
+                        throw BioError.wrap(e);
+                    }
+                } catch (InterruptedException e) {
+                    throw BioError.wrap(e);
+                }
+            }
+            return topicDescriptions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, it->it.getValue().partitions().size()));
+        } catch (Exception e) {
+            throw BioError.wrap(e);
+        }
+    }
+
+    private void checkResultFutures(Map<?, KafkaFuture<Void>> futures) {
+        try {
+            for (Map.Entry<?, KafkaFuture<Void>> entry : futures.entrySet()) {
+                KafkaFuture<Void> future = entry.getValue();
+                future.get();
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            BioError.wrap(e);
+        }
+    }
 }
