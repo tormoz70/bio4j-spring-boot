@@ -36,7 +36,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-boot.version>2.5.12</spring-boot.version>
         <org.apache.poi.version>4.1.0</org.apache.poi.version>
         <ojdbc.version>12.2.0.1</ojdbc.version>
         <postgresql-jdbc.version>42.1.4</postgresql-jdbc.version>
